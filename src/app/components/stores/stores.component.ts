@@ -31,6 +31,18 @@ export class StoresComponent {
   btnLoading: string | number | null = null;
   isBtnLoading = (action: string, id?: string | number | null) => isActionLoading(this.btnLoading, action, id);
 
+  stats = { total: 0, active: 0, inactive: 0, locked: 0, blacklisted: 0 };
+
+  get countItems(): { label: string; value: number }[] {
+    return [
+      { label: 'Total Stores', value: this.stats.total || 0 },
+      { label: 'Active', value: this.stats.active || 0 },
+      { label: 'Inactive', value: this.stats.inactive || 0 },
+      { label: 'Locked', value: this.stats.locked || 0 },
+      { label: 'Blacklisted', value: this.stats.blacklisted || 0 },
+    ];
+  }
+
   constructor(public sharedservice: SharedService, private storeservice: StoreService, private modalService: NgbModal) {}
 
   ngOnInit(): void {
@@ -52,6 +64,15 @@ export class StoresComponent {
         if (res) {
           this.dataList = res.data;
           this.totalCount = res.totalCount;
+          if (res?.stats) {
+            this.stats = {
+              total: Number(res.stats.total || 0),
+              active: Number(res.stats.active || 0),
+              inactive: Number(res.stats.inactive || 0),
+              locked: Number(res.stats.locked || 0),
+              blacklisted: Number(res.stats.blacklisted || 0),
+            };
+          }
           this.hasEverLoaded = true;
           this.isTechnicalIssue = false;
         }
@@ -145,6 +166,9 @@ export class StoresComponent {
       size: 'md',
       centered: true
     });
+    modalRef.componentInstance.title = 'Delete this store?';
+    modalRef.componentInstance.message =
+      'This will permanently delete the store and ALL related data — users, products, orders, leads, setup, media files, and everything else tied to this store. This cannot be undone.';
     modalRef.result.then(result => {
       if (result) {
         if (id) {
@@ -153,7 +177,7 @@ export class StoresComponent {
             finalize(() => this.btnLoading = null)
           ).subscribe({
             next: () => {
-              this.sharedservice.showAlert(1, 'Deleted Successfully');
+              this.sharedservice.showAlert(1, 'Store and all related data deleted');
               this.getDataList();
             },
             error: () => {
@@ -168,18 +192,34 @@ export class StoresComponent {
   }
 
   updateStatus(newStatus, data) {
-    let updatedJson = {
-      name: data.name,
-      email: data.email,
-      slug: data.slug,
-      phone: data.phone,
-      selectedTemplate: data.selectedTemplate,
-      isActive: newStatus
+    if (!data?.id) return;
+    this.btnLoading = actionKey('status', data.id);
+    const body = {
+      isActive: !!newStatus,
+      isLocked: !!data.isLocked,
+      isBlacklisted: !!data.isBlacklisted,
+      allowStorefront: data.allowStorefront !== 0 && data.allowStorefront !== false,
+      allowDashboard: data.allowDashboard !== 0 && data.allowDashboard !== false,
+      allowCheckout: data.allowCheckout !== 0 && data.allowCheckout !== false,
+      allowProductAdd: data.allowProductAdd !== 0 && data.allowProductAdd !== false,
+      productLimit: Number(data.productLimit || 0),
+      maxOrders: Number(data.maxOrders || 0),
+      lockReason: newStatus
+        ? (String(data.lockReason || '').trim() === 'Store marked inactive by platform administrator.'
+            ? ''
+            : (data.lockReason || ''))
+        : (String(data.lockReason || '').trim() || 'Store marked inactive by platform administrator.'),
+      adminNotes: data.adminNotes || '',
     };
-    this.storeservice.updateStore(data.id, updatedJson).subscribe((res: any) => {
-      if (res) {
+    this.storeservice.updateStoreSettings(data.id, body).pipe(
+      finalize(() => this.btnLoading = null)
+    ).subscribe({
+      next: () => {
         this.getDataList();
-        this.sharedservice.showAlert(1, 'Status Updated');
+        this.sharedservice.showAlert(1, newStatus ? 'Store activated' : 'Store marked inactive');
+      },
+      error: (err) => {
+        this.sharedservice.showAlert(2, err.error?.message || err.error?.error || 'Something went wrong');
       }
     });
   }
@@ -193,27 +233,14 @@ export class StoresComponent {
   }
 
   getRemainingDays(item: any): number | null {
-    const exp = this.parseExpireDate(item?.expireDate);
-    if (!exp) {
-      return item?.expireDate ? 0 : null;
-    }
+    if (!item?.expireDate) return null;
+    const exp = this.parseExpireDate(item.expireDate);
+    if (!exp) return 0;
 
-    const now = new Date();
-    const nowUtc = new Date(Date.UTC(
-      now.getUTCFullYear(),
-      now.getUTCMonth(),
-      now.getUTCDate(),
-      now.getUTCHours(),
-      now.getUTCMinutes()
-    ));
-
-    const diffMs = exp.getTime() - nowUtc.getTime();
-
-    if (diffMs <= 0) {
-      return 0;
-    }
-
-    return Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+    const diffMs = exp.getTime() - Date.now();
+    if (diffMs <= 0) return 0;
+    const fullDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    return fullDays === 0 ? 1 : fullDays;
   }
 
   private parseExpireDate(expireDateStr: string | null | undefined): Date | null {

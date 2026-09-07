@@ -59,6 +59,45 @@ export class SharedService {
         return !!this.siteConfig?.white_logo;
     }
 
+    applyFavicon(url?: string | null): void {
+        const href = String(url || this.siteConfig?.icon || '').trim();
+        if (!href || typeof document === 'undefined') return;
+        const links = Array.from(
+            document.querySelectorAll("link[rel='icon'], link[rel='shortcut icon']")
+        ) as HTMLLinkElement[];
+        let link = links[0];
+        if (!link) {
+            link = document.createElement('link');
+            link.setAttribute('rel', 'icon');
+            document.head.appendChild(link);
+        }
+        const lower = href.toLowerCase();
+        link.type = lower.includes('.svg')
+            ? 'image/svg+xml'
+            : lower.includes('.webp')
+              ? 'image/webp'
+              : lower.includes('.jpg') || lower.includes('.jpeg')
+                ? 'image/jpeg'
+                : 'image/png';
+        link.href = href;
+        links.slice(1).forEach((extra) => extra.parentElement?.removeChild(extra));
+    }
+
+    getSiteBrandName(): string {
+        return String(this.siteConfig?.siteName || '').trim() || 'Admin Panel';
+    }
+
+    applyDocumentTitle(pageTitle?: string | null): void {
+        if (typeof document === 'undefined') return;
+        const site = this.getSiteBrandName();
+        const page = String(pageTitle || this.pageName || '').trim();
+        document.title = page && page !== site ? `${page} | ${site}` : site;
+    }
+
+    applySiteBrand(pageTitle?: string | null): void {
+        this.applyFavicon(this.siteConfig?.icon);
+        this.applyDocumentTitle(pageTitle);
+    }
 
     showAlert(type : number, title : string , message? : string) {
         if(type == 1){

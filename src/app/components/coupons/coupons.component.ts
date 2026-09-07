@@ -27,6 +27,18 @@ export class CouponsComponent {
   btnLoading: string | number | null = null;
   isBtnLoading = (action: string, id?: string | number | null) => isActionLoading(this.btnLoading, action, id);
 
+  stats = { total: 0, valid: 0, expired: 0, percentage: 0, flat: 0 };
+
+  get countItems(): { label: string; value: number }[] {
+    return [
+      { label: 'Total', value: this.stats.total || 0 },
+      { label: 'Valid', value: this.stats.valid || 0 },
+      { label: 'Expired', value: this.stats.expired || 0 },
+      { label: 'Percentage Wise', value: this.stats.percentage || 0 },
+      { label: 'Flat Amount Wise', value: this.stats.flat || 0 },
+    ];
+  }
+
   constructor(public sharedservice: SharedService, private couponservice: CouponService, private modalService: NgbModal) { }
 
   ngOnInit(): void {
@@ -48,6 +60,15 @@ export class CouponsComponent {
         if (res) {
           this.dataList = res.data;
           this.totalCount = res.totalCount;
+          if (res?.stats) {
+            this.stats = {
+              total: Number(res.stats.total || 0),
+              valid: Number(res.stats.valid || 0),
+              expired: Number(res.stats.expired || 0),
+              percentage: Number(res.stats.percentage || 0),
+              flat: Number(res.stats.flat || 0),
+            };
+          }
           this.hasEverLoaded = true;
           this.isTechnicalIssue = false;
         }

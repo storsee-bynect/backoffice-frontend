@@ -1,228 +1,274 @@
 <app-breadcrumb [pageName]="sharedservice.pageName" [icon]="sharedservice.pageDetail?.icon" />
-@if(dashboardData){
-    <div class="page-top-main mb-2">
-        <p class="mb-0 text-muted" style="font-size: 12px;">Lead pipeline overview</p>
-        <button type="button" class="site-btn grey-color" [appBtnLoading]="isReloadLoading" [disabled]="isReloadLoading" (click)="loadDashboard(true)">
-            <span class="site-btn-icon"><i class="fa-solid fa-rotate"></i></span>
+
+@if (dashboardData) {
+  <div class="dash">
+    <section class="dash-today">
+      <div class="dash-today__head">
+        <div class="dash-today__copy">
+          <span class="dash-today__badge">Leads</span>
+          <span class="dash-today__title">
+            {{ n('totalLeads') | number }} total · {{ n('winRate') }}% win rate
+          </span>
+        </div>
+        <div class="dash-today__actions">
+          <a routerLink="/leads" class="dash-link">
+            All leads
+            <i class="fa-regular fa-arrow-right"></i>
+          </a>
+          <button type="button" class="dash-link" [appBtnLoading]="isReloadLoading" [disabled]="isReloadLoading" (click)="loadDashboard(true)">
             Refresh
-        </button>
+            <i class="fa-solid fa-rotate"></i>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section class="dash-kpi-grid dash-rev-grid" aria-label="Lead volume">
+      <article class="dash-kpi dash-kpi--money dash-kpi--blue">
+        <div class="dash-kpi__top">
+          <span class="dash-kpi__icon"><i class="fa-solid fa-users"></i></span>
+          <span class="dash-kpi__hint">All time</span>
+        </div>
+        <div class="dash-kpi__value">{{ n('totalLeads') | number }}</div>
+        <div class="dash-kpi__label">Total leads</div>
+        <p class="dash-kpi__note">Every lead captured in the CRM.</p>
+      </article>
+
+      <article class="dash-kpi dash-kpi--money dash-kpi--green">
+        <div class="dash-kpi__top">
+          <span class="dash-kpi__icon"><i class="fa-solid fa-user-plus"></i></span>
+          <span class="dash-kpi__hint">Today</span>
+        </div>
+        <div class="dash-kpi__value">{{ n('todayLeadsCount') | number }}</div>
+        <div class="dash-kpi__label">Today's leads</div>
+        <p class="dash-kpi__note">New leads added today.</p>
+      </article>
+
+      <article class="dash-kpi dash-kpi--money dash-kpi--sky">
+        <div class="dash-kpi__top">
+          <span class="dash-kpi__icon"><i class="fa-solid fa-calendar-week"></i></span>
+          <span class="dash-kpi__hint">7 days</span>
+        </div>
+        <div class="dash-kpi__value">{{ n('weekLeadsCount') | number }}</div>
+        <div class="dash-kpi__label">Last 7 days</div>
+        <p class="dash-kpi__note">Fresh pipeline momentum this week.</p>
+      </article>
+
+      <article class="dash-kpi dash-kpi--money dash-kpi--amber">
+        <div class="dash-kpi__top">
+          <span class="dash-kpi__icon"><i class="fa-solid fa-calendar"></i></span>
+          <span class="dash-kpi__hint">30 days</span>
+        </div>
+        <div class="dash-kpi__value">{{ n('monthLeadsCount') | number }}</div>
+        <div class="dash-kpi__label">Last 30 days</div>
+        <p class="dash-kpi__note">Rolling month of new lead intake.</p>
+      </article>
+    </section>
+
+    <section class="dash-kpi-grid" aria-label="Pipeline status">
+      @for (label of statusLabels; track label; let i = $index) {
+        <article class="dash-kpi" [class.dash-kpi--blue]="i === 0" [class.dash-kpi--sky]="i === 1" [class.dash-kpi--amber]="i === 2" [class.dash-kpi--green]="i === 3" [class.dash-kpi--muted]="i === 4" [class.dash-kpi--red]="i === 5" routerLink="/leads">
+          <div class="dash-kpi__top">
+            <span class="dash-kpi__icon">
+              <i class="fa-solid" [class.fa-sparkles]="i === 0" [class.fa-phone]="i === 1" [class.fa-file-lines]="i === 2" [class.fa-trophy]="i === 3" [class.fa-pause]="i === 4" [class.fa-xmark]="i === 5"></i>
+            </span>
+            <span class="dash-kpi__hint">Status</span>
+          </div>
+          <div class="dash-kpi__value">{{ statusCount(i) | number }}</div>
+          <div class="dash-kpi__label">{{ label }}</div>
+          <p class="dash-kpi__note">{{ label }} stage in your pipeline.</p>
+        </article>
+      }
+    </section>
+
+    <section class="dash-snap" aria-label="Lead sources">
+      @for (label of sourceLabels; track label; let i = $index) {
+        <div class="dash-snap__item" routerLink="/leads">
+          <span class="dash-snap__icon"><i class="fa-regular fa-circle-dot"></i></span>
+          <div>
+            <span class="lbl">{{ label }}</span>
+            <span class="val">{{ sourceCount(i) | number }}</span>
+          </div>
+        </div>
+      }
+    </section>
+
+    <section class="dash-charts">
+      <article class="dash-chart-card">
+        <div class="dash-chart-card__head">
+          <div class="dash-chart-card__title">
+            <span class="dash-chart-card__icon"><i class="fa-solid fa-chart-area"></i></span>
+            <div>
+              <h3>Lead intake trend</h3>
+              <p>New leads over the last 14 days</p>
+            </div>
+          </div>
+        </div>
+        @if (showCharts && leadsTrendChart) {
+          <apx-chart
+            [series]="leadsTrendChart.series!"
+            [chart]="leadsTrendChart.chart!"
+            [xaxis]="leadsTrendChart.xaxis!"
+            [yaxis]="leadsTrendChart.yaxis!"
+            [dataLabels]="leadsTrendChart.dataLabels!"
+            [stroke]="leadsTrendChart.stroke!"
+            [fill]="leadsTrendChart.fill!"
+            [grid]="leadsTrendChart.grid!"
+            [tooltip]="leadsTrendChart.tooltip!"
+            [colors]="leadsTrendChart.colors!"
+          ></apx-chart>
+        } @else {
+          <div class="dash-empty dash-empty--inset">
+            <span class="dash-empty__icon"><i class="fa-regular fa-chart-line"></i></span>
+            <div>
+              <strong>No lead activity yet</strong>
+              <p>Daily intake will appear once leads start coming in.</p>
+            </div>
+          </div>
+        }
+      </article>
+
+      <article class="dash-chart-card">
+        <div class="dash-chart-card__head">
+          <div class="dash-chart-card__title">
+            <span class="dash-chart-card__icon"><i class="fa-solid fa-chart-pie"></i></span>
+            <div>
+              <h3>Status mix</h3>
+              <p>How the current pipeline is distributed</p>
+            </div>
+          </div>
+        </div>
+        @if (showCharts && statusMixChart) {
+          <apx-chart
+            [series]="statusMixChart.series!"
+            [chart]="statusMixChart.chart!"
+            [labels]="statusMixChart.labels!"
+            [legend]="statusMixChart.legend!"
+            [dataLabels]="statusMixChart.dataLabels!"
+            [plotOptions]="statusMixChart.plotOptions!"
+            [colors]="statusMixChart.colors!"
+            [tooltip]="statusMixChart.tooltip!"
+          ></apx-chart>
+        } @else {
+          <div class="dash-empty dash-empty--inset">
+            <span class="dash-empty__icon"><i class="fa-regular fa-users"></i></span>
+            <div>
+              <strong>No status data yet</strong>
+              <p>Pipeline mix will show once leads are staged.</p>
+            </div>
+          </div>
+        }
+      </article>
+    </section>
+
+    <section class="dash-bottom">
+      <article class="dash-chart-card">
+        <div class="dash-chart-card__head">
+          <div class="dash-chart-card__title">
+            <span class="dash-chart-card__icon"><i class="fa-solid fa-bars-progress"></i></span>
+            <div>
+              <h3>By status</h3>
+              <p>Lead counts across pipeline stages</p>
+            </div>
+          </div>
+        </div>
+        @if (showCharts && statusWiseLeadChart) {
+          <apx-chart
+            [series]="statusWiseLeadChart.series!"
+            [chart]="statusWiseLeadChart.chart!"
+            [plotOptions]="statusWiseLeadChart.plotOptions!"
+            [colors]="statusWiseLeadChart.colors!"
+            [xaxis]="statusWiseLeadChart.xaxis!"
+            [dataLabels]="statusWiseLeadChart.dataLabels!"
+            [grid]="statusWiseLeadChart.grid!"
+            [tooltip]="statusWiseLeadChart.tooltip!"
+          ></apx-chart>
+        }
+      </article>
+
+      <article class="dash-chart-card">
+        <div class="dash-chart-card__head">
+          <div class="dash-chart-card__title">
+            <span class="dash-chart-card__icon"><i class="fa-solid fa-bullhorn"></i></span>
+            <div>
+              <h3>By source</h3>
+              <p>Where your leads are coming from</p>
+            </div>
+          </div>
+        </div>
+        @if (showCharts && sourceWiseLeadChart) {
+          <apx-chart
+            [series]="sourceWiseLeadChart.series!"
+            [chart]="sourceWiseLeadChart.chart!"
+            [plotOptions]="sourceWiseLeadChart.plotOptions!"
+            [colors]="sourceWiseLeadChart.colors!"
+            [xaxis]="sourceWiseLeadChart.xaxis!"
+            [dataLabels]="sourceWiseLeadChart.dataLabels!"
+            [grid]="sourceWiseLeadChart.grid!"
+            [tooltip]="sourceWiseLeadChart.tooltip!"
+          ></apx-chart>
+        }
+      </article>
+    </section>
+
+    <section class="dash-upcoming">
+      <div class="dash-chart-card__head">
+        <div class="dash-chart-card__title">
+          <span class="dash-chart-card__icon"><i class="fa-solid fa-clock"></i></span>
+          <div>
+            <h3>Recent leads</h3>
+            <p>Latest entries in the CRM</p>
+          </div>
+        </div>
+        <a routerLink="/leads" class="dash-link">
+          View all
+          <i class="fa-regular fa-arrow-right"></i>
+        </a>
+      </div>
+
+      @if (dashboardData?.recentLeads?.length) {
+        <div class="dash-upcoming-list">
+          @for (item of dashboardData.recentLeads; track item.id) {
+            <div class="dash-upcoming-row" routerLink="/leads">
+              <div class="dash-upcoming-row__when">
+                <i class="fa-regular fa-clock"></i>
+                {{ item.created_at | date: 'dd MMM' }}
+              </div>
+              <div class="dash-upcoming-row__body">
+                <div class="name">{{ item.name || 'Lead' }}</div>
+                <div class="date">
+                  <i class="fa-regular fa-phone"></i>
+                  {{ item.mobile || '—' }}
+                  · {{ sourceLabel(item.source) }}
+                </div>
+              </div>
+              <div class="dash-upcoming-row__posts">{{ statusLabel(item.status) }}</div>
+            </div>
+          }
+        </div>
+      } @else {
+        <div class="dash-empty dash-empty--inset">
+          <span class="dash-empty__icon"><i class="fa-regular fa-user"></i></span>
+          <div>
+            <strong>No recent leads</strong>
+            <p>New leads will appear here as they are added.</p>
+          </div>
+        </div>
+      }
+    </section>
+  </div>
+} @else {
+  <div class="dash-skeleton">
+    <div class="dash-skel-row">
+      @for (i of [1, 2, 3, 4]; track i) {
+        <div class="dash-skel-card"></div>
+      }
     </div>
-    <!-- ----------------------------------- amount display start  -->
-    <div class="d-grid p-0 m-0 two-box">
-        <div class="dash-box-main primary">
-            <div class="dash-box-icon">
-                <i class="fa-regular fa-users-gear"></i>
-            </div>
-            <div class="dash-box-ctx">
-                <div class="dash-box-count">{{dashboardData?.totalLeads || 0 | number}}</div>
-                <div class="dash-box-name">Total Leads</div>
-            </div>
-        </div>
-        <div class="dash-box-main">
-            <div class="dash-box-icon">
-                <i class="fa-regular fa-user-plus"></i>
-            </div>
-            <div class="dash-box-ctx">
-                <div class="dash-box-count">{{dashboardData?.todayLeadsCount || 0 | number}}</div>
-                <div class="dash-box-name">Today Leads</div>
-            </div>
-        </div>
-        <div class="dash-box-main">
-            <div class="dash-box-icon">
-                <i class="fa-regular fa-user-magnifying-glass"></i>
-            </div>
-            <div class="dash-box-ctx">
-                <div class="dash-box-count">{{dashboardData?.weekLeadsCount || 0 | number}}</div>
-                <div class="dash-box-name">This Week Leads</div>
-            </div>
-        </div>
-        <div class="dash-box-main">
-            <div class="dash-box-icon">
-                <i class="fa-regular fa-calendar-range"></i>
-            </div>
-            <div class="dash-box-ctx">
-                <div class="dash-box-count">{{dashboardData?.monthLeadsCount || 0 | number}}</div>
-                <div class="dash-box-name">This Month Leads</div>
-            </div>
-        </div>
+    <div class="dash-skel-row">
+      @for (i of [1, 2, 3, 4, 5, 6]; track i) {
+        <div class="dash-skel-card dash-skel-card--sm"></div>
+      }
     </div>
-    <!-- ----------------------------------- amount display end  -->
-     <div class="chart-main">
-        <div class="lead-chart">
-            <apx-chart [series]="statusWiseLeadChart.series" [chart]="statusWiseLeadChart.chart"
-                        [plotOptions]="statusWiseLeadChart.plotOptions" [colors]="statusWiseLeadChart.colors"
-                        [stroke]="statusWiseLeadChart.stroke" [xaxis]="statusWiseLeadChart.xaxis" [grid]="statusWiseLeadChart.grid"></apx-chart>
-        </div>
-     </div>
-    <!-- ----------------------------------- count display start  -->
-    <div class="d-grid p-0 m-0 three-box">
-        <div class="dash-box-main">
-            <div class="dash-box-icon">
-                <i class="fa-regular fa-calendar-users"></i>
-            </div>
-            <div class="dash-box-ctx">
-                <div class="dash-box-count">{{this.dashboardData?.statusWiseChart[0] || 0 | number}}</div>
-                <div class="dash-box-name">New Leads</div>
-            </div>
-        </div>
-        <div class="dash-box-main">
-            <div class="dash-box-icon">
-                <i class="fa-regular fa-calendar-range"></i>
-            </div>
-            <div class="dash-box-ctx">
-                <div class="dash-box-count">{{this.dashboardData?.statusWiseChart[1] || 0 | number}}</div>
-                <div class="dash-box-name">Contacted Leads</div>
-            </div>
-        </div>
-        <div class="dash-box-main">
-            <div class="dash-box-icon">
-                <i class="fa-regular fa-calendar-pen"></i>
-            </div>
-            <div class="dash-box-ctx">
-                <div class="dash-box-count">{{this.dashboardData?.statusWiseChart[2] || 0 | number}}</div>
-                <div class="dash-box-name">Proposal Sent Leads</div>
-            </div>
-        </div>
-        <div class="dash-box-main">
-            <div class="dash-box-icon">
-                <i class="fa-regular fa-calendar-star"></i>
-            </div>
-            <div class="dash-box-ctx">
-                <div class="dash-box-count">{{this.dashboardData?.statusWiseChart[3] || 0 | number}}</div>
-                <div class="dash-box-name">Won Leads</div>
-            </div>
-        </div>
-        <div class="dash-box-main">
-            <div class="dash-box-icon">
-                <i class="fa-regular fa-calendar-week"></i>
-            </div>
-            <div class="dash-box-ctx">
-                <div class="dash-box-count">{{this.dashboardData?.statusWiseChart[4] || 0 | number}}</div>
-                <div class="dash-box-name">On Hold Leads</div>
-            </div>
-        </div>
-        <div class="dash-box-main">
-            <div class="dash-box-icon">
-                <i class="fa-regular fa-calendar-xmark"></i>
-            </div>
-            <div class="dash-box-ctx">
-                <div class="dash-box-count">{{this.dashboardData?.statusWiseChart[5] || 0 | number}}</div>
-                <div class="dash-box-name">Lost Leads</div>
-            </div>
-        </div>
-    </div>
-    <!-- ----------------------------------- count display end  -->
-    <!-- ----------------------------------- count display start  -->
-    <!-- ----------------------------------- amount display end  -->
-     <div class="chart-main">
-        <div class="lead-chart">
-            <apx-chart [series]="sourceWiseLeadChart.series" [chart]="sourceWiseLeadChart.chart"
-                        [plotOptions]="sourceWiseLeadChart.plotOptions" [colors]="sourceWiseLeadChart.colors"
-                        [stroke]="sourceWiseLeadChart.stroke" [xaxis]="sourceWiseLeadChart.xaxis" [grid]="sourceWiseLeadChart.grid"></apx-chart>
-        </div>
-     </div>
-    <!-- ----------------------------------- count display start  -->
-    <div class="d-grid p-0 m-0 four-box">
-        <div class="dash-box-main">
-            <div class="dash-box-icon">
-                <i class="fa-regular fa-phone"></i>
-            </div>
-            <div class="dash-box-ctx">
-                <div class="dash-box-count">{{this.dashboardData?.statusWiseChart[0] || 0 | number}}</div>
-                <div class="dash-box-name">Cold Calling / Telemarketing</div>
-            </div>
-        </div>
-        <div class="dash-box-main">
-            <div class="dash-box-icon">
-                <i class="fa-regular fa-handshake"></i>
-            </div>
-            <div class="dash-box-ctx">
-                <div class="dash-box-count">{{this.dashboardData?.statusWiseChart[1] || 0 | number}}</div>
-                <div class="dash-box-name">Direct Reach</div>
-            </div>
-        </div>
-        <div class="dash-box-main">
-            <div class="dash-box-icon">
-                <i class="fa-regular fa-paper-plane-top"></i>
-            </div>
-            <div class="dash-box-ctx">
-                <div class="dash-box-count">{{this.dashboardData?.statusWiseChart[2] || 0 | number}}</div>
-                <div class="dash-box-name">Email Marketing</div>
-            </div>
-        </div>
-        <div class="dash-box-main">
-            <div class="dash-box-icon">
-                <i class="fa-regular fa-business-time"></i>
-            </div>
-            <div class="dash-box-ctx">
-                <div class="dash-box-count">{{this.dashboardData?.statusWiseChart[3] || 0 | number}}</div>
-                <div class="dash-box-name">Expo / Seminar</div>
-            </div>
-        </div>
-        <div class="dash-box-main">
-            <div class="dash-box-icon">
-                <i class="fa-brands fa-google"></i>
-            </div>
-            <div class="dash-box-ctx">
-                <div class="dash-box-count">{{this.dashboardData?.statusWiseChart[4] || 0 | number}}</div>
-                <div class="dash-box-name">Google</div>
-            </div>
-        </div>
-        <div class="dash-box-main">
-            <div class="dash-box-icon">
-                <i class="fa-regular fa-database"></i>
-            </div>
-            <div class="dash-box-ctx">
-                <div class="dash-box-count">{{this.dashboardData?.statusWiseChart[5] || 0 | number}}</div>
-                <div class="dash-box-name">Other Source</div>
-            </div>
-        </div>
-        <div class="dash-box-main">
-            <div class="dash-box-icon">
-                <i class="fa-regular fa-arrows-rotate"></i>
-            </div>
-            <div class="dash-box-ctx">
-                <div class="dash-box-count">{{this.dashboardData?.statusWiseChart[6] || 0 | number}}</div>
-                <div class="dash-box-name">Customer Reference</div>
-            </div>
-        </div>
-        <div class="dash-box-main">
-            <div class="dash-box-icon">
-                <i class="fa-regular fa-chart-network"></i>
-            </div>
-            <div class="dash-box-ctx">
-                <div class="dash-box-count">{{this.dashboardData?.statusWiseChart[7] || 0 | number}}</div>
-                <div class="dash-box-name">Social Media</div>
-            </div>
-        </div>
-    </div>
-    <div class="d-grid p-0 m-0 mt-2 two-box">
-        <div class="dash-box-main">
-            <div class="dash-box-icon">
-                <i class="fa-regular fa-globe-pointer"></i>
-            </div>
-            <div class="dash-box-ctx">
-                <div class="dash-box-count">{{this.dashboardData?.statusWiseChart[8] || 0 | number}}</div>
-                <div class="dash-box-name">Website</div>
-            </div>
-        </div>
-        <div class="dash-box-main">
-            <div class="dash-box-icon">
-                <i class="fa-regular fa-megaphone"></i>
-            </div>
-            <div class="dash-box-ctx">
-                <div class="dash-box-count">{{this.dashboardData?.statusWiseChart[9] || 0 | number}}</div>
-                <div class="dash-box-name">Digital Marketing</div>
-            </div>
-        </div>
-    </div>
-    <!-- ----------------------------------- count display end  -->
-}@else {
-    <div class="no-data-found-main py-5">
-        <div class="no-data-found-ctx mb-2">Loading lead dashboard...</div>
-        <button type="button" class="site-btn primary-color" [appBtnLoading]="isReloadLoading" [disabled]="isReloadLoading" (click)="loadDashboard(true)">
-            <span class="site-btn-icon"><i class="fa-solid fa-rotate-right"></i></span>
-            Load Dashboard
-        </button>
-    </div>
+    <div class="dash-skel-chart"></div>
+  </div>
 }

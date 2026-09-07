@@ -1,0 +1,75 @@
+<main>
+  <div class="popup-main">
+    <div class="popup-head">
+      <div class="popup-head-ttl">Campaign report</div>
+      <div class="popup-head-btn">
+        <button (click)="activeModal.close()"><i class="fa-solid fa-x"></i></button>
+      </div>
+    </div>
+    <div class="popup-body">
+      @if (loading) {
+        <div>Loading…</div>
+      } @else if (report) {
+        <div class="mb-3">
+          <strong>{{ report.campaign?.title }}</strong>
+        </div>
+        <div class="row m-0 p-0 mb-3">
+          <div class="col-3">Targeted<br /><strong>{{ report.totals?.targeted || 0 }}</strong></div>
+          <div class="col-3">Sent<br /><strong>{{ report.totals?.sent || 0 }}</strong></div>
+          <div class="col-3">Failed<br /><strong>{{ report.totals?.failed || 0 }}</strong></div>
+          <div class="col-3">Gone<br /><strong>{{ report.totals?.gone || 0 }}</strong></div>
+        </div>
+        <div class="table-responsive mb-3">
+          <table class="table table-bordered text-nowrap mb-0">
+            <thead>
+              <tr>
+                <th>Scheduled (IST)</th>
+                <th>Status</th>
+                <th>Sent</th>
+                <th>Failed</th>
+                <th>Gone</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (run of report.runs || []; track run.id) {
+                <tr>
+                  <td>{{ formatIst(run.scheduled_for) }}</td>
+                  <td>{{ run.status }}</td>
+                  <td>{{ run.sent_count }}</td>
+                  <td>{{ run.failed_count }}</td>
+                  <td>{{ run.gone_count }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        @if (report.recent_failures?.length) {
+          <div class="form-label">Recent failures</div>
+          <div class="table-responsive">
+            <table class="table table-bordered mb-0">
+              <thead>
+                <tr>
+                  <th>Time (IST)</th>
+                  <th>Status</th>
+                  <th>Error</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (row of report.recent_failures; track row.id) {
+                  <tr>
+                    <td>{{ formatIst(row.sent_at) }}</td>
+                    <td>{{ row.status }}</td>
+                    <td>{{ row.error }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      }
+    </div>
+    <div class="popup-footer">
+      <button type="button" class="site-btn grey-color" (click)="activeModal.close()">Close</button>
+    </div>
+  </div>
+</main>

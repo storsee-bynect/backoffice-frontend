@@ -1,0 +1,94 @@
+<div class="ticket-chat-page">
+  @if(isLoading && !ticket){
+    <div class="ticket-chat-loading">
+      <i class="fa-regular fa-comments"></i>
+      <span>Loading conversation…</span>
+    </div>
+  } @else if(isTechnicalIssue){
+    <div class="ticket-chat-empty">
+      <p>Unable to load this ticket.</p>
+      <button type="button" class="site-btn primary-color" (click)="goBack()">Back to tickets</button>
+    </div>
+  } @else if(ticket){
+    <div class="ticket-chat-shell">
+      <header class="ticket-chat-header">
+        <button type="button" class="ticket-chat-icon-btn" (click)="goBack()" aria-label="Back">
+          <i class="fa-solid fa-arrow-left"></i>
+        </button>
+        <div class="ticket-chat-header-main">
+          <div class="ticket-chat-header-row">
+            <span class="ticket-chat-id">#TKCT-{{ ticket.id }}</span>
+            <span class="ticket-status-badge" [class.is-open]="isOpen()" [class.is-closed]="!isOpen()">
+              {{ isOpen() ? 'Open' : 'Closed' }}
+            </span>
+          </div>
+          <h1 class="ticket-chat-subject">{{ ticket.subject }}</h1>
+          @if(ticket.storeName || ticket.storeId){
+            <div class="ticket-chat-store">{{ ticket.storeName || 'Store' }} · ID {{ ticket.storeId }}</div>
+          }
+        </div>
+        <div class="ticket-chat-header-actions">
+          @if(isOpen() && sharedservice.isPageUpdate){
+            <button type="button" class="ticket-chat-close-btn" [appBtnLoading]="isClosing" [disabled]="isClosing" (click)="closeTicket()">
+              <i class="fa-solid fa-circle-check"></i>
+              <span>Close</span>
+            </button>
+          }
+          <button type="button" class="ticket-chat-icon-btn" [appBtnLoading]="isRefreshing" [disabled]="isRefreshing" (click)="refresh()" aria-label="Refresh">
+            <i class="fa-solid fa-rotate"></i>
+          </button>
+        </div>
+      </header>
+
+      <div class="ticket-chat-body">
+        <div class="ticket-chat-messages" #messagesPane>
+          @if(messages.length === 0){
+            <div class="ticket-chat-empty-inline">
+              <i class="fa-regular fa-comment-dots"></i>
+              <span>No messages yet.</span>
+            </div>
+          }
+          @for(msg of messages; track msg.id){
+            <div class="ticket-bubble-row" [class.is-mine]="isMine(msg)" [class.is-theirs]="!isMine(msg)">
+              <div class="ticket-bubble">
+                <div class="ticket-bubble-meta">
+                  <span class="ticket-bubble-name">{{ msg.senderName || (isMine(msg) ? 'You' : 'Store') }}</span>
+                  <span class="ticket-bubble-time">{{ formatTime(msg.created_at) }}</span>
+                </div>
+                <div class="ticket-bubble-text">{{ msg.message }}</div>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+
+      @if(isOpen()){
+        <footer class="ticket-chat-composer">
+          <div class="ticket-chat-composer-row">
+            <input
+              #composerInput
+              type="text"
+              class="ticket-chat-input"
+              placeholder="Reply to store…"
+              [(ngModel)]="draft"
+              (keydown.enter)="sendMessage()" />
+            <button
+              type="button"
+              class="ticket-chat-send"
+              [appBtnLoading]="isSending"
+              [disabled]="isSending || !draft.trim()"
+              (click)="sendMessage()"
+              aria-label="Send">
+              <i class="fa-solid fa-paper-plane"></i>
+            </button>
+          </div>
+        </footer>
+      } @else {
+        <footer class="ticket-chat-closed-note">
+          <i class="fa-solid fa-lock"></i>
+          <span>Ticket closed — read only</span>
+        </footer>
+      }
+    </div>
+  }
+</div>

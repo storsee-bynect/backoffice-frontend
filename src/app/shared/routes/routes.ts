@@ -4,22 +4,23 @@ import { UsersComponent } from "../../components/users/users.component";
 import { RolesComponent } from "../../components/roles/roles.component";
 import { PagesComponent } from "../../components/pages/pages.component";
 import { PageCategoriesComponent } from "../../components/page-categories/page-categories.component";
-import { BannersComponent } from "../../components/banners/banners.component";
 import { TicketsComponent } from "../../components/tickets/tickets.component";
-import { FaqComponent } from "../../components/faq/faq.component";
+import { TicketChatComponent } from "../../components/tickets/ticket-chat/ticket-chat.component";
 import { CouponsComponent } from "../../components/coupons/coupons.component";
 import { ThemeCategoryComponent } from "../../components/theme-category/theme-category.component";
 import { TemplatesComponent } from "../../components/templates/templates.component";
 import { PackagesComponent } from "../../components/packages/packages.component";
 import { StoresComponent } from "../../components/stores/stores.component";
 import { ContactLeadsComponent } from "../../components/contact-leads/contact-leads.component";
-import { SiteConfigurationComponent } from "../../components/site-configuration/site-configuration.component";
 import { StoreUsersComponent } from "../../components/store-users/store-users.component";
 import { PoliciesComponent } from "../../components/policies/policies.component";
 import { TransactionsComponent } from "../../components/transactions/transactions.component";
 import { PaymentSettingComponent } from "../../components/payment-setting/payment-setting.component";
 import { LeadDashboardComponent } from "../../components/lead-dashboard/lead-dashboard.component";
 import { LeadsComponent } from "../../components/leads/leads.component";
+import { NotificationSettingsComponent } from "../../components/notification-settings/notification-settings.component";
+import { PushNotificationsComponent } from "../../components/push-notifications/push-notifications.component";
+import { AppNotificationsComponent } from "../../components/app-notifications/app-notifications.component";
 export const routing: Routes = [
     {
         path: '',
@@ -44,14 +45,11 @@ export const routing: Routes = [
         path: 'page-categories',
         component: PageCategoriesComponent
     },{
-        path: 'banners',
-        component: BannersComponent
-    },{
         path: 'tickets',
         component: TicketsComponent
     },{
-        path: 'faq',
-        component: FaqComponent
+        path: 'tickets/:id',
+        component: TicketChatComponent
     },{
         path: 'coupons',
         component: CouponsComponent
@@ -71,9 +69,6 @@ export const routing: Routes = [
         path: 'contact-leads',
         component: ContactLeadsComponent
     },{
-        path: 'site-configuration',
-        component: SiteConfigurationComponent
-    },{
         path: 'store-users',
         component: StoreUsersComponent
     },{
@@ -82,9 +77,18 @@ export const routing: Routes = [
     },{
         path: 'transactions',
         component: TransactionsComponent
-    },{
+    },    {
         path: 'payment-setting',
         component: PaymentSettingComponent
+    },{
+        path: 'notification-settings',
+        component: NotificationSettingsComponent
+    },{
+        path: 'push-notifications',
+        component: PushNotificationsComponent
+    },{
+        path: 'app-notifications',
+        component: AppNotificationsComponent
     },{
         path: 'lead-dashboard',
         component: LeadDashboardComponent

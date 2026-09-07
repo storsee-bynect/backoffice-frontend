@@ -457,6 +457,124 @@ textarea{
 }
 
 // ------------------------- Selection Custom Color - End
+
+// ------------------------- Data count boxes - Start
+.data-count-main {
+    margin-bottom: 10px;
+    width: 100%;
+    display: flex;
+    align-items: stretch;
+    justify-content: space-between;
+    background-color: #fff;
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid var(--light-border);
+
+    .single-data-count {
+        width: 100%;
+        padding: 0 20px;
+        position: relative;
+
+        &.side-border {
+            border-right: 1px solid var(--light-border);
+        }
+
+        .single-data-ttl {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--heading-font);
+            position: relative;
+            text-decoration: dotted;
+            width: max-content;
+            margin-bottom: 5px;
+
+            &:after {
+                position: absolute;
+                content: '';
+                bottom: -2px;
+                left: 0;
+                width: 50%;
+                height: 1px;
+                border-top: 3px dotted var(--light-border);
+            }
+        }
+
+        .single-data-val {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        &:after {
+            position: absolute;
+            content: '';
+            bottom: 10px;
+            right: 10px;
+            width: 30%;
+            height: 5px;
+            border-radius: 10px;
+            opacity: 0.4;
+            background-color: var(--secondary);
+        }
+    }
+}
+
+@media (max-width: 992px) {
+    .data-count-main {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0;
+        padding: 6px 8px;
+
+        .single-data-count {
+            width: auto;
+            min-width: 0;
+            padding: 8px 10px !important;
+            border-right: none !important;
+            border-bottom: 1px solid var(--light-border);
+
+            &.side-border {
+                border-right: none !important;
+                margin-bottom: 0;
+                padding-bottom: 8px;
+                border-bottom: 1px solid var(--light-border);
+            }
+
+            /* Right column cells get a vertical divider */
+            &:nth-child(even) {
+                border-left: 1px solid var(--light-border);
+            }
+
+            /* Last row: remove bottom border */
+            &:last-child {
+                border-bottom: none;
+            }
+
+            /* Even total: second-to-last shares the final row */
+            &:nth-last-child(2):nth-child(odd) {
+                border-bottom: none;
+            }
+
+            .single-data-ttl {
+                font-size: 12px;
+                margin-bottom: 2px;
+            }
+
+            .single-data-val {
+                font-size: 13px;
+            }
+
+            &:after {
+                bottom: 8px;
+                right: 8px;
+                width: 22%;
+                height: 4px;
+            }
+        }
+    }
+}
+// ------------------------- Data count boxes - End
+
 .page-top-main {
     display: flex;
     align-items: center;

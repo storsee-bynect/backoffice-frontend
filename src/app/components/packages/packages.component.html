@@ -1,5 +1,5 @@
 <app-breadcrumb [pageName]="sharedservice.pageName" [icon]="sharedservice.pageDetail?.icon" />
-<app-page-data-count [totalCount]="totalCount" [filteredCount]="dataList.length" />
+<app-page-data-count [items]="countItems" />
 
 <div class="page-top-main">
     <div class="page-top-search-main d-flex">
@@ -18,7 +18,10 @@
     }
 </div>
 
-@if(dataList.length > 0 && !isTechnicalIssue){
+@if((!hasEverLoaded && isListLoading) || (dataList.length > 0 && !isTechnicalIssue)){
+@if(!hasEverLoaded && isListLoading){
+<app-box-view-skeleton></app-box-view-skeleton>
+}@else {
     <div class="list-content-main" [class.is-list-loading]="isListLoading">
         <div class="plans-grid">
             @for(item of dataList | paginate: { itemsPerPage: limit, currentPage: page, totalItems: totalCount }; track item; let i = $index){
@@ -26,11 +29,14 @@
                     <div class="plan-card-accent"></div>
 
                     <div class="plan-badges">
+                        @if(item.isDefault){
+                            <span class="badge-recommended"><i class="fa-solid fa-shield me-1"></i>Default</span>
+                        }
                         @if(item.isRecommended){
                             <span class="badge-recommended"><i class="fa-solid fa-thumbs-up me-1"></i>Recommended</span>
                         }
                         @if(item.isPopular){
-                            <span class="badge-popular"><i class="fa-solid fa-star me-1"></i>Popular</span>
+                            <span class="badge-popular"><i class="fa-solid fa-star me-1"></i>Most popular</span>
                         }
                         <span class="badge-status" [class.active]="item.isActive" [class.inactive]="!item.isActive">
                             {{ item.isActive ? 'Active' : 'Inactive' }}
@@ -84,7 +90,7 @@
                                     <i class="fa-solid fa-pencil"></i>
                                 </button>
                             }
-                            @if(sharedservice.isPageDelete){
+                            @if(sharedservice.isPageDelete && !item.isDefault && item.slug !== 'basic'){
                                 <button class="plan-action-btn delete" [ngbTooltip]="'Delete Plan'" [appBtnLoading]="isBtnLoading('delete', item.id)" (click)="deleteData(item.id)">
                                     <i class="fa-solid fa-trash-can"></i>
                                 </button>
@@ -108,7 +114,7 @@
             </div>
         </div>
     </div>
-} @else if(isTechnicalIssue || hasEverLoaded || !isListLoading) {
+}} @else if(isTechnicalIssue || hasEverLoaded || !isListLoading) {
     <div class="no-data-found-main">
         <div class="no-data-found-img">
             @if(isTechnicalIssue){

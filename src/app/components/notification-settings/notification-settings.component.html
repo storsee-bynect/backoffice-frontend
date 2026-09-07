@@ -1,0 +1,218 @@
+<app-breadcrumb [pageName]="'Notification Settings'" [icon]="'bell'" />
+
+@if (isDataLoaded) {
+  <div class="em-page">
+    <header class="em-hero">
+      <div class="em-hero__copy">
+        <div class="em-hero__icon" aria-hidden="true"><i class="fa-solid fa-bell"></i></div>
+        <div>
+          <h2>Notification Settings</h2>
+          <p>Chrome Web Push (VAPID) and Firebase App Push keys — stored in database only, not in env.</p>
+        </div>
+      </div>
+    </header>
+
+    <section class="em-panel">
+      <div class="em-panel__top">
+        <div class="em-brand">
+          <div class="em-brand__logo"><i class="fa-brands fa-chrome"></i></div>
+          <div>
+            <div class="em-brand__row">
+              <h3>Chrome Web Push</h3>
+              <span class="em-badge" [class.on]="webSettings.vapid_configured">
+                {{ webSettings.vapid_configured ? 'VAPID ready' : 'Not configured' }}
+              </span>
+            </div>
+            <p class="em-brand__meta">Browser notifications for Super Admin, Dashboard &amp; Stores</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="em-smtp">
+        <div class="em-smtp__head">
+          <div>
+            <h4>VAPID keys</h4>
+            <p>Generate once and save. Public key is exposed to clients; private key stays in DB.</p>
+          </div>
+        </div>
+        <div class="em-smtp__grid">
+          <div class="em-field em-field--wide">
+            <label class="em-field__label">VAPID subject</label>
+            <input class="form-control em-field__input" [(ngModel)]="webSettings.vapid_subject" name="vapidSubject" />
+          </div>
+          <div class="em-field em-field--wide">
+            <label class="em-field__label">Public key</label>
+            <div class="form-control em-field__input" style="height:auto;min-height:38px;word-break:break-all;">
+              {{ webSettings.vapid_public_key || 'Not generated yet' }}
+            </div>
+          </div>
+          <div class="em-field">
+            <label class="em-field__label">Default click URL</label>
+            <input class="form-control em-field__input" [(ngModel)]="webSettings.default_click_url" name="webClick" />
+          </div>
+          <div class="em-field">
+            <label class="em-field__label">Default icon URL</label>
+            <input class="form-control em-field__input" [(ngModel)]="webSettings.default_icon_url" name="webIcon" />
+          </div>
+        </div>
+        <div class="em-smtp__actions">
+          <button type="button" class="site-btn primary-color" [disabled]="isGeneratingVapid" (click)="generateVapid()">
+            {{ isGeneratingVapid ? 'Generating…' : (webSettings.vapid_configured ? 'Regenerate VAPID keys' : 'Generate VAPID keys') }}
+          </button>
+          <button type="button" class="site-btn grey-color" [disabled]="isSavingWeb" (click)="saveWebDefaults()">
+            {{ isSavingWeb ? 'Saving…' : 'Save web defaults' }}
+          </button>
+          <button type="button" class="site-btn grey-color" (click)="enableBrowserPush()">
+            Enable browser notifications
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section class="em-panel" [class.is-off]="!appSettings?.enabled">
+      <div class="em-panel__top">
+        <div class="em-brand">
+          <div class="em-brand__logo"><i class="fa-solid fa-fire"></i></div>
+          <div>
+            <div class="em-brand__row">
+              <h3>Firebase App Push</h3>
+              <span class="em-badge" [class.on]="appSettings?.enabled">
+                {{ appSettings?.enabled ? 'Enabled' : 'Disabled' }}
+              </span>
+            </div>
+            <p class="em-brand__meta">STORSEE Android app · FCM credentials pool</p>
+          </div>
+        </div>
+        <label class="em-check em-check--enable">
+          <input
+            class="em-check__input"
+            type="checkbox"
+            [checked]="!!appSettings?.enabled"
+            [disabled]="isSavingApp"
+            (change)="onAppEnabledToggle($event)"
+          />
+          <span class="em-check__box"></span>
+          <span class="em-check__text">
+            <span class="em-check__title">Enable app push</span>
+            <span class="em-check__hint">Turn on when Firebase keys are ready</span>
+          </span>
+        </label>
+      </div>
+
+      <div class="em-smtp">
+        <div class="em-smtp__head"><div><h4>Defaults</h4><p>Used when campaigns do not override click URL or icon.</p></div></div>
+        <div class="em-smtp__grid">
+          <div class="em-field em-field--wide">
+            <label class="em-field__label">Default click URL</label>
+            <input class="form-control em-field__input" [(ngModel)]="appSettings.default_click_url" name="appClick" />
+          </div>
+          <div class="em-field em-field--wide">
+            <label class="em-field__label">Default icon URL</label>
+            <input class="form-control em-field__input" [(ngModel)]="appSettings.default_icon_url" name="appIcon" />
+          </div>
+        </div>
+        <div class="em-smtp__actions">
+          <button type="button" class="site-btn primary-color" [disabled]="isSavingApp" (click)="saveAppDefaults()">Save defaults</button>
+        </div>
+      </div>
+
+      <div class="em-keys">
+        <div class="em-keys__head">
+          <div>
+            <h4>Firebase credentials</h4>
+            <p>Upload service account JSON (e.g. from APK/assets). Enabled keys rotate in the pool.</p>
+          </div>
+          @if (!showKeyForm) {
+            <button type="button" class="site-btn primary-color" (click)="openAddKey()">
+              <span class="site-btn-icon"><i class="fa-solid fa-plus"></i></span> Add credential
+            </button>
+          }
+        </div>
+
+        @if (showKeyForm) {
+          <div class="em-key-form">
+            <div class="em-key-form__head">
+              <h5>{{ editingKeyId ? 'Edit credential' : 'New credential' }}</h5>
+              <button type="button" class="em-key-form__close" (click)="cancelKeyForm()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="em-key-form__grid">
+              <div class="em-field">
+                <label class="em-field__label">Label</label>
+                <input class="form-control em-field__input" [(ngModel)]="keyForm.label" name="keyLabel" />
+              </div>
+              <div class="em-field">
+                <label class="em-field__label">Project ID</label>
+                <input class="form-control em-field__input" [(ngModel)]="keyForm.project_id" name="projectId" placeholder="auto from JSON" />
+              </div>
+              <div class="em-field em-field--wide">
+                <label class="em-field__label">
+                  Service account JSON
+                  @if (editingKeyId) { <span>leave blank to keep current</span> }
+                </label>
+                <textarea class="form-control em-field__input em-mono" rows="8" [(ngModel)]="keyForm.service_account_json" name="saJson"></textarea>
+                <input type="file" accept="application/json,.json" class="form-control mt-2" (change)="onJsonFile($event)" />
+              </div>
+              <div class="em-field em-field--check">
+                <label class="em-check em-check--inline">
+                  <input class="em-check__input" type="checkbox" [(ngModel)]="keyForm.enabled" name="keyEnabled" />
+                  <span class="em-check__box"></span><span class="em-check__title">In shuffle pool</span>
+                </label>
+              </div>
+            </div>
+            <div class="em-key-form__actions">
+              <button type="button" class="site-btn primary-color" [disabled]="isSavingKey" (click)="saveKey()">
+                {{ isSavingKey ? 'Saving…' : (editingKeyId ? 'Update credential' : 'Save credential') }}
+              </button>
+              <button type="button" class="site-btn grey-color" (click)="cancelKeyForm()" [disabled]="isSavingKey">Cancel</button>
+            </div>
+          </div>
+        }
+
+        @if (!keys.length && !showKeyForm) {
+          <div class="em-empty">
+            <div class="em-empty__icon"><i class="fa-solid fa-key"></i></div>
+            <h5>No Firebase credentials yet</h5>
+            <p>Add the STORSEE service account JSON from Firebase Console or APK/assets.</p>
+            <button type="button" class="site-btn primary-color" (click)="openAddKey()">Add credential</button>
+          </div>
+        }
+
+        @if (keys.length) {
+          <div class="em-key-list">
+            @for (key of keys; track key.id) {
+              <article class="em-key-card" [class.off]="!key.enabled">
+                <div class="em-key-card__icon"><i class="fa-solid fa-fire"></i></div>
+                <div class="em-key-card__main">
+                  <div class="em-key-card__top">
+                    <span class="em-key-card__label">{{ key.label }}</span>
+                    <span class="em-key-card__status" [class.on]="key.enabled">{{ key.enabled ? 'In pool' : 'Off' }}</span>
+                  </div>
+                  <span class="em-key-card__hint">{{ key.project_id || 'Project ID from JSON' }}</span>
+                  <div class="em-key-card__stats">
+                    <span>Today <b>{{ key.send_count_today || 0 }}</b></span>
+                    @if (key.error_count) { <span>Errors <b>{{ key.error_count }}</b></span> }
+                  </div>
+                </div>
+                <div class="em-key-card__actions">
+                  <label class="em-check em-check--compact">
+                    <input class="em-check__input" type="checkbox" [checked]="!!key.enabled" (change)="onKeyToggle(key, $event)" />
+                    <span class="em-check__box"></span><span class="em-check__title">Pool</span>
+                  </label>
+                  <div class="em-key-card__btns">
+                    <button type="button" class="em-test-btn" [disabled]="testingId === key.id" (click)="testKey(key)">
+                      <i class="fa-solid fa-plug"></i> {{ testingId === key.id ? 'Testing…' : 'Test' }}
+                    </button>
+                    <button type="button" class="em-icon-btn" (click)="openEditKey(key)"><i class="fa-solid fa-pen"></i></button>
+                    <button type="button" class="em-icon-btn danger" (click)="deleteKey(key)"><i class="fa-solid fa-trash"></i></button>
+                  </div>
+                </div>
+              </article>
+            }
+          </div>
+        }
+      </div>
+    </section>
+  </div>
+} @else {
+  <app-box-view-skeleton></app-box-view-skeleton>
+}

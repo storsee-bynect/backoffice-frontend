@@ -12,25 +12,17 @@
         Platform subscription only. Templates are purchased separately. Limits are snapshotted on the store.
       </p>
 
-      <div class="assign-billing-tabs">
-        @for(c of billingCycles; track c.id){
-          <button type="button" [class.active]="selectedBillingCycle === c.id" (click)="selectBillingCycle(c.id)">
-            {{ c.label }}
-          </button>
-        }
-      </div>
-
       <div class="assign-plan-grid">
         @for(item of packageList; track item.id){
           <div class="assign-plan-card"
             [class.selected]="selectedPackage?.id === item.id"
             [style.--plan-color]="item.color || '#1d68f1'"
             (click)="selectPackage(item)">
-            @if(item.isRecommended){
-              <span class="badge-recommended"><i class="fa-solid fa-thumbs-up me-1"></i>Recommended</span>
+            @if(item.isDefault){
+              <span class="badge-recommended"><i class="fa-solid fa-shield me-1"></i>Default</span>
             }
             @if(item.isPopular){
-              <span class="assign-plan-card__badge">Popular</span>
+              <span class="assign-plan-card__badge">Most popular</span>
             }
             <div class="assign-plan-card__cycle">{{ planDurationLabel(item) }}</div>
             <div class="assign-plan-card__name">{{ item.name }}</div>
@@ -40,7 +32,7 @@
             </div>
             <div class="assign-plan-card__limits">
               <span><i class="fa-solid fa-box"></i> {{ limitLabel(item.productLimit) }} products</span>
-              <span><i class="fa-solid fa-cart-shopping"></i> {{ limitLabel(item.maxOrders) }} orders/mo</span>
+              <span><i class="fa-solid fa-cart-shopping"></i> {{ limitLabel(item.maxOrders) }} orders</span>
               @if(item.trialDays > 0){
                 <span class="trial"><i class="fa-solid fa-gift"></i> {{ item.trialDays }}d trial</span>
               }

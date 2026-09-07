@@ -1,7 +1,7 @@
 export class PackageReqModel {
     slug: string = '';
-    tierSlug: string = 'starter';
-    billingCycle: string = 'monthly';
+    tierSlug: string = 'storsee';
+    billingCycle: string = '1m';
     billingLabel: string = '1 Month';
     name: string;
     tagline: string = '';
@@ -14,6 +14,7 @@ export class PackageReqModel {
     color: string = '#1d68f1';
     isPopular: boolean = false;
     isRecommended: boolean = false;
+    isDefault: boolean = false;
     isActive: boolean = true;
     sortOrder: number = 0;
     benefits: string;

@@ -68,7 +68,7 @@
                 <i class="fa-solid fa-lock"></i>
               </div>
               <label class="toggle-switch">
-                <input type="checkbox" class="toggle-input" [(ngModel)]="isLocked" (ngModelChange)="onLockChange($event)" />
+                <input type="checkbox" class="toggle-input" [(ngModel)]="isLocked" (ngModelChange)="onLockChange($event)" [disabled]="isBlacklisted" />
                 <span class="toggle-label"></span>
               </label>
             </div>
@@ -108,7 +108,7 @@
               </div>
             </div>
             <label class="toggle-switch">
-              <input type="checkbox" class="toggle-input" [(ngModel)]="isActive" (ngModelChange)="onFeatureChange()" />
+              <input type="checkbox" class="toggle-input" [(ngModel)]="isActive" (ngModelChange)="onActiveChange($event)" [disabled]="isBlacklisted" />
               <span class="toggle-label"></span>
             </label>
           </div>
@@ -228,8 +228,21 @@
         </div>
         <div class="row m-0">
           <div class="col-md-6 col-12 mb-2">
-            <label class="form-label">Reason (shown to store owner)</label>
-            <textarea class="form-control" rows="3" [(ngModel)]="lockReason" placeholder="Why is this store restricted?"></textarea>
+            <label class="form-label">
+              Reason (shown to store owner)
+              @if(needsReason){
+                <span class="text-danger">*</span>
+              }
+            </label>
+            <textarea
+              class="form-control"
+              rows="3"
+              [(ngModel)]="lockReason"
+              [class.is-invalid]="needsReason && !lockReason.trim()"
+              placeholder="Why is this store restricted? Store owner will see this after login."></textarea>
+            @if(needsReason){
+              <div class="form-text">Required when inactive, locked, blacklisted, or dashboard is off.</div>
+            }
           </div>
           <div class="col-md-6 col-12 mb-2">
             <label class="form-label">Internal admin notes</label>

@@ -26,6 +26,16 @@ export class TransactionsComponent {
   btnLoading: string | number | null = null;
   isBtnLoading = (action: string, id?: string | number | null) => isActionLoading(this.btnLoading, action, id);
 
+  stats = { total: 0, completed: 0, cancelled: 0 };
+
+  get countItems(): { label: string; value: number }[] {
+    return [
+      { label: 'Total', value: this.stats.total || 0 },
+      { label: 'Completed', value: this.stats.completed || 0 },
+      { label: 'Cancelled', value: this.stats.cancelled || 0 },
+    ];
+  }
+
   private storeIdFilter: number | null = null;
 
   constructor(
@@ -64,6 +74,13 @@ export class TransactionsComponent {
         if (res) {
           this.dataList = res.data;
           this.totalCount = res.totalCount;
+          if (res?.stats) {
+            this.stats = {
+              total: Number(res.stats.total || 0),
+              completed: Number(res.stats.completed || 0),
+              cancelled: Number(res.stats.cancelled || 0),
+            };
+          }
           this.hasEverLoaded = true;
           this.isTechnicalIssue = false;
         }
@@ -91,6 +108,12 @@ export class TransactionsComponent {
         if (res && res.data) {
           this.dataList = res.data;
           this.totalCount = this.dataList.length;
+          const list = this.dataList || [];
+          this.stats = {
+            total: list.length,
+            completed: list.filter((t: any) => Number(t.status) === 1).length,
+            cancelled: list.filter((t: any) => Number(t.status) !== 1).length,
+          };
           this.hasEverLoaded = true;
           this.isTechnicalIssue = false;
         }

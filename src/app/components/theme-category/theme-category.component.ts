@@ -26,6 +26,13 @@ export class ThemeCategoryComponent {
   btnLoading: string | number | null = null;
   isBtnLoading = (action: string, id?: string | number | null) => isActionLoading(this.btnLoading, action, id);
 
+  get countItems(): { label: string; value: number }[] {
+    return [
+      { label: 'Total Categories', value: this.totalCount || 0 },
+      { label: 'Showing', value: this.dataList?.length || 0 },
+    ];
+  }
+
   constructor(public sharedservice: SharedService, private themecategoryservice: ThemeCategoryService, private modalService: NgbModal) {}
 
   ngOnInit(): void {

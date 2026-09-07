@@ -1,154 +1,146 @@
 <app-breadcrumb [pageName]="sharedservice.pageName" [icon]="sharedservice.pageDetail?.icon" />
-<app-page-data-count [totalCount]="totalCount" [filteredCount]="dataList.length" />
-<div class="page-top-main">
-    <div class="page-top-search-main d-flex">
-        <input type="text" class="form-control" placeholder="Search" [(ngModel)]="searchTxt" (keyup.enter)="filterData()" />
-        <button type="button" class="square-btn site-btn primary-color ms-1" [appBtnLoading]="isSearchLoading" [disabled]="isSearchLoading || isListLoading" (click)="filterData()"><i
-                class="fa-solid fa-magnifying-glass"></i></button>
-    </div>
-    @if(sharedservice.isPageInsert){
-        <div class="page-top-btns-main d-flex justify-content-end">
-            <button class="site-btn dark-color ms-1" (click)="addUpdateData(false)">
-                <div class="site-btn-icon"><i class="fa-solid fa-plus"></i></div>
-                Create
-            </button>
-        </div>
-    }
-</div>
-@if(dataList.length > 0 && !isTechnicalIssue){
-<div class="page-table-main" [class.is-list-loading]="isListLoading">
-    <div class="table-responsive">
-        <table class="table table-bordered text-nowrap mb-0">
-            <thead>
-                <tr>
-                    <th class="sr-th">Sr No.</th>
-                    <th>Store</th>
-                    <th>Ticket Id</th>
-                    <th>Subject</th>
-                    <th>Content</th>
-                    <th>Create Date</th>
-                    <th>Status</th>
-                    <th>Answer</th>
-                    @if(sharedservice.isPageUpdate || sharedservice.isPageDelete){
-                    <th>Action</th>
-                    }
-                </tr>
-            </thead>
-            <tbody>
-                @for(item of dataList | paginate: { itemsPerPage: limit, currentPage: page , totalItems : totalCount}; track
-                item;let i=$index){
-                <tr>
-                    <td class="sr-no-td">{{(i+1)}}</td>
-                    <td>
-                        <div class="table-btns-main">
-                            <button [ngbTooltip]="'View Store'" (click)="sharedservice.viewContent(item.storeId)" class="table-single-btn primary"><i class="fa-solid fa-shop"></i></button>
-                        </div>
-                    </td>
-                    <td>#TKCT-{{item.id}}</td>
-                    <td>{{item.subject}}</td>
-                    <td>
-                        <div class="table-btns-main">
-                            @if(sharedservice.isPageUpdate){
-                                <button [ngbTooltip]="'View Content'" (click)="sharedservice.viewContent(item.content)" class="table-single-btn primary"><i class="fa-solid fa-eye"></i></button>
-                            }
-                        </div>
-                    </td>
-                    <td>{{item.created_at.split('T')[0]}}</td>
-                    @if(item.status == 1){
-                        <td colspan="2">
-                            <div class="status-td">
-                                <span class="status-table yellow">
-                                    Pending
-                                </span>
-                            </div>
-                        </td>
-                        @if(sharedservice.isPageUpdate){
-                            <td>
-                                <div class="table-btns-main">
-                                    <button [ngbTooltip]="'Approve Ticket'" class="table-single-btn green" (click)="updateStatus(2,item)" ><i class="fa-solid fa-check"></i></button>
-                                    <button [ngbTooltip]="'Reject Ticket'" class="table-single-btn red ms-1" (click)="updateStatus(3,item)" ><i class="fa-solid fa-x"></i></button>
-                                </div>
-                            </td>
-                        }
-                    }@else {
-                        @if(sharedservice.isPageUpdate || sharedservice.isPageDelete){
-                            <td>
-                                <div class="status-td">
-                                    <span class="status-table" [ngClass]="item.status == 2 ? 'green' : 'red'">
-                                        {{item.status == 2 ? 'Completed' : 'Rejected'}}
-                                    </span>
-                                </div>
-                            </td>
-                            <td>
-                                <div class="table-btns-main">
-                                    @if(sharedservice.isPageUpdate){
-                                        <button [ngbTooltip]="'View Answer'" (click)="sharedservice.viewContent(item.answer)" class="table-single-btn primary"><i class="fa-solid fa-comments"></i></button>
-                                    }
-                                </div>
-                            </td>
-                            <td>
-                                <div class="table-btns-main">
-                                    @if(sharedservice.isPageUpdate){
-                                        <button [ngbTooltip]="'Update Data'" class="table-single-btn primary" (click)="addUpdateData(true,item)"><i class="fa-solid fa-pencil"></i></button>
-                                    }
-                                    @if(sharedservice.isPageDelete){
-                                        <button [ngbTooltip]="'Delete Data'" class="table-single-btn red ms-1" [appBtnLoading]="isBtnLoading('delete', item.pageId)" (click)="deleteData(item.pageId)"><i class="fa-solid fa-trash-can"></i></button>
-                                    }
-                                </div>
-                            </td>
-                        }
-                    }
-                </tr>
-                }
-            </tbody>
-        </table>
+<app-page-data-count [items]="countItems" />
 
+<div class="ticket-toolbar">
+  <div class="ticket-filters">
+    <button type="button" class="ticket-filter-chip" [class.is-active]="statusFilter === ''" [disabled]="isListLoading" (click)="setStatusFilter('')">
+      All <span class="ticket-filter-count">{{ stats.total || 0 }}</span>
+    </button>
+    <button type="button" class="ticket-filter-chip is-open" [class.is-active]="statusFilter === 'open'" [disabled]="isListLoading" (click)="setStatusFilter('open')">
+      Open <span class="ticket-filter-count">{{ stats.open || 0 }}</span>
+    </button>
+    <button type="button" class="ticket-filter-chip is-closed" [class.is-active]="statusFilter === 'closed'" [disabled]="isListLoading" (click)="setStatusFilter('closed')">
+      Closed <span class="ticket-filter-count">{{ stats.closed || 0 }}</span>
+    </button>
+  </div>
+
+  <div class="ticket-toolbar-right">
+    <div class="ticket-search">
+      <input type="text" class="form-control" placeholder="Search tickets…" [(ngModel)]="searchTxt" (keyup.enter)="filterData()" />
+      <button type="button" class="square-btn site-btn primary-color" [appBtnLoading]="isSearchLoading" [disabled]="isSearchLoading || isListLoading" (click)="filterData()">
+        <i class="fa-solid fa-magnifying-glass"></i>
+      </button>
     </div>
-    <div class="main-pagination">
-        <div class="data-limit-main">
-            <select class="form-select" [(ngModel)]="limit" [disabled]="isListLoading" (ngModelChange)="onLimitChange()">
-                <option [value]="10">10</option>
-                <option [value]="30">30</option>
-                <option [value]="50">50</option>
-                <option [value]="100">100</option>
-                <option [value]="500">500</option>
-            </select>
+  </div>
+</div>
+
+@if((!hasEverLoaded && isListLoading) || (dataList.length > 0 && !isTechnicalIssue)){
+<div class="ticket-cards-wrap" [class.is-list-loading]="isListLoading && hasEverLoaded">
+  @if(!hasEverLoaded && isListLoading){
+  <div class="ticket-card-grid">
+    @for(i of [1,2,3,4,5,6]; track i){
+      <div class="ticket-card ticket-card-skeleton">
+        <div class="ticket-card-body">
+          <div class="ticket-card-head">
+            <span class="sk sk-badge"></span>
+            <span class="sk sk-time"></span>
+          </div>
+          <span class="sk sk-title"></span>
+          <span class="sk sk-desc"></span>
+          <div class="ticket-card-tags">
+            <span class="sk sk-tag"></span>
+            <span class="sk sk-tag"></span>
+            <span class="sk sk-tag"></span>
+          </div>
         </div>
-        <div class="pagination-inner">
-            <pagination-controls (pageChange)="onPageChange($event)" />
+        <div class="ticket-card-actions">
+          <span class="sk sk-btn"></span>
+          <span class="sk sk-btn sk-btn-primary"></span>
         </div>
+      </div>
+    }
+  </div>
+  }@else {
+  <div class="ticket-card-grid">
+    @for(item of dataList | paginate: { itemsPerPage: limit, currentPage: page , totalItems : totalCount}; track item.id){
+    <article class="ticket-card" [class.is-closed]="!isOpen(item.status)">
+      <div class="ticket-card-body">
+        <div class="ticket-card-head">
+          <span class="ticket-status-badge" [class.is-open]="isOpen(item.status)" [class.is-closed]="!isOpen(item.status)">
+            {{ isOpen(item.status) ? 'Open' : 'Closed' }}
+          </span>
+          <span class="ticket-card-time">{{ formatDateTime(item.lastMessageAt || item.created_at) }}</span>
+        </div>
+
+        <h3 class="ticket-card-title">{{ item.subject || 'Ticket' }}</h3>
+        <p class="ticket-card-desc">{{ previewText(item.lastMessage) }}</p>
+
+        <div class="ticket-card-tags">
+          @if(item.storeName || item.storeId){
+          <span class="ticket-tag">
+            <i class="fa-regular fa-building"></i>
+            {{ item.storeName || ('Store #' + item.storeId) }}
+          </span>
+          }
+          @if(item.contactName){
+          <span class="ticket-tag">
+            <i class="fa-regular fa-user"></i>
+            {{ item.contactName }}
+          </span>
+          }
+          @if(item.contactEmail || item.storeEmail){
+          <span class="ticket-tag">
+            <i class="fa-regular fa-envelope"></i>
+            {{ item.contactEmail || item.storeEmail }}
+          </span>
+          }
+        </div>
+      </div>
+
+      <div class="ticket-card-actions">
+        <button type="button" class="ticket-btn ticket-btn-outline" (click)="openTicket(item.id)">Open</button>
+        @if(isOpen(item.status) && sharedservice.isPageUpdate){
+          <button
+            type="button"
+            class="ticket-btn ticket-btn-primary"
+            [appBtnLoading]="closingId === item.id"
+            [disabled]="closingId === item.id"
+            (click)="closeTicket($event, item)">
+            Close
+          </button>
+        }
+      </div>
+    </article>
+    }
+  </div>
+  <div class="main-pagination">
+    <div class="data-limit-main">
+      <select class="form-select" [(ngModel)]="limit" [disabled]="isListLoading" (ngModelChange)="onLimitChange()">
+        <option [value]="10">10</option>
+        <option [value]="30">30</option>
+        <option [value]="50">50</option>
+        <option [value]="100">100</option>
+        <option [value]="500">500</option>
+      </select>
     </div>
+    <div class="pagination-inner">
+      <pagination-controls (pageChange)="onPageChange($event)" />
+    </div>
+  </div>
+  }
 </div>
 } @else if(isTechnicalIssue || hasEverLoaded || !isListLoading) {
-    <div class="no-data-found-main">
-        <div class="no-data-found-img">
-            @if(isTechnicalIssue){
-                <img src="../../../assets/img/technical-issue.png" alt="">
-            }@else {
-                <img src="../../../assets/img/no-data.png" alt="">
-            }
-        </div>
-        @if(isTechnicalIssue){
-            <div class="no-data-found-ttl">We Found Some Technical Issues in Our System</div>
-        }@else {
-            <div class="no-data-found-ttl">No Record Found!</div>
-        }
-        @if(isTechnicalIssue){
-            <div class="no-data-found-ctx">
-                Currently we're working on the Issue please try again later.
-            </div>
-            <button class="site-btn primary-color" routerLink="/dashboard">Go to Dashboard</button>
-        }@else {
-            <div class="no-data-found-ctx">
-                You don't currently have any Record.
-                @if(sharedservice.isPageInsert){
-                Create a new Record by clicking the button below.
-                }
-            </div>
-            @if(sharedservice.isPageInsert){
-            <button class="site-btn primary-color" (click)="addUpdateData(false)"><span
-                    class="site-btn-icon"><i class="fa-solid fa-plus"></i></span> Create</button>
-            }
-        }
+<div class="no-data-found-main">
+  <div class="no-data-found-img">
+    @if(isTechnicalIssue){
+      <img src="../../../assets/img/technical-issue.png" alt="">
+    }@else {
+      <img src="../../../assets/img/no-data.png" alt="">
+    }
+  </div>
+  @if(isTechnicalIssue){
+    <div class="no-data-found-ttl">We Found Some Technical Issues in Our System</div>
+    <div class="no-data-found-ctx">Currently we're working on the Issue please try again later.</div>
+    <button class="site-btn primary-color" routerLink="/dashboard">Go to Dashboard</button>
+  }@else {
+    <div class="no-data-found-ttl">No tickets found</div>
+    <div class="no-data-found-ctx">
+      @if(statusFilter || searchTxt){
+        Try another filter or clear search.
+      }@else {
+        Stores create tickets from their dashboard.
+      }
     </div>
+  }
+</div>
 }

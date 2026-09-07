@@ -121,8 +121,8 @@ export class FileUploadComponent implements OnInit, OnDestroy, AfterViewInit {
     this.imgRect = { x: 0, y: 0, w: this.canvasW, h: this.canvasH };
     this.ctx = canvas.getContext('2d')!;
 
-    const pad = Math.round(Math.min(this.canvasW, this.canvasH) * 0.1);
-    this.crop = { x: pad, y: pad, w: this.canvasW - pad * 2, h: this.canvasH - pad * 2 };
+    // default crop = full image selected (user can still resize/move)
+    this.crop = { x: 0, y: 0, w: this.canvasW, h: this.canvasH };
 
     this.drawCanvas();
     this.attachListeners(canvas);

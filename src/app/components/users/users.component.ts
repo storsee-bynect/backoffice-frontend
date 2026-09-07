@@ -26,6 +26,16 @@ export class UsersComponent {
   btnLoading: string | number | null = null;
   isBtnLoading = (action: string, id?: string | number | null) => isActionLoading(this.btnLoading, action, id);
 
+  stats = { total: 0, active: 0, inactive: 0 };
+
+  get countItems(): { label: string; value: number }[] {
+    return [
+      { label: 'Total Users', value: this.stats.total || 0 },
+      { label: 'Active', value: this.stats.active || 0 },
+      { label: 'Inactive', value: this.stats.inactive || 0 },
+    ];
+  }
+
   constructor(public sharedservice: SharedService, private userservice: UserService, private modalService: NgbModal) { }
 
   ngOnInit(): void {
@@ -47,6 +57,13 @@ export class UsersComponent {
         if (res) {
           this.dataList = res.data;
           this.totalCount = res.totalCount;
+          if (res?.stats) {
+            this.stats = {
+              total: Number(res.stats.total || 0),
+              active: Number(res.stats.active || 0),
+              inactive: Number(res.stats.inactive || 0),
+            };
+          }
           this.hasEverLoaded = true;
           this.isTechnicalIssue = false;
         }

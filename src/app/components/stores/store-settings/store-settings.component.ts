@@ -4,6 +4,17 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { StoreService } from '../stores.service';
 import { SharedService } from '../../../shared/services/shared.service';
 
+function asBool(val: unknown, defaultTrue = true): boolean {
+  if (val === null || val === undefined) return defaultTrue;
+  if (typeof val === 'boolean') return val;
+  if (typeof val === 'string') {
+    const s = val.trim().toLowerCase();
+    if (s === 'true' || s === '1') return true;
+    if (s === 'false' || s === '0' || s === '') return false;
+  }
+  return Number(val) === 1;
+}
+
 @Component({
   selector: 'app-store-settings',
   templateUrl: './store-settings.component.html',
@@ -39,15 +50,15 @@ export class StoreSettingsComponent implements OnInit {
 
   ngOnInit(): void {
     if (!this.store) return;
-    this.isActive = !!this.store.isActive;
-    this.isLocked = !!this.store.isLocked;
-    this.isBlacklisted = !!this.store.isBlacklisted;
-    this.allowStorefront = this.store.allowStorefront !== 0 && this.store.allowStorefront !== false;
-    this.allowDashboard = this.store.allowDashboard !== 0 && this.store.allowDashboard !== false;
-    this.allowCheckout = this.store.allowCheckout !== 0 && this.store.allowCheckout !== false;
-    this.allowProductAdd = this.store.allowProductAdd !== 0 && this.store.allowProductAdd !== false;
-    this.lockReason = this.store.lockReason || '';
-    this.adminNotes = this.store.adminNotes || '';
+    this.isActive = asBool(this.store.isActive, true);
+    this.isLocked = asBool(this.store.isLocked, false);
+    this.isBlacklisted = asBool(this.store.isBlacklisted, false);
+    this.allowStorefront = asBool(this.store.allowStorefront, true);
+    this.allowDashboard = asBool(this.store.allowDashboard, true);
+    this.allowCheckout = asBool(this.store.allowCheckout, true);
+    this.allowProductAdd = asBool(this.store.allowProductAdd, true);
+    this.lockReason = String(this.store.lockReason || '').trim();
+    this.adminNotes = String(this.store.adminNotes || '').trim();
 
     const pl = Number(this.store.productLimit || 0);
     const mo = Number(this.store.maxOrders || 0);
@@ -57,6 +68,10 @@ export class StoreSettingsComponent implements OnInit {
     this.maxOrders = mo > 0 ? mo : 100;
 
     this.syncFullAccessFlag();
+  }
+
+  get needsReason(): boolean {
+    return this.isBlacklisted || this.isLocked || !this.isActive || !this.allowDashboard;
   }
 
   limitLabel(value: number): string {
@@ -81,16 +96,34 @@ export class StoreSettingsComponent implements OnInit {
     this.syncFullAccessFlag();
   }
 
+  onActiveChange(enabled: boolean) {
+    if (!enabled) {
+      if (!this.lockReason.trim()) {
+        this.lockReason = 'Store marked inactive by platform administrator.';
+      }
+    } else if (
+      this.lockReason === 'Store marked inactive by platform administrator.' &&
+      !this.isLocked &&
+      !this.isBlacklisted
+    ) {
+      this.lockReason = '';
+    }
+    this.syncFullAccessFlag();
+  }
+
   onLockChange(enabled: boolean) {
     if (enabled) {
       this.allowDashboard = false;
       this.allowStorefront = false;
-      if (!this.lockReason) {
+      if (!this.lockReason.trim()) {
         this.lockReason = 'Store locked by platform administrator.';
       }
     } else if (!this.isBlacklisted) {
       this.allowStorefront = true;
       this.allowDashboard = true;
+      if (this.lockReason === 'Store locked by platform administrator.') {
+        this.lockReason = '';
+      }
     }
     this.syncFullAccessFlag();
   }
@@ -103,7 +136,7 @@ export class StoreSettingsComponent implements OnInit {
       this.allowDashboard = false;
       this.allowCheckout = false;
       this.allowProductAdd = false;
-      if (!this.lockReason) {
+      if (!this.lockReason.trim() || this.lockReason === 'Store locked by platform administrator.') {
         this.lockReason = 'Store blacklisted by platform administrator.';
       }
     } else {
@@ -115,7 +148,8 @@ export class StoreSettingsComponent implements OnInit {
       this.allowProductAdd = true;
       if (
         this.lockReason === 'Store blacklisted by platform administrator.' ||
-        this.lockReason === 'Store locked by platform administrator.'
+        this.lockReason === 'Store locked by platform administrator.' ||
+        this.lockReason === 'Store marked inactive by platform administrator.'
       ) {
         this.lockReason = '';
       }
@@ -151,6 +185,10 @@ export class StoreSettingsComponent implements OnInit {
       this.sharedservice.showAlert(2, 'Enter a valid order limit (minimum 1) or choose Unlimited');
       return;
     }
+    if (this.needsReason && !this.lockReason.trim()) {
+      this.sharedservice.showAlert(2, 'Please enter a reason — it is shown to the store owner after login.');
+      return;
+    }
 
     this.isSaving = true;
     const body = {
@@ -163,16 +201,16 @@ export class StoreSettingsComponent implements OnInit {
       allowProductAdd: this.allowProductAdd,
       productLimit: this.useCustomProductLimit ? Number(this.productLimit) : 0,
       maxOrders: this.useCustomOrderLimit ? Number(this.maxOrders) : 0,
-      lockReason: this.lockReason,
-      adminNotes: this.adminNotes,
+      lockReason: this.lockReason.trim(),
+      adminNotes: this.adminNotes.trim(),
     };
 
     this.storeservice.updateStoreSettings(this.store.id, body).pipe(
       finalize(() => this.isSaving = false)
     ).subscribe({
-      next: () => {
+      next: (res) => {
         this.sharedservice.showAlert(1, 'Store settings saved');
-        this.activeModal.close(true);
+        this.activeModal.close(res?.store || true);
       },
       error: (err) => {
         this.sharedservice.showAlert(2, err.error?.message || err.error?.error || 'Something went wrong');

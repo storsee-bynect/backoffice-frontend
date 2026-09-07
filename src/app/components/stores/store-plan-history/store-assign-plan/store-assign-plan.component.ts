@@ -4,7 +4,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { PackageService } from '../../../packages/packages.service';
 import { StoreService } from '../../stores.service';
 import { SharedService } from '../../../../shared/services/shared.service';
-import { BILLING_CYCLES, filterPackagesByCycle, planDisplayDuration } from '../../../../shared/utils/plan-billing.util';
+import { planDisplayDuration } from '../../../../shared/utils/plan-billing.util';
 
 @Component({
   selector: 'app-store-assign-plan',
@@ -19,8 +19,6 @@ export class StoreAssignPlanComponent implements OnInit {
   packageList: any[] = [];
   selectedPackage: any = null;
   isSaving = false;
-  selectedBillingCycle: 'monthly' | 'semiannual' | 'annual' = 'monthly';
-  readonly billingCycles = BILLING_CYCLES;
 
   applyPackageLimits = true;
   useCustomLimits = false;
@@ -53,28 +51,16 @@ export class StoreAssignPlanComponent implements OnInit {
           }
           return p;
         });
-        this.applyBillingCycleFilter();
+        this.packageList = [...this.allPackages].sort(
+          (a, b) => Number(a.sortOrder || 0) - Number(b.sortOrder || 0) || Number(a.amount) - Number(b.amount)
+        );
+        if (this.packageList.length) {
+          const popular = this.packageList.find((p) => p.isPopular) || this.packageList.find((p) => p.isRecommended);
+          this.selectedPackage = popular || this.packageList.find((p) => Number(p.amount) > 0) || this.packageList[0];
+          this.onCustomLimitsToggle();
+        }
       }
     });
-  }
-
-  selectBillingCycle(cycle: 'monthly' | 'semiannual' | 'annual') {
-    this.selectedBillingCycle = cycle;
-    this.applyBillingCycleFilter();
-  }
-
-  applyBillingCycleFilter() {
-    this.packageList = filterPackagesByCycle(this.allPackages, this.selectedBillingCycle);
-    if (!this.packageList.length) {
-      this.selectedPackage = null;
-      return;
-    }
-    const stillValid = this.packageList.find((p) => p.id === this.selectedPackage?.id);
-    if (!stillValid) {
-      const popular = this.packageList.find((p) => p.isRecommended) || this.packageList.find((p) => p.isPopular);
-      this.selectedPackage = popular || this.packageList[0];
-      this.onCustomLimitsToggle();
-    }
   }
 
   planDurationLabel(pkg: any): string {

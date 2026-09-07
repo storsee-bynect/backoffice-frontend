@@ -33,18 +33,13 @@ import { PageCategoriesComponent } from './components/page-categories/page-categ
 import { AddUpdatePageCategoryComponent } from './components/page-categories/add-update-page-category/add-update-page-category.component';
 import { TableViewSkeletonComponent } from './shared/components/table-view-skeleton/table-view-skeleton.component';
 import { BoxViewSkeletonComponent } from './shared/components/box-view-skeleton/box-view-skeleton.component';
-import { BannersComponent } from './components/banners/banners.component';
-import { AddUpdateBannerComponent } from './components/banners/add-update-banner/add-update-banner.component';
 import { Interceptor } from './shared/services/intercenptor';
 import { BtnLoadingDirective } from './shared/directives/btn-loading.directive';
 import { ViewImageComponent } from './shared/components/view-image/view-image.component';
 import { ViewContentComponent } from './shared/components/view-content/view-content.component';
 import { TicketsComponent } from './components/tickets/tickets.component';
-import { AddUpdateTicketComponent } from './components/tickets/add-update-ticket/add-update-ticket.component';
-import { AnswerTicketComponent } from './components/tickets/answer-ticket/answer-ticket.component';
+import { TicketChatComponent } from './components/tickets/ticket-chat/ticket-chat.component';
 import { NgxSimpleTextEditorModule } from 'ngx-simple-text-editor';
-import { FaqComponent } from './components/faq/faq.component';
-import { AddUpdateFaqComponent } from './components/faq/add-update-faq/add-update-faq.component';
 import { CouponsComponent } from './components/coupons/coupons.component';
 import { AddUpdateCouponComponent } from './components/coupons/add-update-coupon/add-update-coupon.component';
 import { OnlyNumberDirective } from './shared/directive/only-number.directive';
@@ -62,7 +57,6 @@ import { ContactLeadsComponent } from './components/contact-leads/contact-leads.
 import { ViewStoreDetailComponent } from './components/stores/view-store-detail/view-store-detail.component';
 import { ViewTemplateDetailComponent } from './components/templates/view-template-detail/view-template-detail.component';
 import { NgApexchartsModule } from 'ng-apexcharts';
-import { SiteConfigurationComponent } from './components/site-configuration/site-configuration.component';
 import { StoreUsersComponent } from './components/store-users/store-users.component';
 import { AddUpdateStoreUserComponent } from './components/store-users/add-update-store-user/add-update-store-user.component';
 import { StoreUsersListComponent } from './components/stores/store-users-list/store-users-list.component';
@@ -78,6 +72,13 @@ import { ViewLocationComponent } from './shared/components/view-location/view-lo
 import { StorePlanHistoryComponent } from './components/stores/store-plan-history/store-plan-history.component';
 import { StoreAssignPlanComponent } from './components/stores/store-plan-history/store-assign-plan/store-assign-plan.component';
 import { StoreSettingsComponent } from './components/stores/store-settings/store-settings.component';
+import { NotificationSettingsComponent } from './components/notification-settings/notification-settings.component';
+import { PushNotificationsComponent } from './components/push-notifications/push-notifications.component';
+import { AddUpdatePushCampaignComponent } from './components/push-notifications/add-update-push-campaign/add-update-push-campaign.component';
+import { PushCampaignReportComponent } from './components/push-notifications/push-campaign-report/push-campaign-report.component';
+import { AppNotificationsComponent } from './components/app-notifications/app-notifications.component';
+import { AddUpdateAppNotificationComponent } from './components/app-notifications/add-update-app-notification/add-update-app-notification.component';
+import { AppNotificationReportComponent } from './components/app-notifications/app-notification-report/app-notification-report.component';
 
 @NgModule({
   declarations: [
@@ -88,7 +89,6 @@ import { StoreSettingsComponent } from './components/stores/store-settings/store
     LoginComponent,
     DashboardComponent,
     SidebarComponent,
-    BreadcrumbComponent,
     PageDataCountComponent,
     UsersComponent,
     AddUpdateUsersComponent,
@@ -100,16 +100,10 @@ import { StoreSettingsComponent } from './components/stores/store-settings/store
     PageCategoriesComponent,
     AddUpdatePageCategoryComponent,
     TableViewSkeletonComponent,
-    BoxViewSkeletonComponent,
-    BannersComponent,
-    AddUpdateBannerComponent,
     ViewImageComponent,
     ViewContentComponent,
     TicketsComponent,
-    AddUpdateTicketComponent,
-    AnswerTicketComponent,
-    FaqComponent,
-    AddUpdateFaqComponent,
+    TicketChatComponent,
     CouponsComponent,
     AddUpdateCouponComponent,
     ThemeCategoryComponent,
@@ -125,7 +119,6 @@ import { StoreSettingsComponent } from './components/stores/store-settings/store
     ContactLeadsComponent,
     ViewStoreDetailComponent,
     ViewTemplateDetailComponent,
-    SiteConfigurationComponent,
     StoreUsersComponent,
     AddUpdateStoreUserComponent,
     StoreUsersListComponent,
@@ -156,7 +149,16 @@ import { StoreSettingsComponent } from './components/stores/store-settings/store
     NgMultiSelectDropDownModule,
     ToastrModule.forRoot(),
     NgxSimpleTextEditorModule,
-    NgApexchartsModule
+    NgApexchartsModule,
+    BreadcrumbComponent,
+    BoxViewSkeletonComponent,
+    NotificationSettingsComponent,
+    PushNotificationsComponent,
+    AddUpdatePushCampaignComponent,
+    PushCampaignReportComponent,
+    AppNotificationsComponent,
+    AddUpdateAppNotificationComponent,
+    AppNotificationReportComponent
   ],
   providers: [
     { provide: APP_INITIALIZER, useFactory: initAppConfig, deps: [ConfigService], multi: true },

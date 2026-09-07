@@ -13,9 +13,8 @@
                     <div class="form-inp-main">
                         <label class="form-label">Tier <sup>*</sup></label>
                         <select class="form-select" [(ngModel)]="dataReqModel.tierSlug" (ngModelChange)="syncSlugFromTierCycle()" [disabled]="isEdit">
-                            <option value="starter">Starter</option>
-                            <option value="growth">Growth</option>
-                            <option value="scale">Scale</option>
+                            <option value="basic">Basic</option>
+                            <option value="storsee">Storsee</option>
                         </select>
                     </div>
                 </div>
@@ -23,9 +22,13 @@
                     <div class="form-inp-main">
                         <label class="form-label">Billing period <sup>*</sup></label>
                         <select class="form-select" [(ngModel)]="dataReqModel.billingCycle" (ngModelChange)="onBillingCycleChange()" [disabled]="isEdit">
-                            <option value="monthly">1 Month</option>
-                            <option value="semiannual">6 Months</option>
-                            <option value="annual">1 Year</option>
+                            <option value="trial">3-Day Trial</option>
+                            <option value="1m">1 Month</option>
+                            <option value="3m">3 Months</option>
+                            <option value="6m">6 Months</option>
+                            <option value="12m">12 Months</option>
+                            <option value="24m">24 Months</option>
+                            <option value="48m">48 Months</option>
                         </select>
                     </div>
                 </div>

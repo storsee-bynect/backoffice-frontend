@@ -34,7 +34,8 @@
             "inlineStyleLanguage": "scss",
             "assets": [
               "src/favicon.ico",
-              "src/assets"
+              "src/assets",
+              { "glob": "push-sw.js", "input": "src", "output": "/" }
             ],
             "styles": [
               "node_modules/leaflet/dist/leaflet.css",
@@ -102,7 +103,8 @@
             "inlineStyleLanguage": "scss",
             "assets": [
               "src/favicon.ico",
-              "src/assets"
+              "src/assets",
+              { "glob": "push-sw.js", "input": "src", "output": "/" }
             ],
             "styles": [
               "src/styles.scss"

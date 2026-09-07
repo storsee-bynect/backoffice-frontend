@@ -35,7 +35,9 @@
         </div>
         <hr>
     <div class="main-files">
-        @if((filesList.length > 0 || hasEverLoaded)){
+        @if(!hasEverLoaded && isListLoading){
+            <app-box-view-skeleton></app-box-view-skeleton>
+        }@else if(filesList.length > 0 || hasEverLoaded){
             <div class="d-grid p-0 m-0 file-box list-content-main" [class.is-list-loading]="isListLoading">
                 @if(filesList.length){
                 @for(item of filesList; track item){

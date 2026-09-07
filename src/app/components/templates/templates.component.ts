@@ -26,6 +26,18 @@ export class TemplatesComponent {
   btnLoading: string | number | null = null;
   isBtnLoading = (action: string, id?: string | number | null) => isActionLoading(this.btnLoading, action, id);
 
+  stats = { total: 0, active: 0, inactive: 0, free: 0, paid: 0 };
+
+  get countItems(): { label: string; value: number }[] {
+    return [
+      { label: 'Total Templates', value: this.stats.total || 0 },
+      { label: 'Active', value: this.stats.active || 0 },
+      { label: 'Inactive', value: this.stats.inactive || 0 },
+      { label: 'Free', value: this.stats.free || 0 },
+      { label: 'Paid', value: this.stats.paid || 0 },
+    ];
+  }
+
   constructor(public sharedservice: SharedService, private templateservice: TemplateService, private modalService: NgbModal) {}
 
   ngOnInit(): void {
@@ -47,6 +59,15 @@ export class TemplatesComponent {
         if (res) {
           this.dataList = res.data;
           this.totalCount = res.totalCount;
+          if (res?.stats) {
+            this.stats = {
+              total: Number(res.stats.total || 0),
+              active: Number(res.stats.active || 0),
+              inactive: Number(res.stats.inactive || 0),
+              free: Number(res.stats.free || 0),
+              paid: Number(res.stats.paid || 0),
+            };
+          }
           this.hasEverLoaded = true;
           this.isTechnicalIssue = false;
         }

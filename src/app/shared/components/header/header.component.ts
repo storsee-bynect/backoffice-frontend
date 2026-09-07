@@ -32,10 +32,8 @@ export class HeaderComponent implements OnInit {
     { label: 'Transactions',     url: '/transactions',       group: 'Monetisation' },
     { label: 'Templates',        url: '/templates',          group: 'Content' },
     { label: 'Theme Category',   url: '/theme-category',     group: 'Content' },
-    { label: 'Banners',          url: '/banners',            group: 'Content' },
     { label: 'Pages',            url: '/pages',              group: 'Content' },
     { label: 'Page Categories',  url: '/page-categories',    group: 'Content' },
-    { label: 'FAQs',             url: '/faq',                group: 'Support' },
     { label: 'Tickets',          url: '/tickets',            group: 'Support' },
     { label: 'Contact Leads',    url: '/contact-leads',      group: 'Leads' },
     { label: 'Leads',            url: '/leads',              group: 'Leads' },
@@ -43,7 +41,9 @@ export class HeaderComponent implements OnInit {
     { label: 'Coupons',          url: '/coupons',            group: 'Marketing' },
     { label: 'Policies',         url: '/policies',           group: 'Settings' },
     { label: 'Payment Setting',  url: '/payment-setting',    group: 'Settings' },
-    { label: 'Site Config',      url: '/site-configuration', group: 'Settings' },
+    { label: 'Notification Settings', url: '/notification-settings', group: 'Settings' },
+    { label: 'Web Push Campaigns', url: '/push-notifications', group: 'Marketing' },
+    { label: 'App Push Campaigns', url: '/app-notifications', group: 'Marketing' },
     { label: 'Store Users',      url: '/store-users',        group: 'Tools' },
   ];
 

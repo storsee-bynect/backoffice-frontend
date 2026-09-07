@@ -1,5 +1,5 @@
 <app-breadcrumb [pageName]="sharedservice.pageName" [icon]="sharedservice.pageDetail?.icon" />
-<app-page-data-count [totalCount]="totalCount" [filteredCount]="dataList.length" />
+<app-page-data-count [items]="countItems" />
 
 <div class="page-top-main">
   <div class="page-top-search-main d-flex">
@@ -18,7 +18,10 @@
   }
 </div>
 
-@if(dataList.length > 0 && !isTechnicalIssue){
+@if((!hasEverLoaded && isListLoading) || (dataList.length > 0 && !isTechnicalIssue)){
+@if(!hasEverLoaded && isListLoading){
+<app-box-view-skeleton></app-box-view-skeleton>
+}@else {
   <div class="list-content-main" [class.is-list-loading]="isListLoading">
     <div class="tpl-grid">
       @for(item of dataList | paginate: { itemsPerPage: limit, currentPage: page, totalItems: totalCount }; track item.id){
@@ -79,7 +82,7 @@
       </div>
     </div>
   </div>
-} @else if(isTechnicalIssue || hasEverLoaded || !isListLoading) {
+}} @else if(isTechnicalIssue || hasEverLoaded || !isListLoading) {
   <div class="no-data-found-main">
     <div class="no-data-found-img">
       <img [src]="isTechnicalIssue ? 'assets/img/technical-issue.png' : 'assets/img/no-data.png'" alt="" />

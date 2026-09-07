@@ -58,11 +58,15 @@ export class AddUpdatePackageComponent {
 
   onBillingCycleChange() {
     const map: Record<string, { label: string; days: number }> = {
-      monthly: { label: '1 Month', days: 30 },
-      semiannual: { label: '6 Months', days: 180 },
-      annual: { label: '1 Year', days: 365 },
+      trial: { label: '3-Day Trial', days: 3 },
+      '1m': { label: '1 Month', days: 30 },
+      '3m': { label: '3 Months', days: 90 },
+      '6m': { label: '6 Months', days: 180 },
+      '12m': { label: '12 Months', days: 365 },
+      '24m': { label: '24 Months', days: 730 },
+      '48m': { label: '48 Months', days: 1460 },
     };
-    const c = map[this.dataReqModel.billingCycle] || map['monthly'];
+    const c = map[this.dataReqModel.billingCycle] || map['1m'];
     this.dataReqModel.billingLabel = c.label;
     this.dataReqModel.duration = c.days;
     this.syncSlugFromTierCycle();
@@ -70,9 +74,13 @@ export class AddUpdatePackageComponent {
 
   syncSlugFromTierCycle() {
     if (this.isEdit) return;
-    const tier = (this.dataReqModel.tierSlug || 'starter').toLowerCase();
-    const cycle = (this.dataReqModel.billingCycle || 'monthly').toLowerCase();
-    this.dataReqModel.slug = `${tier}-${cycle}`;
+    const tier = (this.dataReqModel.tierSlug || 'storsee').toLowerCase();
+    const cycle = (this.dataReqModel.billingCycle || '1m').toLowerCase();
+    if (tier === 'basic' || cycle === 'trial') {
+      this.dataReqModel.slug = 'basic';
+    } else {
+      this.dataReqModel.slug = `plan-${cycle}`;
+    }
   }
 
   deleteBenefit(index: number) {

@@ -1,10 +1,10 @@
-<div class="data-count-main">
-    <div class="single-data-count side-border">
-        <div class="single-data-ttl">Total Records</div>
-        <div class="single-data-val">{{totalCount}}</div>
-    </div>
-    <div class="single-data-count">
-        <div class="single-data-ttl">Filtered Records</div>
-        <div class="single-data-val">{{filteredCount}}</div>
-    </div>
+<div class="data-count-main" *ngIf="displayItems.length">
+  <div
+    *ngFor="let item of displayItems; let last = last"
+    class="single-data-count"
+    [class.side-border]="!last"
+  >
+    <div class="single-data-ttl">{{ item.label }}</div>
+    <div class="single-data-val">{{ item.value }}</div>
+  </div>
 </div>

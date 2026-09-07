@@ -26,6 +26,13 @@ export class PageCategoriesComponent {
   btnLoading: string | number | null = null;
   isBtnLoading = (action: string, id?: string | number | null) => isActionLoading(this.btnLoading, action, id);
 
+  get countItems(): { label: string; value: number }[] {
+    return [
+      { label: 'Total Page Categories', value: this.totalCount || 0 },
+      { label: 'Showing', value: this.dataList?.length || 0 },
+    ];
+  }
+
   constructor(public sharedservice: SharedService, private pagecategoryservice: PageCategoryService, private modalService: NgbModal) {}
 
   ngOnInit(): void {

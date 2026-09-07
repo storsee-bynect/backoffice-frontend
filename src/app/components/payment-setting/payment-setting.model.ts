@@ -1,4 +1,5 @@
-export class PaymentSettingReqModel{
-    rzp_keyId : string;
-    rzp_keySecret : string;
+export class PaymentSettingReqModel {
+  enableRazorpay: boolean = false;
+  rzp_keyId: string = '';
+  rzp_keySecret: string = '';
 }

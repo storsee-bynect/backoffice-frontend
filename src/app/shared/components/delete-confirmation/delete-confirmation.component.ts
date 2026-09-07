@@ -7,6 +7,8 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
   styleUrl: './delete-confirmation.component.scss'
 })
 export class DeleteConfirmationComponent {
+  title = 'Are you sure?';
+  message = 'You want to delete this record!';
 
   constructor(public activeModal : NgbActiveModal){}
 

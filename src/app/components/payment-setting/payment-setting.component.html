@@ -1,27 +1,114 @@
 <app-breadcrumb [pageName]="sharedservice.pageName" [icon]="sharedservice.pageDetail?.icon" />
-@if(isDataLoaded){
-    <div class="page-table-main">
-        <div class="row m-0 p-0">
-            <div class="col-lg-6 col-12 mb-2">
-                <div class="form-inp-main">
-                    <label class="form-label">Razorpay Key ID</label>
-                        <input class="form-control" type="text" placeholder="Enter Razorpay Key ID" [(ngModel)]="paymentsetting.rzp_keyId" />
-                </div>
+
+@if (isDataLoaded) {
+  <div class="pay">
+    <section class="pay__card" [class.pay__card--active]="paymentsetting.enableRazorpay">
+      <div class="pay__card-top">
+        <div class="pay__brand">
+          <span class="pay__brand-icon">
+            <i class="fa-solid fa-credit-card"></i>
+          </span>
+          <div class="pay__brand-text">
+            <div class="pay__title-row">
+              <h2 class="pay__card-title">Razorpay</h2>
+              <span class="pay__badge" [class.pay__badge--on]="paymentsetting.enableRazorpay">
+                {{ paymentsetting.enableRazorpay ? 'Enabled' : 'Disabled' }}
+              </span>
             </div>
-            <div class="col-lg-6 col-12 mb-2">
-                <div class="form-inp-main">
-                    <label class="form-label">Razorpay Key Secret</label>
-                        <input class="form-control" type="text" placeholder="Enter Razorpay Key Secret" [(ngModel)]="paymentsetting.rzp_keySecret" />
-                </div>
-            </div>
-            <div class="col-12">
-                <div class="popup-footer">
-                    <button type="button" class="site-btn primary-color ms-1" (click)="updateSetting()" [appBtnLoading]="isSaving" [disabled]="isSaving">
-                        <span class="site-btn-icon"><i class="fa-solid fa-check"></i></span>
-                        Update
-                    </button>
-                </div>
-            </div>
+            <p class="pay__card-desc">Accept UPI, cards, netbanking &amp; wallets for plan payments</p>
+          </div>
         </div>
+        <label class="toggle-switch" aria-label="Enable Razorpay">
+          <input
+            class="toggle-input"
+            type="checkbox"
+            [ngModel]="paymentsetting.enableRazorpay"
+            (ngModelChange)="onRazorpayToggle($event)"
+          />
+          <span class="toggle-label"></span>
+        </label>
+      </div>
+
+      @if (paymentsetting.enableRazorpay) {
+        <div class="pay__creds">
+          <div class="pay__creds-head">
+            <div class="pay__creds-head-left">
+              <!-- <span class="pay__creds-lock"><i class="fa-solid fa-key"></i></span> -->
+              <div>
+                <div class="pay__creds-title">API Credentials</div>
+                <div class="pay__creds-sub">From Razorpay Dashboard → Settings → API Keys</div>
+              </div>
+            </div>
+            <span class="pay__creds-secure"><i class="fa-solid fa-shield-halved"></i> Secure</span>
+          </div>
+
+          <div class="pay__fields">
+            <div class="pay__field">
+              <label class="pay__field-label" for="sa-rzp-key-id">
+                <i class="fa-regular fa-id-card"></i>
+                Key ID
+              </label>
+              <input
+                id="sa-rzp-key-id"
+                class="pay__input"
+                type="text"
+                autocomplete="off"
+                spellcheck="false"
+                placeholder="rzp_live_xxxxxxxxxxxx"
+                [(ngModel)]="paymentsetting.rzp_keyId"
+              />
+            </div>
+
+            <div class="pay__field">
+                <label class="pay__field-label" for="sa-rzp-key-secret">
+                <i class="fa-solid fa-lock"></i>
+                Key Secret
+              </label>
+              <div class="pay__secret">
+                <input
+                  id="sa-rzp-key-secret"
+                  class="pay__input"
+                  [type]="showSecret ? 'text' : 'password'"
+                  autocomplete="new-password"
+                  spellcheck="false"
+                  placeholder="Enter Key Secret"
+                  [(ngModel)]="paymentsetting.rzp_keySecret"
+                />
+                <button
+                  type="button"
+                  class="pay__secret-btn"
+                  (click)="showSecret = !showSecret"
+                  [attr.aria-label]="showSecret ? 'Hide secret' : 'Show secret'"
+                >
+                  <i class="fa-regular" [class.fa-eye]="!showSecret" [class.fa-eye-slash]="showSecret"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      } @else {
+        <div class="pay__off-hint">
+          <i class="fa-regular fa-circle-info"></i>
+          <span>Enable Razorpay to enter Key ID and Key Secret.</span>
+        </div>
+      }
+    </section>
+
+    <div class="pay__footer">
+      <button
+        type="button"
+        class="site-btn primary-color"
+        (click)="updateSetting()"
+        [appBtnLoading]="isSaving"
+        [disabled]="isSaving"
+      >
+        <span class="site-btn-icon"><i class="fa-solid fa-check"></i></span>
+        Save Payment Setting
+      </button>
     </div>
+  </div>
+} @else {
+  <div class="page-table-main">
+    <app-table-view-skeleton></app-table-view-skeleton>
+  </div>
 }

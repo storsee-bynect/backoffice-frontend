@@ -27,6 +27,12 @@ export class RolesComponent {
   btnLoading: string | number | null = null;
   isBtnLoading = (action: string, id?: string | number | null) => isActionLoading(this.btnLoading, action, id);
 
+  get countItems(): { label: string; value: number }[] {
+    return [
+      { label: 'Total Roles', value: this.totalCount || 0 },
+    ];
+  }
+
   constructor(public sharedservice: SharedService, private roleservice: RoleService, private modalService: NgbModal) {}
 
   ngOnInit(): void {
@@ -47,7 +53,7 @@ export class RolesComponent {
       next: (res: any) => {
         if (res) {
           this.dataList = res.data;
-          this.totalCount = res.totalCount;
+          this.totalCount = Array.isArray(this.dataList) ? this.dataList.length : 0;
           this.hasEverLoaded = true;
           this.isTechnicalIssue = false;
         }

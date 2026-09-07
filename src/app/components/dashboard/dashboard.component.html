@@ -1,160 +1,382 @@
 <app-breadcrumb [pageName]="sharedservice.pageName" [icon]="sharedservice.pageDetail?.icon" />
-@if(dashboardData){
-    <div class="page-top-main mb-2">
-        <p class="mb-0 text-muted" style="font-size: 12px;">Platform overview at a glance</p>
-        <button type="button" class="site-btn grey-color" [appBtnLoading]="isReloadLoading" [disabled]="isReloadLoading" (click)="loadDashboard(true)">
-            <span class="site-btn-icon"><i class="fa-solid fa-rotate"></i></span>
-            Refresh
+
+@if (dashboardData) {
+  <div class="dash">
+    <section class="dash-today">
+      <div class="dash-today__head">
+        <div class="dash-today__copy">
+          <span class="dash-today__badge">Platform</span>
+          <span class="dash-today__title">
+            {{ n('totalStores') | number }} stores · {{ n('livePlans') | number }} live plans
+          </span>
+        </div>
+        <button type="button" class="dash-link" [appBtnLoading]="isReloadLoading" [disabled]="isReloadLoading" (click)="loadDashboard(true)">
+          Refresh
+          <i class="fa-solid fa-rotate"></i>
         </button>
+      </div>
+    </section>
+
+    <section class="dash-kpi-grid dash-rev-grid" aria-label="Revenue">
+      <article class="dash-kpi dash-kpi--money dash-kpi--green">
+        <div class="dash-kpi__top">
+          <span class="dash-kpi__icon"><i class="fa-solid fa-indian-rupee-sign"></i></span>
+          <span class="dash-kpi__hint">Today</span>
+        </div>
+        <div class="dash-kpi__value">{{ money('revenueToday') }}</div>
+        <div class="dash-kpi__label">Today's revenue</div>
+        <p class="dash-kpi__note">Plan payments collected today.</p>
+      </article>
+
+      <article class="dash-kpi dash-kpi--money dash-kpi--blue">
+        <div class="dash-kpi__top">
+          <span class="dash-kpi__icon"><i class="fa-solid fa-wallet"></i></span>
+          <span class="dash-kpi__hint">7 days</span>
+        </div>
+        <div class="dash-kpi__value">{{ money('revenue7d') }}</div>
+        <div class="dash-kpi__label">Last 7 days revenue</div>
+        <p class="dash-kpi__note">Subscription payments this week.</p>
+      </article>
+
+      <article class="dash-kpi dash-kpi--money dash-kpi--sky">
+        <div class="dash-kpi__top">
+          <span class="dash-kpi__icon"><i class="fa-solid fa-chart-line"></i></span>
+          <span class="dash-kpi__hint">30 days</span>
+        </div>
+        <div class="dash-kpi__value">{{ money('revenue30d') }}</div>
+        <div class="dash-kpi__label">Last 30 days revenue</div>
+        <p class="dash-kpi__note">Rolling month of plan revenue.</p>
+      </article>
+
+      <article class="dash-kpi dash-kpi--money dash-kpi--amber">
+        <div class="dash-kpi__top">
+          <span class="dash-kpi__icon"><i class="fa-solid fa-coins"></i></span>
+          <span class="dash-kpi__hint">365 days</span>
+        </div>
+        <div class="dash-kpi__value">{{ money('revenue365d') }}</div>
+        <div class="dash-kpi__label">Last 365 days revenue</div>
+        <p class="dash-kpi__note">{{ n('totalTransactions') | number }} transactions all time · {{ money('totalTransactionAmt') }}.</p>
+      </article>
+    </section>
+
+    <section class="dash-kpi-grid" aria-label="Key metrics">
+      <article class="dash-kpi dash-kpi--blue" routerLink="/stores">
+        <div class="dash-kpi__top">
+          <span class="dash-kpi__icon"><i class="fa-solid fa-shop"></i></span>
+          <span class="dash-kpi__hint">Last 24h</span>
+        </div>
+        <div class="dash-kpi__value">{{ n('storesToday') | number }}</div>
+        <div class="dash-kpi__label">New stores today</div>
+        <p class="dash-kpi__note">{{ n('stores7d') | number }} in last 7 days · {{ n('stores30d') | number }} in 30 days.</p>
+      </article>
+
+      <article class="dash-kpi dash-kpi--sky" routerLink="/stores">
+        <div class="dash-kpi__top">
+          <span class="dash-kpi__icon"><i class="fa-solid fa-credit-card"></i></span>
+          <span class="dash-kpi__hint">Live</span>
+        </div>
+        <div class="dash-kpi__value">{{ n('livePlans') | number }}</div>
+        <div class="dash-kpi__label">Active subscriptions</div>
+        <p class="dash-kpi__note">{{ n('expiring7d') | number }} expiring within 7 days.</p>
+      </article>
+
+      <article class="dash-kpi dash-kpi--green">
+        <div class="dash-kpi__top">
+          <span class="dash-kpi__icon"><i class="fa-solid fa-building"></i></span>
+          <span class="dash-kpi__hint">Setup</span>
+        </div>
+        <div class="dash-kpi__value">{{ setupRate() }}</div>
+        <div class="dash-kpi__label">Store setup complete</div>
+        <p class="dash-kpi__note">{{ n('setupComplete') | number }} of {{ n('totalStores') | number }} finished setup.</p>
+      </article>
+
+      <article class="dash-kpi dash-kpi--amber" routerLink="/tickets">
+        <div class="dash-kpi__top">
+          <span class="dash-kpi__icon"><i class="fa-solid fa-ticket"></i></span>
+          <span class="dash-kpi__hint">Support</span>
+        </div>
+        <div class="dash-kpi__value">{{ n('openTickets') | number }}</div>
+        <div class="dash-kpi__label">Open tickets</div>
+        <p class="dash-kpi__note">{{ n('totalTicket') | number }} tickets overall.</p>
+      </article>
+    </section>
+
+    <section class="dash-snap" aria-label="Platform totals">
+      <div class="dash-snap__item" routerLink="/stores">
+        <span class="dash-snap__icon"><i class="fa-regular fa-shop"></i></span>
+        <div>
+          <span class="lbl">Stores</span>
+          <span class="val">{{ n('totalStores') | number }}</span>
+        </div>
+      </div>
+      <div class="dash-snap__item">
+        <span class="dash-snap__icon"><i class="fa-regular fa-users"></i></span>
+        <div>
+          <span class="lbl">Admins</span>
+          <span class="val">{{ n('totalUsers') | number }}</span>
+        </div>
+      </div>
+      <div class="dash-snap__item" routerLink="/packages">
+        <span class="dash-snap__icon"><i class="fa-regular fa-box"></i></span>
+        <div>
+          <span class="lbl">Plans</span>
+          <span class="val">{{ n('totalPackages') | number }}</span>
+        </div>
+      </div>
+      <div class="dash-snap__item" routerLink="/templates">
+        <span class="dash-snap__icon"><i class="fa-regular fa-layer-group"></i></span>
+        <div>
+          <span class="lbl">Templates</span>
+          <span class="val">{{ n('totalTemplate') | number }}</span>
+        </div>
+      </div>
+      <div class="dash-snap__item">
+        <span class="dash-snap__icon"><i class="fa-regular fa-ticket"></i></span>
+        <div>
+          <span class="lbl">Tickets</span>
+          <span class="val">{{ n('totalTicket') | number }}</span>
+        </div>
+      </div>
+      <div class="dash-snap__item">
+        <span class="dash-snap__icon"><i class="fa-regular fa-inbox"></i></span>
+        <div>
+          <span class="lbl">Contact leads</span>
+          <span class="val">{{ n('totalContactLeads') | number }}</span>
+        </div>
+      </div>
+      <div class="dash-snap__item">
+        <span class="dash-snap__icon"><i class="fa-regular fa-clock"></i></span>
+        <div>
+          <span class="lbl">Expiring (7d)</span>
+          <span class="val">{{ n('expiring7d') | number }}</span>
+        </div>
+      </div>
+      <div class="dash-snap__item">
+        <span class="dash-snap__icon"><i class="fa-regular fa-gifts"></i></span>
+        <div>
+          <span class="lbl">Coupons</span>
+          <span class="val">{{ n('totalCoupons') | number }}</span>
+        </div>
+      </div>
+      <div class="dash-snap__item">
+        <span class="dash-snap__icon"><i class="fa-regular fa-files"></i></span>
+        <div>
+          <span class="lbl">Pages</span>
+          <span class="val">{{ n('totalPages') | number }}</span>
+        </div>
+      </div>
+      <div class="dash-snap__item">
+        <span class="dash-snap__icon"><i class="fa-regular fa-scroll"></i></span>
+        <div>
+          <span class="lbl">Roles</span>
+          <span class="val">{{ n('totalRoles') | number }}</span>
+        </div>
+      </div>
+      <div class="dash-snap__item">
+        <span class="dash-snap__icon"><i class="fa-regular fa-cart-shopping"></i></span>
+        <div>
+          <span class="lbl">Tpl purchases</span>
+          <span class="val">{{ n('totalTemplatePurchases') | number }}</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="dash-charts">
+      <article class="dash-chart-card">
+        <div class="dash-chart-card__head">
+          <div class="dash-chart-card__title">
+            <span class="dash-chart-card__icon"><i class="fa-solid fa-chart-area"></i></span>
+            <div>
+              <h3>Revenue trend</h3>
+              <p>Plan payments over the last 14 days</p>
+            </div>
+          </div>
+        </div>
+        @if (showCharts && revenueChartOptions) {
+          <apx-chart
+            [series]="revenueChartOptions.series!"
+            [chart]="revenueChartOptions.chart!"
+            [xaxis]="revenueChartOptions.xaxis!"
+            [yaxis]="revenueChartOptions.yaxis!"
+            [dataLabels]="revenueChartOptions.dataLabels!"
+            [stroke]="revenueChartOptions.stroke!"
+            [fill]="revenueChartOptions.fill!"
+            [grid]="revenueChartOptions.grid!"
+            [tooltip]="revenueChartOptions.tooltip!"
+            [colors]="revenueChartOptions.colors!"
+          ></apx-chart>
+        } @else {
+          <div class="dash-empty dash-empty--inset">
+            <span class="dash-empty__icon"><i class="fa-regular fa-chart-line"></i></span>
+            <div>
+              <strong>No revenue data yet</strong>
+              <p>Payments will appear here once stores subscribe.</p>
+            </div>
+          </div>
+        }
+      </article>
+
+      <article class="dash-chart-card">
+        <div class="dash-chart-card__head">
+          <div class="dash-chart-card__title">
+            <span class="dash-chart-card__icon"><i class="fa-solid fa-shop"></i></span>
+            <div>
+              <h3>New stores</h3>
+              <p>Registrations over the last 14 days</p>
+            </div>
+          </div>
+        </div>
+        @if (showCharts && storesChartOptions) {
+          <apx-chart
+            [series]="storesChartOptions.series!"
+            [chart]="storesChartOptions.chart!"
+            [xaxis]="storesChartOptions.xaxis!"
+            [yaxis]="storesChartOptions.yaxis!"
+            [dataLabels]="storesChartOptions.dataLabels!"
+            [stroke]="storesChartOptions.stroke!"
+            [fill]="storesChartOptions.fill!"
+            [grid]="storesChartOptions.grid!"
+            [tooltip]="storesChartOptions.tooltip!"
+            [colors]="storesChartOptions.colors!"
+          ></apx-chart>
+        } @else {
+          <div class="dash-empty dash-empty--inset">
+            <span class="dash-empty__icon"><i class="fa-regular fa-shop"></i></span>
+            <div>
+              <strong>No store sign-ups yet</strong>
+              <p>New registrations will show up in this chart.</p>
+            </div>
+          </div>
+        }
+      </article>
+    </section>
+
+    <section class="dash-bottom">
+      <article class="dash-chart-card">
+        <div class="dash-chart-card__head">
+          <div class="dash-chart-card__title">
+            <span class="dash-chart-card__icon"><i class="fa-solid fa-chart-pie"></i></span>
+            <div>
+              <h3>Active plan mix</h3>
+              <p>How live subscription windows are distributed</p>
+            </div>
+          </div>
+        </div>
+        @if (showCharts && planMixChartOptions) {
+          <apx-chart
+            [series]="planMixChartOptions.series!"
+            [chart]="planMixChartOptions.chart!"
+            [labels]="planMixChartOptions.labels!"
+            [legend]="planMixChartOptions.legend!"
+            [dataLabels]="planMixChartOptions.dataLabels!"
+            [plotOptions]="planMixChartOptions.plotOptions!"
+            [colors]="planMixChartOptions.colors!"
+            [tooltip]="planMixChartOptions.tooltip!"
+          ></apx-chart>
+        } @else {
+          <div class="dash-empty dash-empty--inset">
+            <span class="dash-empty__icon"><i class="fa-regular fa-credit-card"></i></span>
+            <div>
+              <strong>No active subscriptions to chart yet</strong>
+              <p>Plan mix will appear once stores go live on a plan.</p>
+            </div>
+          </div>
+        }
+      </article>
+
+      <article class="dash-upcoming">
+        <div class="dash-chart-card__head">
+          <div class="dash-chart-card__title">
+            <span class="dash-chart-card__icon"><i class="fa-solid fa-shop"></i></span>
+            <div>
+              <h3>Recent stores</h3>
+              <p>Latest registrations on the platform</p>
+            </div>
+          </div>
+          <a routerLink="/stores" class="dash-link">
+            View all
+            <i class="fa-regular fa-arrow-right"></i>
+          </a>
+        </div>
+
+        @if (dashboardData?.recentStores?.length) {
+          <div class="dash-upcoming-list">
+            @for (item of dashboardData.recentStores; track item.id) {
+              <div class="dash-upcoming-row" routerLink="/stores">
+                <div class="dash-upcoming-row__when">
+                  <i class="fa-regular fa-clock"></i>
+                  {{ item.created_at | date: 'dd MMM' }}
+                </div>
+                <div class="dash-upcoming-row__body">
+                  <div class="name">{{ item.name || 'Store' }}</div>
+                  <div class="date">
+                    <i class="fa-regular fa-envelope"></i>
+                    {{ item.email }}
+                  </div>
+                </div>
+                <div class="dash-upcoming-row__posts" [class.is-zero]="!item.isActive">
+                  {{ item.isActive ? 'Active' : 'Inactive' }}
+                </div>
+              </div>
+            }
+          </div>
+        } @else {
+          <div class="dash-empty dash-empty--inset">
+            <span class="dash-empty__icon"><i class="fa-regular fa-shop"></i></span>
+            <div>
+              <strong>No stores yet</strong>
+              <p>New store registrations will appear here.</p>
+            </div>
+          </div>
+        }
+      </article>
+    </section>
+
+    @if (dashboardData?.openTicketList?.length) {
+      <section class="dash-upcoming dash-tickets">
+        <div class="dash-chart-card__head">
+          <div class="dash-chart-card__title">
+            <span class="dash-chart-card__icon"><i class="fa-solid fa-headset"></i></span>
+            <div>
+              <h3>Open support tickets</h3>
+              <p>Needs attention from the team</p>
+            </div>
+          </div>
+          <a routerLink="/tickets" class="dash-link">
+            All tickets
+            <i class="fa-regular fa-arrow-right"></i>
+          </a>
+        </div>
+        <div class="dash-upcoming-list">
+          @for (t of dashboardData.openTicketList; track t.id) {
+            <div class="dash-upcoming-row" routerLink="/tickets">
+              <div class="dash-upcoming-row__when">#{{ t.id }}</div>
+              <div class="dash-upcoming-row__body">
+                <div class="name">{{ t.subject || 'Support ticket' }}</div>
+                <div class="date">
+                  <i class="fa-regular fa-calendar"></i>
+                  {{ t.created_at | date: 'EEE, dd MMM yyyy' }}
+                </div>
+              </div>
+              <div class="dash-upcoming-row__posts">Open</div>
+            </div>
+          }
+        </div>
+      </section>
+    }
+  </div>
+} @else {
+  <div class="dash-skeleton">
+    <div class="dash-skel-row">
+      @for (i of [1, 2, 3, 4]; track i) {
+        <div class="dash-skel-card"></div>
+      }
     </div>
-    <!-- ----------------------------------- amount display start  -->
-    <div class="d-grid p-0 mb-2 two-box">
-        <div class="dash-box-main primary">
-            <div class="dash-box-icon">
-                <i class="fa-regular fa-money-from-bracket"></i>
-            </div>
-            <div class="dash-box-ctx">
-                <div class="dash-box-count">₹ {{dashboardData?.totalTransactionAmt || 0 | number}}</div>
-                <div class="dash-box-name">Transaction Amount</div>
-            </div>
-        </div>
-        <div class="dash-box-main">
-            <div class="dash-box-icon">
-                <i class="fa-regular fa-money-bill-transfer"></i>
-            </div>
-            <div class="dash-box-ctx">
-                <div class="dash-box-count">{{dashboardData?.totalTransactions || 0 | number}}</div>
-                <div class="dash-box-name">Transactions Count</div>
-            </div>
-        </div>
+    <div class="dash-skel-row">
+      @for (i of [1, 2, 3, 4]; track i) {
+        <div class="dash-skel-card"></div>
+      }
     </div>
-    <!-- ----------------------------------- amount display end  -->
-     <div class="chart-main">
-        <div style="height: 300px;">
-            <apx-chart [series]="transactionChart.series" [chart]="transactionChart.chart"
-                [plotOptions]="transactionChart.plotOptions" [colors]="transactionChart.colors"
-                [stroke]="transactionChart.stroke" [xaxis]="transactionChart.xaxis"
-                [grid]="transactionChart.grid"></apx-chart>
-        </div>
-     </div>
-    <!-- ----------------------------------- count display start  -->
-    <div class="d-grid p-0 m-0 three-box">
-        <div class="dash-box-main">
-            <div class="dash-box-icon">
-                <i class="fa-regular fa-shop"></i>
-            </div>
-            <div class="dash-box-ctx">
-                <div class="dash-box-count">{{dashboardData?.totalStores || 0 | number}}</div>
-                <div class="dash-box-name">Stores</div>
-            </div>
-        </div>
-        <div class="dash-box-main">
-            <div class="dash-box-icon">
-                <i class="fa-regular fa-users"></i>
-            </div>
-            <div class="dash-box-ctx">
-                <div class="dash-box-count">{{dashboardData?.totalUsers || 0 | number}}</div>
-                <div class="dash-box-name">Administrators</div>
-            </div>
-        </div>
-        <div class="dash-box-main">
-            <div class="dash-box-icon">
-                <i class="fa-regular fa-images"></i>
-            </div>
-            <div class="dash-box-ctx">
-                <div class="dash-box-count">{{dashboardData?.totalBanners || 0 | number}}</div>
-                <div class="dash-box-name">Banners</div>
-            </div>
-        </div>
-        <div class="dash-box-main">
-            <div class="dash-box-icon">
-                <i class="fa-regular fa-gifts"></i>
-            </div>
-            <div class="dash-box-ctx">
-                <div class="dash-box-count">{{dashboardData?.totalCoupons || 0 | number}}</div>
-                <div class="dash-box-name">Coupons</div>
-            </div>
-        </div>
-        <div class="dash-box-main">
-            <div class="dash-box-icon">
-                <i class="fa-regular fa-list"></i>
-            </div>
-            <div class="dash-box-ctx">
-                <div class="dash-box-count">{{dashboardData?.totalFaq || 0 | number}}</div>
-                <div class="dash-box-name">Faqs</div>
-            </div>
-        </div>
-        <div class="dash-box-main">
-            <div class="dash-box-icon">
-                <i class="fa-regular fa-box"></i>
-            </div>
-            <div class="dash-box-ctx">
-                <div class="dash-box-count">{{dashboardData?.totalPackages || 0 | number}}</div>
-                <div class="dash-box-name">Packages</div>
-            </div>
-        </div>
-        <div class="dash-box-main">
-            <div class="dash-box-icon">
-                <i class="fa-regular fa-files"></i>
-            </div>
-            <div class="dash-box-ctx">
-                <div class="dash-box-count">{{dashboardData?.totalPages || 0 | number}}</div>
-                <div class="dash-box-name">Pages</div>
-            </div>
-        </div>
-        <div class="dash-box-main">
-            <div class="dash-box-icon">
-                <i class="fa-regular fa-table-cells"></i>
-            </div>
-            <div class="dash-box-ctx">
-                <div class="dash-box-count">{{dashboardData?.totalPagescategory || 0 | number}}</div>
-                <div class="dash-box-name">Page Categories</div>
-            </div>
-        </div>
-        <div class="dash-box-main">
-            <div class="dash-box-icon">
-                <i class="fa-regular fa-scroll"></i>
-            </div>
-            <div class="dash-box-ctx">
-                <div class="dash-box-count">{{dashboardData?.totalRoles || 0 | number}}</div>
-                <div class="dash-box-name">Roles</div>
-            </div>
-        </div>
-        <div class="dash-box-main">
-            <div class="dash-box-icon">
-                <i class="fa-regular fa-table-layout"></i>
-            </div>
-            <div class="dash-box-ctx">
-                <div class="dash-box-count">{{dashboardData?.totalTemplate || 0 | number}}</div>
-                <div class="dash-box-name">Templates</div>
-            </div>
-        </div>
-        <div class="dash-box-main">
-            <div class="dash-box-icon">
-                <i class="fa-regular fa-table-list"></i>
-            </div>
-            <div class="dash-box-ctx">
-                <div class="dash-box-count">{{dashboardData?.totalThemecategory || 0 | number}}</div>
-                <div class="dash-box-name">Theme Categories</div>
-            </div>
-        </div>
-        <div class="dash-box-main">
-            <div class="dash-box-icon">
-                <i class="fa-regular fa-tickets"></i>
-            </div>
-            <div class="dash-box-ctx">
-                <div class="dash-box-count">{{dashboardData?.totalTicket || 0 | number}}</div>
-                <div class="dash-box-name">Support Tickets</div>
-            </div>
-        </div>
-    </div>
-    <!-- ----------------------------------- count display end  -->
-}@else {
-    <div class="no-data-found-main py-5">
-        <div class="no-data-found-ctx mb-2">Loading dashboard...</div>
-        <button type="button" class="site-btn primary-color" [appBtnLoading]="isReloadLoading" [disabled]="isReloadLoading" (click)="loadDashboard(true)">
-            <span class="site-btn-icon"><i class="fa-solid fa-rotate-right"></i></span>
-            Load Dashboard
-        </button>
-    </div>
+    <div class="dash-skel-chart"></div>
+  </div>
 }

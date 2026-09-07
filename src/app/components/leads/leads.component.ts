@@ -27,6 +27,20 @@ export class LeadsComponent {
   btnLoading: string | number | null = null;
   isBtnLoading = (action: string, id?: string | number | null) => isActionLoading(this.btnLoading, action, id);
 
+  stats = { total: 0, new: 0, contacted: 0, proposalSent: 0, won: 0, onHold: 0, lost: 0 };
+
+  get countItems(): { label: string; value: number }[] {
+    return [
+      { label: 'Total', value: this.stats.total || 0 },
+      { label: 'New', value: this.stats.new || 0 },
+      { label: 'Contacted', value: this.stats.contacted || 0 },
+      { label: 'Proposal Sent', value: this.stats.proposalSent || 0 },
+      { label: 'Won', value: this.stats.won || 0 },
+      { label: 'On Hold', value: this.stats.onHold || 0 },
+      { label: 'Lost', value: this.stats.lost || 0 },
+    ];
+  }
+
   constructor(public sharedservice: SharedService, private leadservice: LeadService, private modalService: NgbModal) {}
 
   ngOnInit(): void {
@@ -48,6 +62,17 @@ export class LeadsComponent {
         if (res) {
           this.dataList = res.data;
           this.totalCount = res.totalCount;
+          if (res?.stats) {
+            this.stats = {
+              total: Number(res.stats.total || 0),
+              new: Number(res.stats.new || 0),
+              contacted: Number(res.stats.contacted || 0),
+              proposalSent: Number(res.stats.proposalSent || 0),
+              won: Number(res.stats.won || 0),
+              onHold: Number(res.stats.onHold || 0),
+              lost: Number(res.stats.lost || 0),
+            };
+          }
           this.hasEverLoaded = true;
           this.isTechnicalIssue = false;
         }

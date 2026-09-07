@@ -1,0 +1,178 @@
+<app-breadcrumb [pageName]="'Push Notifications'" [icon]="'bell'" />
+<div class="page-top-main">
+  <div class="page-top-search-main d-flex">
+    @if (tab === 'campaigns') {
+      <input type="text" class="form-control" placeholder="Search" [(ngModel)]="searchTxt" (keyup.enter)="filterData()" />
+      <button class="square-btn site-btn primary-color ms-1" (click)="filterData()"><i class="fa-solid fa-magnifying-glass"></i></button>
+      <select class="form-select ms-1" style="width: auto;" [(ngModel)]="statusFilter" (ngModelChange)="filterData()">
+        <option value="">All statuses</option>
+        <option value="draft">Draft</option>
+        <option value="scheduled">Scheduled</option>
+        <option value="sending">Sending</option>
+        <option value="completed">Completed</option>
+        <option value="paused">Paused</option>
+        <option value="cancelled">Cancelled</option>
+      </select>
+    }
+  </div>
+  <div class="page-top-btns-main d-flex justify-content-end">
+    <button class="site-btn ms-1" [class.primary-color]="tab === 'campaigns'" [class.grey-color]="tab !== 'campaigns'" (click)="tab = 'campaigns'">Campaigns</button>
+    <button class="site-btn ms-1" [class.primary-color]="tab === 'settings'" [class.grey-color]="tab !== 'settings'" (click)="tab = 'settings'">Settings</button>
+    @if (tab === 'campaigns') {
+      <button class="site-btn dark-color ms-1" (click)="addUpdateData(false)">
+        <div class="site-btn-icon"><i class="fa-solid fa-plus"></i></div>
+        Create
+      </button>
+    }
+  </div>
+</div>
+
+@if (tab === 'campaigns') {
+  @if ((dataList.length > 0 || !isDataLoaded) && !isTechnicalIssue) {
+    <div class="page-table-main">
+      @if (isDataLoaded) {
+        <div class="table-responsive">
+          <table class="table table-bordered text-nowrap mb-0">
+            <thead>
+              <tr>
+                <th class="sr-th">Sr No.</th>
+                <th>Title</th>
+                <th>Audience</th>
+                <th>Send</th>
+                <th>Next run (IST)</th>
+                <th>Sent / Failed</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (item of dataList | paginate: { itemsPerPage: limit, currentPage: page, totalItems: totalCount }; track item.id; let i = $index) {
+                <tr>
+                  <td class="sr-no-td">{{ i + 1 }}</td>
+                  <td>
+                    {{ item.title }}
+                    @if (item.is_occasion_auto) {
+                      <div class="text-muted small">Occasion auto</div>
+                    }
+                  </td>
+                  <td>{{ audienceLabel(item.audience) }}</td>
+                  <td>{{ sendModeLabel(item.send_mode) }}</td>
+                  <td>{{ formatIst(item.next_run_at) }}</td>
+                  <td>{{ item.sent_count || 0 }} / {{ item.failed_count || 0 }}</td>
+                  <td>
+                    <div class="status-td">
+                      <span class="status-table" [ngClass]="statusClass(item.status)">{{ item.status }}</span>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="table-btns-main">
+                      <button [ngbTooltip]="'Update'" class="table-single-btn primary ms-1" (click)="addUpdateData(true, item)"><i class="fa-solid fa-pencil"></i></button>
+                      <button [ngbTooltip]="'Report'" class="table-single-btn primary ms-1" (click)="openReport(item)"><i class="fa-solid fa-chart-simple"></i></button>
+                      <button [ngbTooltip]="'Send now'" class="table-single-btn primary ms-1" (click)="sendNow(item)"><i class="fa-solid fa-paper-plane"></i></button>
+                      @if (canPause(item)) {
+                        <button [ngbTooltip]="item.status === 'paused' ? 'Resume' : 'Pause'" class="table-single-btn primary ms-1" (click)="pauseOrResume(item)">
+                          <i class="fa-solid" [class.fa-pause]="item.status !== 'paused'" [class.fa-play]="item.status === 'paused'"></i>
+                        </button>
+                      }
+                      <button [ngbTooltip]="'Delete'" class="table-single-btn red ms-1" (click)="deleteData(item.id)"><i class="fa-solid fa-trash-can"></i></button>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        <div class="main-pagination">
+          <div class="data-limit-main">
+            <select class="form-select" [(ngModel)]="limit" (ngModelChange)="page = 1; getDataList()">
+              <option [value]="10">10</option>
+              <option [value]="30">30</option>
+              <option [value]="50">50</option>
+              <option [value]="100">100</option>
+            </select>
+          </div>
+          <div class="pagination-inner">
+            <pagination-controls (pageChange)="page = $event; getDataList()" />
+          </div>
+        </div>
+      } @else {
+        <app-box-view-skeleton></app-box-view-skeleton>
+      }
+    </div>
+  } @else {
+    <div class="no-data-found-main">
+      <div class="no-data-found-img">
+        @if (isTechnicalIssue) {
+          <img src="../../../assets/img/technical-issue.png" alt="">
+        } @else {
+          <img src="../../../assets/img/no-data.png" alt="">
+        }
+      </div>
+      @if (isTechnicalIssue) {
+        <div class="no-data-found-ttl">We Found Some Technical Issues in Our System</div>
+        <div class="no-data-found-ctx">Currently we're working on the Issue please try again later.</div>
+        <button class="site-btn primary-color" routerLink="/dashboard">Go to Dashboard</button>
+      } @else {
+        <div class="no-data-found-ttl">No Record Found!</div>
+        <div class="no-data-found-ctx">You don't currently have any Record.</div>
+        <button class="site-btn primary-color" (click)="addUpdateData(false)"><span class="site-btn-icon"><i class="fa-solid fa-plus"></i></span> Create</button>
+      }
+    </div>
+  }
+}
+
+@if (tab === 'settings') {
+  <div class="page-table-main p-3">
+    @if (!settingsLoaded) {
+      <app-box-view-skeleton></app-box-view-skeleton>
+    } @else {
+      <div class="row m-0 p-0">
+        <div class="col-lg-6 col-12 mb-2">
+          <div class="form-inp-main">
+            <label class="form-label">Occasion auto-greetings</label>
+            <select class="form-select" [(ngModel)]="settings.occasion_auto_enabled">
+              <option [ngValue]="true">Enabled</option>
+              <option [ngValue]="false">Disabled</option>
+            </select>
+          </div>
+        </div>
+        <div class="col-lg-6 col-12 mb-2">
+          <div class="form-inp-main">
+            <label class="form-label">Occasion send time (IST)</label>
+            <input class="form-control" type="time" [(ngModel)]="settings.occasion_send_time_utc" />
+          </div>
+        </div>
+        <div class="col-lg-6 col-12 mb-2">
+          <div class="form-inp-main">
+            <label class="form-label">Default click URL</label>
+            <input class="form-control" type="text" [(ngModel)]="settings.default_click_url" placeholder="https://app.storsee.com" />
+          </div>
+        </div>
+        <div class="col-lg-6 col-12 mb-2">
+          <div class="form-inp-main">
+            <label class="form-label">Notification icon</label>
+            <div class="form-control d-flex align-items-center gap-2" style="height: auto; min-height: 38px;">
+              @if (faviconUrl) {
+                <img [src]="faviconUrl" alt="" style="width: 28px; height: 28px; object-fit: cover; border-radius: 6px;" />
+                <span>Site favicon from Site Configuration</span>
+              } @else {
+                <span>Set a favicon in Site Configuration. That icon is used on every push.</span>
+              }
+            </div>
+          </div>
+        </div>
+        <div class="col-12 mb-2">
+          <div class="form-inp-main">
+            <label class="form-label">VAPID public key</label>
+            <div class="form-control" style="height: auto; min-height: 38px;">
+              {{ settings.vapid_configured ? (settings.vapid_public_key || 'Configured') : 'Not configured. Add VAPID keys to the API environment.' }}
+            </div>
+          </div>
+        </div>
+        <div class="col-12 mt-2">
+          <button type="button" class="site-btn primary-color" [disabled]="settingsSaving" (click)="saveSettings()">Save settings</button>
+        </div>
+      </div>
+    }
+  </div>
+}

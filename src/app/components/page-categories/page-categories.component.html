@@ -1,5 +1,5 @@
 <app-breadcrumb [pageName]="sharedservice.pageName" [icon]="sharedservice.pageDetail?.icon" />
-<app-page-data-count [totalCount]="totalCount" [filteredCount]="dataList.length" />
+<app-page-data-count [items]="countItems" />
 <div class="page-top-main">
     <div class="page-top-search-main d-flex">
         <input type="text" class="form-control" placeholder="Search" [(ngModel)]="searchTxt" (keyup.enter)="filterData()" />
@@ -16,7 +16,12 @@
     }
 </div>
 
-@if(dataList.length > 0 && !isTechnicalIssue){
+@if((!hasEverLoaded && isListLoading) || (dataList.length > 0 && !isTechnicalIssue)){
+@if(!hasEverLoaded && isListLoading){
+<div class="page-table-main">
+    <app-table-view-skeleton></app-table-view-skeleton>
+</div>
+}@else {
 <div class="page-table-main" [class.is-list-loading]="isListLoading">
         <div class="table-responsive">
             <table class="table table-bordered text-nowrap mb-0">
@@ -69,7 +74,7 @@
             </div>
         </div>
 </div>
-} @else if(isTechnicalIssue || hasEverLoaded || !isListLoading) {
+}} @else if(isTechnicalIssue || hasEverLoaded || !isListLoading) {
     <div class="no-data-found-main">
         <div class="no-data-found-img">
             @if(isTechnicalIssue){

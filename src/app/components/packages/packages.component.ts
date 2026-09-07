@@ -27,6 +27,18 @@ export class PackagesComponent {
   btnLoading: string | number | null = null;
   isBtnLoading = (action: string, id?: string | number | null) => isActionLoading(this.btnLoading, action, id);
 
+  stats = { total: 0, active: 0, inactive: 0, popular: 0, recommended: 0 };
+
+  get countItems(): { label: string; value: number }[] {
+    return [
+      { label: 'Total Plans', value: this.stats.total || 0 },
+      { label: 'Active', value: this.stats.active || 0 },
+      { label: 'Inactive', value: this.stats.inactive || 0 },
+      { label: 'Popular', value: this.stats.popular || 0 },
+      { label: 'Recommended', value: this.stats.recommended || 0 },
+    ];
+  }
+
   constructor(public sharedservice: SharedService, private packageservice: PackageService, private modalService: NgbModal) { }
 
   ngOnInit(): void {
@@ -48,6 +60,15 @@ export class PackagesComponent {
         if (res) {
           this.dataList = res.data;
           this.totalCount = res.totalCount;
+          if (res?.stats) {
+            this.stats = {
+              total: Number(res.stats.total || 0),
+              active: Number(res.stats.active || 0),
+              inactive: Number(res.stats.inactive || 0),
+              popular: Number(res.stats.popular || 0),
+              recommended: Number(res.stats.recommended || 0),
+            };
+          }
           this.hasEverLoaded = true;
           this.isTechnicalIssue = false;
         }

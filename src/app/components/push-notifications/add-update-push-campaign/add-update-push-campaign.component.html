@@ -1,0 +1,164 @@
+<main class="push-modal">
+  <div class="popup-main">
+    <div class="popup-head push-modal__head">
+      <div class="push-modal__head-text">
+        <div class="popup-head-ttl">{{ isEdit ? 'Update' : 'Create' }} Push Campaign</div>
+        <p class="push-modal__subtitle">Times are India Standard Time. The database stores them in UTC.</p>
+      </div>
+      <div class="popup-head-btn">
+        <button type="button" aria-label="Close" (click)="activeModal.close()"><i class="fa-solid fa-x"></i></button>
+      </div>
+    </div>
+
+    <div class="popup-body push-modal__body">
+      <section class="push-card">
+        <div class="push-card__label">Preview</div>
+        <div class="push-preview">
+          <div class="push-preview__icon">
+            @if (faviconUrl) {
+              <img [src]="faviconUrl" alt="" />
+            } @else {
+              <i class="fa-solid fa-bell"></i>
+            }
+          </div>
+          <div class="push-preview__copy">
+            <strong>{{ title.trim() || 'Notification title' }}</strong>
+            <span>{{ body.trim() || 'Message body appears here' }}</span>
+          </div>
+        </div>
+        <p class="push-hint">Icon is always the favicon from Site Configuration. Change it there to update every campaign.</p>
+      </section>
+
+      <section class="push-card">
+        <div class="push-card__label">Message</div>
+        <div class="row m-0 p-0">
+          <div class="col-lg-8 col-12 mb-2">
+            <div class="form-inp-main">
+              <label class="form-label">Title</label>
+              <input class="form-control" type="text" placeholder="Enter title" [(ngModel)]="title" maxlength="80" />
+            </div>
+          </div>
+          <div class="col-lg-4 col-12 mb-2">
+            <div class="form-inp-main">
+              <label class="form-label">Save as</label>
+              <select class="form-select" [(ngModel)]="status">
+                <option value="draft">Draft</option>
+                <option value="scheduled">Scheduled</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-12 mb-0">
+            <div class="form-inp-main">
+              <label class="form-label">Body</label>
+              <textarea class="form-control" rows="3" placeholder="Enter the message customers will see" [(ngModel)]="body" maxlength="180"></textarea>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="push-card">
+        <div class="push-card__label">Who and where</div>
+        <label class="form-label">Audience</label>
+        <div class="push-choice" role="group" aria-label="Audience">
+          @for (opt of audiences; track opt.value) {
+            <button
+              type="button"
+              class="push-choice__btn"
+              [class.is-on]="audience === opt.value"
+              (click)="audience = opt.value">
+              <strong>{{ opt.label }}</strong>
+              <small>{{ opt.hint }}</small>
+            </button>
+          }
+        </div>
+        <div class="form-inp-main mt-2">
+          <label class="form-label">Click URL</label>
+          <input class="form-control" type="text" placeholder="https://app.storsee.com" [(ngModel)]="click_url" />
+        </div>
+        <div class="form-inp-main mt-2">
+          <label class="form-label">Large image <em>optional</em></label>
+          <div class="push-image-row">
+            <input class="form-control" type="file" accept="image/*" (change)="onImageFile($event)" />
+            @if (image_url) {
+              <button type="button" class="site-btn grey-color" (click)="clearImage()">Remove</button>
+            }
+          </div>
+          @if (uploadingImage) {
+            <div class="push-hint">Uploading…</div>
+          }
+          @if (image_url) {
+            <img [src]="image_url" alt="" class="push-media-preview" />
+          }
+        </div>
+      </section>
+
+      <section class="push-card">
+        <div class="push-card__label">When to send</div>
+        <div class="push-choice" role="group" aria-label="Send mode">
+          @for (opt of sendModes; track opt.value) {
+            <button
+              type="button"
+              class="push-choice__btn"
+              [class.is-on]="send_mode === opt.value"
+              (click)="send_mode = opt.value">
+              <strong>{{ opt.label }}</strong>
+              <small>{{ opt.hint }}</small>
+            </button>
+          }
+        </div>
+
+        @if (send_mode === 'once') {
+          <div class="mt-3">
+            <label class="form-label">Date and time (IST)</label>
+            @for (slot of onceSlots; track i; let i = $index) {
+              <div class="push-slot">
+                <input class="form-control" type="datetime-local" [(ngModel)]="onceSlots[i]" />
+                <button type="button" class="site-btn grey-color" (click)="removeOnceSlot(i)">Remove</button>
+              </div>
+            }
+            <button type="button" class="site-btn dark-color" (click)="addOnceSlot()">Add time</button>
+          </div>
+        }
+
+        @if (send_mode === 'daily') {
+          <div class="row m-0 p-0 mt-3">
+            <div class="col-lg-6 col-12 mb-2">
+              <label class="form-label">Time each day (IST)</label>
+              @for (t of dailyTimes; track i; let i = $index) {
+                <div class="push-slot">
+                  <input class="form-control" type="time" [(ngModel)]="dailyTimes[i]" />
+                  <button type="button" class="site-btn grey-color" (click)="removeDailyTime(i)">Remove</button>
+                </div>
+              }
+              <button type="button" class="site-btn dark-color" (click)="addDailyTime()">Add time</button>
+            </div>
+            <div class="col-lg-3 col-12 mb-2">
+              <div class="form-inp-main">
+                <label class="form-label">Start date (IST) <em>optional</em></label>
+                <input class="form-control" type="date" [(ngModel)]="start_at" />
+              </div>
+            </div>
+            <div class="col-lg-3 col-12 mb-2">
+              <div class="form-inp-main">
+                <label class="form-label">End date (IST) <em>optional</em></label>
+                <input class="form-control" type="date" [(ngModel)]="end_at" />
+              </div>
+            </div>
+          </div>
+        }
+
+        @if (send_mode === 'instant') {
+          <p class="push-hint mt-2">If you save as Scheduled, this campaign sends immediately. Draft keeps it unsent.</p>
+        }
+      </section>
+    </div>
+
+    <div class="popup-footer">
+      <button type="button" class="site-btn grey-color" (click)="activeModal.close()">Close</button>
+      @if (isEdit) {
+        <button type="button" class="site-btn dark-color ms-1" [disabled]="testing" (click)="testSend()">Send test</button>
+      }
+      <button type="button" class="site-btn primary-color ms-1" [disabled]="saving" (click)="validateData()">{{ isEdit ? 'Update' : 'Create' }}</button>
+    </div>
+  </div>
+</main>
