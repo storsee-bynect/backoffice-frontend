@@ -1,17 +1,5 @@
 <div class="sidebar">
   <nav class="sidebar-nav">
-    <!-- Dashboard direct link (always visible) -->
-    <a
-      class="nav-item"
-      routerLink="/dashboard"
-      routerLinkActive="active"
-      [routerLinkActiveOptions]="{ exact: true }"
-      (click)="sharedservice.isSidebarOpen = false">
-      <span class="nav-item-icon"><i class="fa-solid fa-house"></i></span>
-      <span class="nav-item-label">Dashboard</span>
-    </a>
-
-    <!-- Dynamic groups from sidebarPages -->
     @for(group of sharedservice.sidebarPages; track group.category){
       @if(group.pages?.length > 0){
         <div class="nav-group" [class.is-expanded]="isExpanded(group.category)">

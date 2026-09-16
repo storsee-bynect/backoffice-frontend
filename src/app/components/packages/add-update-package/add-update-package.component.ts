@@ -17,6 +17,7 @@ export class AddUpdatePackageComponent {
   dataReqModel: PackageReqModel = new PackageReqModel();
   benefits: any[] = [];
   isSaving = false;
+  enableIntroPricing = false;
 
   constructor(
     public sharedservice: SharedService,
@@ -35,6 +36,9 @@ export class AddUpdatePackageComponent {
       this.dataReqModel.tagline = this.data.tagline || '';
       this.dataReqModel.description = this.data.description || '';
       this.dataReqModel.amount = this.data.amount;
+      this.dataReqModel.introMonths = Number(this.data.introMonths || 0);
+      this.dataReqModel.introAmount = Number(this.data.introAmount || 0);
+      this.enableIntroPricing = this.dataReqModel.introMonths > 0;
       this.dataReqModel.duration = this.data.duration;
       this.dataReqModel.productLimit = this.data.productLimit;
       this.dataReqModel.maxOrders = this.data.maxOrders || 0;
@@ -53,6 +57,15 @@ export class AddUpdatePackageComponent {
     } else {
       this.benefits.push({ text: '' });
       this.onBillingCycleChange();
+    }
+  }
+
+  onIntroToggle() {
+    if (!this.enableIntroPricing) {
+      this.dataReqModel.introMonths = 0;
+      this.dataReqModel.introAmount = 0;
+    } else if (!this.dataReqModel.introMonths) {
+      this.dataReqModel.introMonths = 1;
     }
   }
 
@@ -102,6 +115,18 @@ export class AddUpdatePackageComponent {
     if (!this.dataReqModel.duration) errTxt += 'Enter Duration <br/>';
     if (this.dataReqModel.productLimit == null || this.dataReqModel.productLimit === undefined) errTxt += 'Enter Product Limit <br/>';
     if (this.benefits.length === 0 || this.benefits.every(b => !b.text?.trim())) errTxt += 'Add at least one Benefit <br/>';
+
+    if (this.enableIntroPricing) {
+      if (!this.dataReqModel.introMonths || this.dataReqModel.introMonths < 1) {
+        errTxt += 'Enter intro months (at least 1) <br/>';
+      }
+      if (this.dataReqModel.introAmount == null || this.dataReqModel.introAmount === undefined) {
+        errTxt += 'Enter intro price <br/>';
+      }
+    } else {
+      this.dataReqModel.introMonths = 0;
+      this.dataReqModel.introAmount = 0;
+    }
 
     if (errTxt === '') {
       this.dataReqModel.benefits = JSON.stringify(this.benefits.filter(b => b.text?.trim()));

@@ -187,6 +187,9 @@ function buildUrlConstant() {
       getFoldersByPath: base + 'file/getFoldersByPath',
       getFilesByPath: base + 'file/getFilesByPath',
     },
+    ShippingAPI: {
+      adminBase: base + 'shipping/admin/',
+    },
   };
 }
 

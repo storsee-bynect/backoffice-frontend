@@ -31,6 +31,17 @@ export class StoresComponent {
   btnLoading: string | number | null = null;
   isBtnLoading = (action: string, id?: string | number | null) => isActionLoading(this.btnLoading, action, id);
 
+  /** True while this store row is deleting / status-updating */
+  isStoreBusy(id: string | number | null | undefined): boolean {
+    if (id == null) return false;
+    return this.isBtnLoading('delete', id) || this.isBtnLoading('status', id);
+  }
+
+  /** Any store currently deleting — block create / list spam */
+  get isAnyStoreDeleting(): boolean {
+    return typeof this.btnLoading === 'string' && String(this.btnLoading).startsWith('delete:');
+  }
+
   stats = { total: 0, active: 0, inactive: 0, locked: 0, blacklisted: 0 };
 
   get countItems(): { label: string; value: number }[] {
@@ -162,13 +173,14 @@ export class StoresComponent {
   }
 
   deleteData(id: number) {
+    if (this.isStoreBusy(id) || this.isAnyStoreDeleting) return;
     const modalRef = this.modalService.open(DeleteConfirmationComponent, {
       size: 'md',
       centered: true
     });
-    modalRef.componentInstance.title = 'Delete this store?';
+    modalRef.componentInstance.title = 'Permanently delete this store?';
     modalRef.componentInstance.message =
-      'This will permanently delete the store and ALL related data — users, products, orders, leads, setup, media files, and everything else tied to this store. This cannot be undone.';
+      'Hard delete: store admins/users, customers, products, orders, categories, brands, banners, pages, coupons, leads, tickets, files, images, and all other store data will be permanently removed. This cannot be undone.';
     modalRef.result.then(result => {
       if (result) {
         if (id) {
@@ -177,11 +189,14 @@ export class StoresComponent {
             finalize(() => this.btnLoading = null)
           ).subscribe({
             next: () => {
-              this.sharedservice.showAlert(1, 'Store and all related data deleted');
+              this.sharedservice.showAlert(1, 'Store hard-deleted with all related data & media');
               this.getDataList();
             },
-            error: () => {
-              this.sharedservice.showAlert(2, 'Something Went Wrong');
+            error: (err) => {
+              this.sharedservice.showAlert(
+                2,
+                err?.error?.message || err?.error?.error || 'Failed to delete store'
+              );
             }
           });
         } else {
@@ -192,7 +207,7 @@ export class StoresComponent {
   }
 
   updateStatus(newStatus, data) {
-    if (!data?.id) return;
+    if (!data?.id || this.isStoreBusy(data.id)) return;
     this.btnLoading = actionKey('status', data.id);
     const body = {
       isActive: !!newStatus,

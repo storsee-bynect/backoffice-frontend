@@ -79,6 +79,7 @@ import { PushCampaignReportComponent } from './components/push-notifications/pus
 import { AppNotificationsComponent } from './components/app-notifications/app-notifications.component';
 import { AddUpdateAppNotificationComponent } from './components/app-notifications/add-update-app-notification/add-update-app-notification.component';
 import { AppNotificationReportComponent } from './components/app-notifications/app-notification-report/app-notification-report.component';
+import { ShippingManagerComponent } from './components/shipping/shipping-manager.component';
 
 @NgModule({
   declarations: [
@@ -133,7 +134,8 @@ import { AppNotificationReportComponent } from './components/app-notifications/a
     ViewLocationComponent,
     StorePlanHistoryComponent,
     StoreAssignPlanComponent,
-    StoreSettingsComponent
+    StoreSettingsComponent,
+    ShippingManagerComponent
   ],
   imports: [
     OnlyNumberDirective,

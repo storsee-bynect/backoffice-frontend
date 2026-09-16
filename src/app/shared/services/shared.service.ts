@@ -171,28 +171,48 @@ export class SharedService {
 
     pageName: any;
     pageDetail: any;
-    isPageView: boolean;
-    isPageInsert: boolean;
-    isPageUpdate: boolean;
-    isPageDelete: boolean;
+    isPageView: boolean = false;
+    isPageInsert: boolean = false;
+    isPageUpdate: boolean = false;
+    isPageDelete: boolean = false;
+
+    /** Normalize admin route for permission lookup */
+    normalizeAdminPath(url: string): string {
+        let s = String(url || '').split('?')[0].split('#')[0].trim();
+        if (!s) return '';
+        if (!s.startsWith('/')) s = '/' + s;
+        if (s.length > 1 && s.endsWith('/')) s = s.slice(0, -1);
+        return s.toLowerCase();
+    }
 
     givePermissionByUrl(url: string) {
-        let allPages = [];
-        this.sidebarPages.forEach(e => {
-            e.pages.forEach(f => {
-                allPages.push(f);
-            })
-        })
-        let findPage = allPages.find(f => f.url == url);
-        if (findPage) {
-            let action = findPage?.action;
-            this.pageName = findPage.pagename;
-            this.pageDetail = findPage;
-            this.isPageView = Boolean(action & 1);
-            this.isPageInsert = Boolean(action & 2);
-            this.isPageUpdate = Boolean(action & 4);
-            this.isPageDelete = Boolean(action & 8);
-        }
+        const path = this.normalizeAdminPath(url);
+        this.isPageView = false;
+        this.isPageInsert = false;
+        this.isPageUpdate = false;
+        this.isPageDelete = false;
+        this.pageName = '';
+        this.pageDetail = null;
+
+        if (!path || path === '/login' || path === '/register') return;
+
+        const allPages: any[] = [];
+        (this.sidebarPages || []).forEach((e: any) => {
+            (e?.pages || []).forEach((f: any) => allPages.push(f));
+        });
+
+        const findPage = allPages.find(
+            (f) => this.normalizeAdminPath(f?.url) === path
+        );
+        if (!findPage) return;
+
+        const action = Number(findPage.action) || 0;
+        this.pageName = findPage.pagename;
+        this.pageDetail = findPage;
+        this.isPageView = Boolean(action & 1);
+        this.isPageInsert = Boolean(action & 2);
+        this.isPageUpdate = Boolean(action & 4);
+        this.isPageDelete = Boolean(action & 8);
     }
 
     async UploadFile(directory: string, dimentions?: { width: number; height: number }): Promise<any | null> {

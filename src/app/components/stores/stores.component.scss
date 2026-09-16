@@ -41,10 +41,30 @@
   gap: 4px;
 }
 
-.page-table-main.is-list-loading {
-  .table-responsive {
-    opacity: 0.72;
+tr.is-store-deleting {
+  opacity: 0.72;
+  background: #fff7ed;
+
+  .table-single-btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
     pointer-events: none;
-    transition: opacity 0.15s ease;
   }
+}
+
+.status-table.is-disabled {
+  opacity: 0.45;
+  cursor: not-allowed !important;
+  pointer-events: none;
+}
+
+.store-deleting-label {
+  display: inline-flex;
+  align-items: center;
+  margin-right: 8px;
+  font-size: 0.72rem;
+  font-weight: 650;
+  letter-spacing: 0.02em;
+  color: #c2410c;
+  white-space: nowrap;
 }

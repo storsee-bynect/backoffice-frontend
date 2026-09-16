@@ -21,6 +21,7 @@ import { LeadsComponent } from "../../components/leads/leads.component";
 import { NotificationSettingsComponent } from "../../components/notification-settings/notification-settings.component";
 import { PushNotificationsComponent } from "../../components/push-notifications/push-notifications.component";
 import { AppNotificationsComponent } from "../../components/app-notifications/app-notifications.component";
+import { ShippingManagerComponent } from "../../components/shipping/shipping-manager.component";
 export const routing: Routes = [
     {
         path: '',
@@ -95,6 +96,9 @@ export const routing: Routes = [
     },{
         path: 'leads',
         component: LeadsComponent
+    },{
+        path: 'shipping',
+        component: ShippingManagerComponent
     },{
         path: '**',
         component: DashboardComponent

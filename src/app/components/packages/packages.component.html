@@ -50,8 +50,13 @@
                     }
                     <div class="plan-price">
                         <span class="price-symbol">₹</span>
-                        <span class="price-amount">{{ item.amount }}</span>
-                        <span class="price-duration">/ {{ item.billingLabel || (item.duration + ' days') }}</span>
+                        @if(item.introMonths > 0){
+                            <span class="price-amount">{{ item.introAmount }}</span>
+                            <span class="price-duration">first {{ item.introMonths }} mo → then ₹{{ item.amount }}</span>
+                        } @else {
+                            <span class="price-amount">{{ item.amount }}</span>
+                            <span class="price-duration">/ {{ item.billingLabel || (item.duration + ' days') }}</span>
+                        }
                     </div>
 
                     <div class="plan-limits">

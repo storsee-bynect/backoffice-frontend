@@ -1,0 +1,735 @@
+<app-breadcrumb [pageName]="'Shipping Manager'" [icon]="'truck'" />
+
+<div class="ship">
+  <header class="ship-hero">
+    <div class="ship-hero__brand">
+      <img class="ship-hero__logo" [src]="storseeLogo" alt="Storsee" />
+      <div>
+        <div class="ship-hero__eyebrow">Platform logistics</div>
+        <h1 class="ship-hero__title">STORSEE Shipping</h1>
+        <p class="ship-hero__sub">Shiprocket-powered fulfillment, margin control, and remittance ops.</p>
+      </div>
+    </div>
+    <div class="ship-hero__partner">
+      <span>Carrier</span>
+      <img [src]="shiprocketLogo" alt="Shiprocket" />
+    </div>
+  </header>
+
+  <nav class="ship-tabs" aria-label="Shipping sections">
+    @for (tab of tabs; track tab.key) {
+      <button
+        type="button"
+        class="ship-tabs__btn"
+        [class.is-active]="activeTab === tab.key"
+        (click)="setTab(tab.key)">
+        <i class="fa-solid" [ngClass]="tab.icon"></i>
+        <span>{{ tab.label }}</span>
+      </button>
+    }
+  </nav>
+
+  <!-- OVERVIEW -->
+  @if (activeTab === 'overview') {
+    @if (isLoading) {
+      <app-box-view-skeleton />
+    } @else {
+      @if (loadError) {
+        <div class="ship-empty">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+          <h3>Couldn’t load shipping data</h3>
+          <p>{{ loadError }}</p>
+          <button type="button" class="site-btn dark-color mt-2" (click)="loadOverview()">Retry</button>
+        </div>
+      }
+
+      <div class="ship-metrics">
+        <div class="ship-metric">
+          <span class="ship-metric__label">Total shipments</span>
+          <strong>{{ overview.stats?.totalShipments || 0 }}</strong>
+        </div>
+        <div class="ship-metric">
+          <span class="ship-metric__label">Delivered</span>
+          <strong>{{ overview.stats?.delivered || 0 }}</strong>
+        </div>
+        <div class="ship-metric">
+          <span class="ship-metric__label">Provider cost</span>
+          <strong>₹{{ (overview.stats?.providerCost || 0) | number: '1.0-2' }}</strong>
+        </div>
+        <div class="ship-metric ship-metric--accent">
+          <span class="ship-metric__label">Storsee profit</span>
+          <strong>₹{{ (overview.stats?.storseeProfit || 0) | number: '1.0-2' }}</strong>
+        </div>
+      </div>
+
+      <section class="ship-health-card">
+        <div class="ship-health-card__top">
+          <div class="ship-health-card__brand">
+            <img [src]="shiprocketLogo" alt="Shiprocket" />
+            <div>
+              <h2>Provider health</h2>
+              <p>Live status for the Storsee × Shiprocket integration</p>
+            </div>
+          </div>
+          @if (shiprocket) {
+            <span class="ship-pill" [ngClass]="healthClass(shiprocket.healthStatus)">
+              {{ shiprocket.healthStatus || 'unknown' }}
+            </span>
+          }
+        </div>
+
+        @if (shiprocket) {
+          <div class="ship-health-grid">
+            <div class="ship-health-stat">
+              <span>Status</span>
+              <strong [class.text-ok]="shiprocket.enabled" [class.text-warn]="!shiprocket.enabled">
+                {{ shiprocket.enabled ? 'Enabled' : 'Disabled' }}
+              </strong>
+            </div>
+            <div class="ship-health-stat">
+              <span>Environment</span>
+              <strong>{{ shiprocket.environment || 'production' }}</strong>
+            </div>
+            <div class="ship-health-stat">
+              <span>Credentials</span>
+              <strong>{{ shiprocket.hasCredentials ? 'Configured' : 'Missing' }}</strong>
+            </div>
+            <div class="ship-health-stat">
+              <span>Last success</span>
+              <strong>{{ shiprocket.lastSuccessAt ? (shiprocket.lastSuccessAt | date: 'short') : '—' }}</strong>
+            </div>
+            <div class="ship-health-stat ship-health-stat--wide">
+              <span>Last error</span>
+              <strong class="ship-ellipsis">{{ shiprocket.lastError || 'None' }}</strong>
+            </div>
+          </div>
+          <div class="ship-health-actions">
+            <button type="button" class="site-btn" (click)="setTab('providers')">Manage credentials</button>
+            <button type="button" class="site-btn dark-color" [appBtnLoading]="testingId === shiprocket.id" (click)="testConnection(shiprocket)">
+              Test connection
+            </button>
+          </div>
+        } @else {
+          <div class="ship-empty ship-empty--compact">
+            <p>Shiprocket provider is not seeded yet. Run API migrations.</p>
+          </div>
+        }
+      </section>
+    }
+  }
+
+  <!-- PROVIDERS -->
+  @if (activeTab === 'providers') {
+    @if (shiprocket; as p) {
+      <section class="ship-provider-card">
+        <div class="ship-provider-card__head">
+          <div class="ship-provider-card__brand">
+            <img [src]="shiprocketLogo" alt="Shiprocket" />
+            <div>
+              <div class="ship-provider-card__title-row">
+                <h2>Shiprocket</h2>
+                <span class="ship-badge" [class.ship-badge--on]="p.enabled" [class.ship-badge--off]="!p.enabled">
+                  {{ p.enabled ? 'Enabled' : 'Disabled' }}
+                </span>
+                @if (p.hasCredentials) {
+                  <span class="ship-badge ship-badge--ok">Credentials set</span>
+                }
+              </div>
+              <p class="ship-muted mb-0">Platform carrier for Storsee Shipping · Health: {{ p.healthStatus || 'unknown' }}</p>
+            </div>
+          </div>
+          <div class="ship-provider-card__actions">
+            <button type="button" class="site-btn" (click)="toggleProvider(p)">{{ p.enabled ? 'Disable' : 'Enable' }}</button>
+            <button type="button" class="site-btn dark-color" [appBtnLoading]="testingId === p.id" (click)="testConnection(p)">Test connection</button>
+          </div>
+        </div>
+
+        <div class="ship-provider-meta">
+          <label class="ship-field-label">Environment</label>
+          <div class="ship-seg">
+            <button type="button" [class.is-on]="p.environment !== 'sandbox'" (click)="setEnvironment(p, 'production')">Production</button>
+            <button type="button" [class.is-on]="p.environment === 'sandbox'" (click)="setEnvironment(p, 'sandbox')">Sandbox</button>
+          </div>
+        </div>
+
+        <div class="ship-creds">
+          <div class="ship-creds__head">
+            <div>
+              <div class="ship-creds__title">API credentials</div>
+              <div class="ship-creds__sub">Email + password from Shiprocket API settings. Encrypted at rest.</div>
+            </div>
+            <span class="ship-creds__secure"><i class="fa-solid fa-shield-halved"></i> Secure</span>
+          </div>
+          <div class="row g-3">
+            <div class="col-md-5">
+              <label class="ship-field-label">API email</label>
+              <input class="form-control" placeholder="Shiprocket login email" [(ngModel)]="credForm(p.id).email" autocomplete="off" />
+            </div>
+            <div class="col-md-5">
+              <label class="ship-field-label">API password</label>
+              <div class="ship-pass">
+                <input
+                  class="form-control"
+                  [type]="showPassword[p.id] ? 'text' : 'password'"
+                  placeholder="Shiprocket API password"
+                  [(ngModel)]="credForm(p.id).password"
+                  autocomplete="new-password" />
+                <button type="button" class="ship-pass__toggle" (click)="showPassword[p.id] = !showPassword[p.id]">
+                  <i class="fa-solid" [ngClass]="showPassword[p.id] ? 'fa-eye-slash' : 'fa-eye'"></i>
+                </button>
+              </div>
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+              <button type="button" class="site-btn dark-color w-100" [appBtnLoading]="savingCredId === p.id" (click)="saveCredentials(p)">
+                {{ p.hasCredentials ? 'Rotate' : 'Save' }}
+              </button>
+            </div>
+          </div>
+          @if (p.hasCredentials) {
+            <p class="ship-muted mt-3 mb-0">Last error: {{ p.lastError || '—' }} · Last success: {{ p.lastSuccessAt ? (p.lastSuccessAt | date: 'medium') : '—' }}</p>
+          }
+        </div>
+      </section>
+    } @else {
+      <div class="ship-empty">
+        <img class="ship-empty__logo" [src]="shiprocketLogo" alt="Shiprocket" />
+        <h3>Shiprocket not available</h3>
+        <p>Seed providers via API migration, then refresh this page.</p>
+      </div>
+    }
+  }
+
+  <!-- RULES -->
+  @if (activeTab === 'rules') {
+    <div class="row g-3">
+      <div class="col-xl-6">
+        <section class="ship-panel">
+          <div class="ship-panel__head">
+            <div>
+              <h2>Margin rules</h2>
+              <p class="ship-panel__sub">Control Storsee markup on Shiprocket cost</p>
+            </div>
+            <button type="button" class="site-btn grey-color" (click)="resetMarginForm()">New</button>
+          </div>
+
+          <div class="ship-form-grid">
+            <div class="ship-field ship-field--full">
+              <label class="ship-field-label">Rule name *</label>
+              <input class="form-control" [(ngModel)]="marginForm.name" placeholder="e.g. Global +₹20" />
+            </div>
+            <div class="ship-field">
+              <label class="ship-field-label">Priority</label>
+              <input class="form-control" type="number" [(ngModel)]="marginForm.priority" />
+            </div>
+            <div class="ship-field">
+              <label class="ship-field-label">Scope</label>
+              <select class="form-select" [(ngModel)]="marginForm.scope">
+                <option value="global">Global</option>
+                <option value="merchant">Merchant</option>
+              </select>
+            </div>
+            @if (marginForm.scope === 'merchant') {
+              <div class="ship-field">
+                <label class="ship-field-label">Store ID</label>
+                <input class="form-control" type="number" [(ngModel)]="marginForm.storeId" />
+              </div>
+            }
+            <div class="ship-field">
+              <label class="ship-field-label">Pricing type</label>
+              <select class="form-select" [(ngModel)]="marginForm.pricingType">
+                <option value="fixed_add">Fixed add-on (₹)</option>
+                <option value="percent_add">Percent add-on (%)</option>
+                <option value="flat_merchant">Flat merchant price</option>
+              </select>
+            </div>
+            @if (marginForm.pricingType === 'fixed_add') {
+              <div class="ship-field">
+                <label class="ship-field-label">Amount (₹)</label>
+                <input class="form-control" type="number" [(ngModel)]="marginForm.amount" />
+              </div>
+            }
+            @if (marginForm.pricingType === 'percent_add') {
+              <div class="ship-field">
+                <label class="ship-field-label">Percent (%)</label>
+                <input class="form-control" type="number" [(ngModel)]="marginForm.percent" />
+              </div>
+            }
+            @if (marginForm.pricingType === 'flat_merchant') {
+              <div class="ship-field">
+                <label class="ship-field-label">Merchant price (₹)</label>
+                <input class="form-control" type="number" [(ngModel)]="marginForm.merchantPrice" />
+              </div>
+            }
+            <div class="ship-field">
+              <label class="ship-field-label">Payment mode</label>
+              <select class="form-select" [(ngModel)]="marginForm.paymentMode">
+                <option value="">Any</option>
+                <option value="prepaid">Prepaid</option>
+                <option value="cod">COD</option>
+              </select>
+            </div>
+            <div class="ship-field">
+              <label class="ship-field-label">Min monthly shipments</label>
+              <input class="form-control" type="number" [(ngModel)]="marginForm.minMonthlyShipments" placeholder="Optional" />
+            </div>
+            <div class="ship-field">
+              <label class="ship-field-label">Max monthly shipments</label>
+              <input class="form-control" type="number" [(ngModel)]="marginForm.maxMonthlyShipments" placeholder="Optional" />
+            </div>
+            <div class="ship-field ship-field--full ship-check">
+              <label><input type="checkbox" [(ngModel)]="marginForm.active" /> Active</label>
+            </div>
+          </div>
+          <div class="ship-form-actions">
+            <button type="button" class="site-btn dark-color" [appBtnLoading]="isSavingMargin" (click)="saveMarginRule()">
+              {{ marginForm.id ? 'Update margin rule' : 'Create margin rule' }}
+            </button>
+          </div>
+
+          <div class="ship-rule-list">
+            @for (r of marginRules; track r.id) {
+              <div class="ship-rule-item">
+                <div>
+                  <strong>{{ r.name }}</strong>
+                  <span class="ship-muted d-block">{{ pricingLabel(r) }} · {{ r.scope }} · P{{ r.priority }}</span>
+                </div>
+                <div class="ship-rule-item__actions">
+                  <span class="ship-badge" [class.ship-badge--on]="r.active">{{ r.active ? 'Active' : 'Off' }}</span>
+                  <button type="button" class="site-btn grey-color" (click)="editMargin(r)">Edit</button>
+                  <button type="button" class="site-btn" (click)="deleteMargin(r)">Delete</button>
+                </div>
+              </div>
+            } @empty {
+              <div class="ship-empty ship-empty--compact"><p>No margin rules yet. Create one above.</p></div>
+            }
+          </div>
+        </section>
+      </div>
+
+      <div class="col-xl-6">
+        <section class="ship-panel">
+          <div class="ship-panel__head">
+            <div>
+              <h2>Routing rules</h2>
+              <p class="ship-panel__sub">When to force Shiprocket for a quote</p>
+            </div>
+            <button type="button" class="site-btn grey-color" (click)="resetRoutingForm()">New</button>
+          </div>
+
+          <div class="ship-form-grid">
+            <div class="ship-field ship-field--full">
+              <label class="ship-field-label">Rule name *</label>
+              <input class="form-control" [(ngModel)]="routingForm.name" placeholder="e.g. COD always Shiprocket" />
+            </div>
+            <div class="ship-field">
+              <label class="ship-field-label">Priority</label>
+              <input class="form-control" type="number" [(ngModel)]="routingForm.priority" />
+            </div>
+            <div class="ship-field">
+              <label class="ship-field-label">Force provider</label>
+              <select class="form-select" [(ngModel)]="routingForm.forceProvider">
+                <option value="shiprocket">Shiprocket</option>
+              </select>
+            </div>
+            <div class="ship-field">
+              <label class="ship-field-label">Payment mode</label>
+              <select class="form-select" [(ngModel)]="routingForm.paymentMode">
+                <option value="">Any</option>
+                <option value="prepaid">Prepaid</option>
+                <option value="cod">COD</option>
+              </select>
+            </div>
+            <div class="ship-field">
+              <label class="ship-field-label">Min weight (kg)</label>
+              <input class="form-control" type="number" [(ngModel)]="routingForm.minWeightKg" />
+            </div>
+            <div class="ship-field">
+              <label class="ship-field-label">Max weight (kg)</label>
+              <input class="form-control" type="number" [(ngModel)]="routingForm.maxWeightKg" />
+            </div>
+            <div class="ship-field">
+              <label class="ship-field-label">Min order value (₹)</label>
+              <input class="form-control" type="number" [(ngModel)]="routingForm.minOrderValue" />
+            </div>
+            <div class="ship-field ship-field--full ship-check">
+              <label><input type="checkbox" [(ngModel)]="routingForm.active" /> Active</label>
+            </div>
+          </div>
+          <div class="ship-form-actions">
+            <button type="button" class="site-btn dark-color" [appBtnLoading]="isSavingRule" (click)="saveRoutingRule()">
+              {{ routingForm.id ? 'Update routing rule' : 'Create routing rule' }}
+            </button>
+          </div>
+
+          <div class="ship-rule-list">
+            @for (r of rules; track r.id) {
+              <div class="ship-rule-item">
+                <div>
+                  <strong>{{ r.name }}</strong>
+                  <span class="ship-muted d-block">Priority {{ r.priority }} · Force {{ (r.actions || r.actionsJson)?.forceProvider || 'shiprocket' }}</span>
+                </div>
+                <div class="ship-rule-item__actions">
+                  <span class="ship-badge" [class.ship-badge--on]="r.active">{{ r.active ? 'Active' : 'Off' }}</span>
+                  <button type="button" class="site-btn grey-color" (click)="editRouting(r)">Edit</button>
+                  <button type="button" class="site-btn" (click)="deleteRouting(r)">Delete</button>
+                </div>
+              </div>
+            } @empty {
+              <div class="ship-empty ship-empty--compact"><p>No routing rules yet. Create one above.</p></div>
+            }
+          </div>
+        </section>
+      </div>
+    </div>
+  }
+
+  <!-- CALCULATOR -->
+  @if (activeTab === 'calculator') {
+    <section class="ship-panel">
+      <div class="ship-panel__head">
+        <div>
+          <h2>Rate calculator</h2>
+          <p class="ship-panel__sub">Shiprocket cost vs Storsee merchant price</p>
+        </div>
+        <img class="ship-panel__brand-mark" [src]="shiprocketLogo" alt="Shiprocket" />
+      </div>
+
+      <div class="ship-calc-grid">
+        <div class="ship-field">
+          <label class="ship-field-label">Pickup pincode *</label>
+          <input class="form-control" maxlength="6" [(ngModel)]="rateForm.pickupPincode" placeholder="110001" />
+        </div>
+        <div class="ship-field">
+          <label class="ship-field-label">Destination pincode *</label>
+          <input class="form-control" maxlength="6" [(ngModel)]="rateForm.destinationPincode" placeholder="400001" />
+        </div>
+        <div class="ship-field">
+          <label class="ship-field-label">Weight (kg)</label>
+          <input class="form-control" type="number" step="0.1" [(ngModel)]="rateForm.weightKg" />
+        </div>
+        <div class="ship-field">
+          <label class="ship-field-label">Order value (₹)</label>
+          <input class="form-control" type="number" [(ngModel)]="rateForm.orderValue" />
+        </div>
+        <div class="ship-field">
+          <label class="ship-field-label">L (cm)</label>
+          <input class="form-control" type="number" [(ngModel)]="rateForm.lengthCm" />
+        </div>
+        <div class="ship-field">
+          <label class="ship-field-label">W (cm)</label>
+          <input class="form-control" type="number" [(ngModel)]="rateForm.widthCm" />
+        </div>
+        <div class="ship-field">
+          <label class="ship-field-label">H (cm)</label>
+          <input class="form-control" type="number" [(ngModel)]="rateForm.heightCm" />
+        </div>
+        <div class="ship-field">
+          <label class="ship-field-label">Payment</label>
+          <select class="form-select" [(ngModel)]="rateForm.paymentMode">
+            <option value="prepaid">Prepaid</option>
+            <option value="cod">COD</option>
+          </select>
+        </div>
+      </div>
+      <div class="ship-form-actions">
+        <button type="button" class="site-btn dark-color" [appBtnLoading]="isCalculating" (click)="calculateRates()">Calculate rates</button>
+      </div>
+
+      @if (rateResults.length) {
+        <div class="table-responsive ship-table-wrap mt-3">
+          <table class="ship-table">
+            <thead>
+              <tr>
+                <th>Courier</th>
+                <th>Service</th>
+                <th>ETA</th>
+                <th>Provider cost</th>
+                <th>Merchant price</th>
+                <th>Storsee profit</th>
+                <th>Margin %</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (row of rateResults; track $index) {
+                <tr>
+                  <td>
+                    <div class="ship-inline-brand">
+                      <img [src]="shiprocketLogo" alt="" />
+                      {{ row.courier || 'Shiprocket' }}
+                    </div>
+                  </td>
+                  <td>{{ row.service || '—' }}</td>
+                  <td>{{ row.estimatedDays || '—' }} days</td>
+                  <td>₹{{ (row.totalProviderCost || 0) | number: '1.2-2' }}</td>
+                  <td>₹{{ (row.merchantPrice || 0) | number: '1.2-2' }}</td>
+                  <td class="ship-profit">₹{{ (row.storseeProfit || 0) | number: '1.2-2' }}</td>
+                  <td>{{ (row.marginPercentage || 0) | number: '1.1-1' }}%</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      } @else {
+        <div class="ship-empty ship-empty--compact mt-3">
+          <i class="fa-solid fa-calculator"></i>
+          <p>Enter pincodes and calculate to see Shiprocket rates with Storsee margin.</p>
+        </div>
+      }
+    </section>
+  }
+
+  <!-- SHIPMENTS -->
+  @if (activeTab === 'shipments') {
+    <section class="ship-panel p-0 overflow-hidden">
+      <div class="ship-panel__head ship-panel__head--pad ship-panel__head--toolbar">
+        <div>
+          <h2>Shipments</h2>
+          <p class="ship-panel__sub">AWB, cost, and profit across stores</p>
+        </div>
+        <input class="form-control ship-search" placeholder="Search AWB, order, store…" [(ngModel)]="shipmentFilter" />
+      </div>
+      @if (filteredShipments.length) {
+        <div class="table-responsive">
+          <table class="ship-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Order</th>
+                <th>Store</th>
+                <th>Courier</th>
+                <th>AWB</th>
+                <th>Status</th>
+                <th>Provider cost</th>
+                <th>Merchant charge</th>
+                <th>Profit</th>
+                <th>Created</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (s of filteredShipments; track s.id) {
+                <tr>
+                  <td>{{ s.id }}</td>
+                  <td>{{ s.orderId }}</td>
+                  <td>{{ s.storeId }}</td>
+                  <td>{{ s.courierName || 'Shiprocket' }}</td>
+                  <td class="ship-mono">{{ s.awb || '—' }}</td>
+                  <td><span class="ship-status">{{ s.status }}</span></td>
+                  <td>₹{{ (s.totalProviderCost || 0) | number: '1.2-2' }}</td>
+                  <td>₹{{ (s.merchantTotalShippingCharge || 0) | number: '1.2-2' }}</td>
+                  <td class="ship-profit">₹{{ (s.storseeShippingProfit || 0) | number: '1.2-2' }}</td>
+                  <td>{{ s.created_at | date: 'short' }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      } @else {
+        <div class="ship-empty">
+          <i class="fa-solid fa-box-open"></i>
+          <h3>No shipments yet</h3>
+          <p>Merchant-created Shiprocket AWBs will appear here.</p>
+        </div>
+      }
+    </section>
+  }
+
+  <!-- ANALYTICS -->
+  @if (activeTab === 'analytics') {
+    <section class="ship-panel">
+      <div class="ship-panel__head">
+        <div>
+          <h2>Analytics</h2>
+          <p class="ship-panel__sub">Shipping performance and Storsee margin</p>
+        </div>
+        <img class="ship-panel__brand-mark" [src]="storseeLogo" alt="Storsee" />
+      </div>
+      <div class="ship-metrics">
+        <div class="ship-metric">
+          <span class="ship-metric__label">Shipping revenue</span>
+          <strong>₹{{ (analytics?.shippingRevenue || 0) | number: '1.2-2' }}</strong>
+        </div>
+        <div class="ship-metric ship-metric--accent">
+          <span class="ship-metric__label">Storsee profit</span>
+          <strong>₹{{ (analytics?.storseeProfit || overview.stats?.storseeProfit || 0) | number: '1.2-2' }}</strong>
+        </div>
+        <div class="ship-metric">
+          <span class="ship-metric__label">Provider cost</span>
+          <strong>₹{{ (analytics?.providerCost || overview.stats?.providerCost || 0) | number: '1.2-2' }}</strong>
+        </div>
+        <div class="ship-metric">
+          <span class="ship-metric__label">Delivery rate</span>
+          <strong>{{ deliveryRate }}%</strong>
+        </div>
+      </div>
+      <div class="ship-metrics ship-metrics--tight mt-3">
+        <div class="ship-metric">
+          <span class="ship-metric__label">NDR</span>
+          <strong>{{ analytics?.ndr || 0 }}</strong>
+        </div>
+        <div class="ship-metric">
+          <span class="ship-metric__label">RTO</span>
+          <strong>{{ analytics?.rto || 0 }}</strong>
+        </div>
+        <div class="ship-metric">
+          <span class="ship-metric__label">Cancelled</span>
+          <strong>{{ analytics?.cancelled || 0 }}</strong>
+        </div>
+        <div class="ship-metric">
+          <span class="ship-metric__label">Total shipments</span>
+          <strong>{{ analytics?.totalShipments || overview.stats?.totalShipments || 0 }}</strong>
+        </div>
+      </div>
+    </section>
+  }
+
+  <!-- LOGS -->
+  @if (activeTab === 'logs') {
+    <section class="ship-panel p-0 overflow-hidden">
+      <div class="ship-panel__head ship-panel__head--pad ship-panel__head--toolbar">
+        <div>
+          <h2>Provider API logs</h2>
+          <p class="ship-panel__sub">Outbound Shiprocket calls</p>
+        </div>
+        <input class="form-control ship-search" placeholder="Filter endpoint, status, error…" [(ngModel)]="logFilter" />
+      </div>
+      @if (filteredLogs.length) {
+        <div class="table-responsive">
+          <table class="ship-table">
+            <thead>
+              <tr>
+                <th>Provider</th>
+                <th>Endpoint</th>
+                <th>HTTP</th>
+                <th>Duration</th>
+                <th>Error</th>
+                <th>Time</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (l of filteredLogs; track l.id) {
+                <tr [class.ship-row--error]="l.errorMessage">
+                  <td>
+                    <div class="ship-inline-brand">
+                      <img [src]="shiprocketLogo" alt="" />
+                      {{ l.providerCode }}
+                    </div>
+                  </td>
+                  <td class="ship-mono">{{ l.endpoint }}</td>
+                  <td>{{ l.httpStatus || '—' }}</td>
+                  <td>{{ l.durationMs != null ? l.durationMs + 'ms' : '—' }}</td>
+                  <td class="ship-ellipsis">{{ l.errorMessage || '—' }}</td>
+                  <td>{{ l.created_at | date: 'short' }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      } @else {
+        <div class="ship-empty">
+          <i class="fa-solid fa-terminal"></i>
+          <h3>No API logs yet</h3>
+          <p>Auth, rates, and AWB calls will show here after you test Shiprocket.</p>
+        </div>
+      }
+    </section>
+  }
+
+  <!-- WEBHOOKS -->
+  @if (activeTab === 'webhooks') {
+    <section class="ship-panel p-0 overflow-hidden">
+      <div class="ship-panel__head ship-panel__head--pad">
+        <div>
+          <h2>Webhook inbox</h2>
+          <p class="ship-panel__sub">Idempotent Shiprocket tracking callbacks</p>
+        </div>
+      </div>
+      @if (webhooks.length) {
+        <div class="table-responsive">
+          <table class="ship-table">
+            <thead>
+              <tr>
+                <th>Provider</th>
+                <th>Shipment</th>
+                <th>Payload hash</th>
+                <th>Processed</th>
+                <th>Time</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (w of webhooks; track w.id) {
+                <tr>
+                  <td>
+                    <div class="ship-inline-brand">
+                      <img [src]="shiprocketLogo" alt="" />
+                      {{ w.providerCode }}
+                    </div>
+                  </td>
+                  <td>{{ w.shipmentId || '—' }}</td>
+                  <td class="ship-mono">{{ w.payloadHash || '—' }}</td>
+                  <td>
+                    <span class="ship-badge" [class.ship-badge--on]="w.processed" [class.ship-badge--off]="!w.processed">
+                      {{ w.processed ? 'Processed' : 'Pending' }}
+                    </span>
+                  </td>
+                  <td>{{ w.created_at | date: 'short' }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      } @else {
+        <div class="ship-empty">
+          <i class="fa-solid fa-satellite-dish"></i>
+          <h3>No webhook events</h3>
+          <p>Shiprocket status callbacks will land here once shipments move.</p>
+        </div>
+      }
+    </section>
+  }
+
+  <!-- REMITTANCES -->
+  @if (activeTab === 'remittances') {
+    <section class="ship-panel p-0 overflow-hidden">
+      <div class="ship-panel__head ship-panel__head--pad">
+        <div>
+          <h2>COD remittance</h2>
+          <p class="ship-panel__sub">Normalized COD settlements from Shiprocket</p>
+        </div>
+      </div>
+      @if (remittances.length) {
+        <div class="table-responsive">
+          <table class="ship-table">
+            <thead>
+              <tr>
+                <th>Store</th>
+                <th>Provider</th>
+                <th>AWB</th>
+                <th>COD amount</th>
+                <th>Status</th>
+                <th>Remitted</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (r of remittances; track r.id) {
+                <tr>
+                  <td>{{ r.storeId }}</td>
+                  <td>{{ r.providerCode }}</td>
+                  <td class="ship-mono">{{ r.awb || '—' }}</td>
+                  <td>₹{{ (r.codAmount || 0) | number: '1.2-2' }}</td>
+                  <td><span class="ship-status">{{ r.status || '—' }}</span></td>
+                  <td>{{ r.remittedAt ? (r.remittedAt | date: 'short') : '—' }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      } @else {
+        <div class="ship-empty">
+          <i class="fa-solid fa-money-bill-transfer"></i>
+          <h3>No remittance rows</h3>
+          <p>COD remittance records will appear after delivered COD shipments settle.</p>
+        </div>
+      }
+    </section>
+  }
+</div>

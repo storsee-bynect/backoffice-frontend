@@ -66,7 +66,7 @@
                 <!-- Price -->
                 <div class="col-lg-6 col-12 mb-2">
                     <div class="form-inp-main">
-                        <label class="form-label">Price (₹) <sup>*</sup></label>
+                        <label class="form-label">{{ enableIntroPricing ? 'Price after intro (₹)' : 'Price (₹)' }} <sup>*</sup></label>
                         <input class="form-control" type="number" OnlyNumber placeholder="0 for Free" [(ngModel)]="dataReqModel.amount" />
                     </div>
                 </div>
@@ -77,6 +77,44 @@
                         <label class="form-label">Duration (Days) <sup>*</sup></label>
                         <input class="form-control" type="number" OnlyNumber placeholder="30, 180, 365" [(ngModel)]="dataReqModel.duration" readonly />
                         <small class="text-muted">Auto-set from billing period. Templates are not included in plans.</small>
+                    </div>
+                </div>
+
+                <!-- Intro pricing -->
+                <div class="col-12 mb-2">
+                    <div class="intro-pricing-box">
+                        <div class="toggle-flag-item">
+                            <label class="toggle-switch">
+                                <input type="checkbox" class="toggle-input" [(ngModel)]="enableIntroPricing" (ngModelChange)="onIntroToggle()" />
+                                <span class="toggle-label"></span>
+                            </label>
+                            <span class="toggle-flag-label">
+                                <i class="fa-solid fa-tags me-1 text-primary"></i>
+                                Introductory pricing (first X months different price)
+                            </span>
+                        </div>
+                        @if(enableIntroPricing){
+                            <div class="row m-0 p-0 mt-2">
+                                <div class="col-lg-6 col-12 mb-2">
+                                    <div class="form-inp-main">
+                                        <label class="form-label">First months <sup>*</sup></label>
+                                        <input class="form-control" type="number" OnlyNumber min="1" placeholder="e.g. 3" [(ngModel)]="dataReqModel.introMonths" />
+                                        <small class="text-muted">Charge intro price while store has paid less than this many months.</small>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-12 mb-2">
+                                    <div class="form-inp-main">
+                                        <label class="form-label">Intro price (₹) <sup>*</sup></label>
+                                        <input class="form-control" type="number" OnlyNumber placeholder="e.g. 499" [(ngModel)]="dataReqModel.introAmount" />
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="intro-pricing-hint">
+                                        ₹{{ dataReqModel.introAmount || 0 }} for first {{ dataReqModel.introMonths || 0 }} months, then ₹{{ dataReqModel.amount || 0 }}
+                                    </div>
+                                </div>
+                            </div>
+                        }
                     </div>
                 </div>
 
@@ -207,8 +245,13 @@
                         <div class="preview-name">{{ dataReqModel.name || 'Plan Name' }}</div>
                         <div class="preview-price">
                             <span class="preview-symbol">₹</span>
-                            <span class="preview-amount">{{ dataReqModel.amount || 0 }}</span>
-                            <span class="preview-dur">/ {{ dataReqModel.duration || 0 }} Days</span>
+                            @if(enableIntroPricing && dataReqModel.introMonths > 0){
+                                <span class="preview-amount">{{ dataReqModel.introAmount || 0 }}</span>
+                                <span class="preview-dur">for first {{ dataReqModel.introMonths }} mo, then ₹{{ dataReqModel.amount || 0 }}</span>
+                            } @else {
+                                <span class="preview-amount">{{ dataReqModel.amount || 0 }}</span>
+                                <span class="preview-dur">/ {{ dataReqModel.duration || 0 }} Days</span>
+                            }
                         </div>
                         <div class="preview-limits">
                             <span><i class="fa-solid fa-box me-1"></i>{{ dataReqModel.productLimit == 0 ? 'Unlimited' : dataReqModel.productLimit }} Products</span>

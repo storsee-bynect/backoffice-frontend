@@ -7,6 +7,8 @@ export class PackageReqModel {
     tagline: string = '';
     description: string = '';
     amount: number;
+    introMonths: number = 0;
+    introAmount: number = 0;
     duration: number;
     productLimit: number;
     maxOrders: number = 0;

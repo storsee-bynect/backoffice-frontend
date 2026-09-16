@@ -60,6 +60,22 @@
     color: var(--normal-font);
 }
 
+.intro-pricing-box {
+    padding: 10px 12px;
+    background-color: var(--sidebar-bg);
+    border-radius: 10px;
+    border: 1px dashed var(--light-border);
+}
+
+.intro-pricing-hint {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--heading-font);
+    padding: 6px 10px;
+    border-radius: 8px;
+    background: color-mix(in srgb, #1d68f1 8%, white);
+}
+
 // Live Preview
 .plan-preview {
     border: 1px solid var(--light-border);
