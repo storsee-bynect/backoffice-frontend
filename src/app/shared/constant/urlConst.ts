@@ -115,6 +115,7 @@ function buildUrlConstant() {
       getTransactions: base + 'transaction/getAllTransactions',
       getAllTransactionsByPage: base + 'transaction/getAllTransactionsByPage',
       getTransactionByStoreId: base + 'transaction/getTransactionByStoreId',
+      getTransactionInvoice: base + 'transaction/getTransactionInvoice/',
       addTransaction: base + 'transaction/createTransaction',
       updateTransaction: base + 'transaction/updateTransaction/',
       deleteTransaction: base + 'transaction/deleteTransaction/',

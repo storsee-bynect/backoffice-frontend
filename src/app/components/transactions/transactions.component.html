@@ -2,7 +2,7 @@
 <app-page-data-count [items]="countItems" />
 <div class="page-top-main">
     <div class="page-top-search-main d-flex">
-        <input type="text" class="form-control" placeholder="Search" [(ngModel)]="searchTxt" (keyup.enter)="filterData()" />
+        <input type="text" class="form-control" placeholder="Search store, invoice, plan, coupon…" [(ngModel)]="searchTxt" (keyup.enter)="filterData()" />
         <button
             type="button"
             class="square-btn site-btn primary-color ms-1"
@@ -25,13 +25,14 @@
                 <thead>
                     <tr>
                         <th class="sr-th">Sr No.</th>
+                        <th>Invoice</th>
                         <th>Store</th>
-                        <th>Type</th>
-                        <th>Amount</th>
                         <th>Plan</th>
+                        <th>Amount</th>
+                        <th>Coupon</th>
+                        <th>Type</th>
                         <th>Status</th>
-                        <th>Note</th>
-                        <th>Create Date</th>
+                        <th>Date</th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -40,25 +41,55 @@
                     item;let i=$index){
                         <tr>
                             <td class="sr-no-td">{{(page - 1) * limit + i + 1}}</td>
-                            <td>{{item.storeName}}</td>
-                            <td>{{item.type}}</td>
-                            <td>₹{{item.amt}}</td>
-                            <td>{{item.plan}}</td>
+                            <td>
+                                <div class="tx-invoice">{{ item.invoiceNo || ('#' + item.id) }}</div>
+                                @if(item.paymentId){
+                                    <div class="tx-payid">{{ item.paymentId }}</div>
+                                }
+                            </td>
+                            <td>
+                                <div class="tx-store">{{ item.storeName || ('Store #' + item.storeId) }}</div>
+                                @if(item.storeEmail){
+                                    <div class="tx-sub">{{ item.storeEmail }}</div>
+                                }
+                                @if(item.storeSlug){
+                                    <div class="tx-sub">/{{ item.storeSlug }}</div>
+                                }
+                            </td>
+                            <td>{{ item.plan || '—' }}</td>
+                            <td>
+                                <strong>₹{{ item.amt }}</strong>
+                                @if(item.discountAmt > 0){
+                                    <div class="tx-sub">−₹{{ item.discountAmt }} discount</div>
+                                }
+                            </td>
+                            <td>{{ item.couponCode || '—' }}</td>
+                            <td>{{ item.type || '—' }}</td>
                             <td>
                                 <div class="status-td">
                                     <span class="status-table" [ngClass]="item.status == 1 ? 'green' : 'red'">
-                                        {{item.status == 1 ? 'Completed' : 'Cancelled'}}
+                                        {{ item.status == 1 ? 'Completed' : 'Cancelled' }}
                                     </span>
                                 </div>
                             </td>
+                            <td>{{ formatDate(item.created_at) }}</td>
                             <td>
                                 <div class="table-btns-main">
-                                    <button [ngbTooltip]="'View Note'" class="table-single-btn green" (click)="sharedservice.viewContent(item.note)"><i class="fa-solid fa-eye"></i></button>
-                                </div>
-                            </td>
-                            <td>{{item.created_at.split('T')[0]}} {{item.created_at.split('T')[1].split('.')[0].split(':')[0]}}:{{item.created_at.split('T')[1].split('.')[0].split(':')[1]}}</td>
-                            <td>
-                                <div class="table-btns-main">
+                                    @if(item.note){
+                                        <button [ngbTooltip]="'View Note'" class="table-single-btn green" (click)="sharedservice.viewContent(item.note)">
+                                            <i class="fa-solid fa-eye"></i>
+                                        </button>
+                                    }
+                                    @if(item.status == 1){
+                                        <button
+                                            [ngbTooltip]="'Download Invoice'"
+                                            class="table-single-btn grey ms-1"
+                                            [appBtnLoading]="invoiceLoadingId === item.id"
+                                            [disabled]="invoiceLoadingId === item.id"
+                                            (click)="downloadInvoice(item)">
+                                            <i class="fa-solid fa-file-arrow-down"></i>
+                                        </button>
+                                    }
                                     @if(sharedservice.isPageDelete){
                                         <button
                                             [ngbTooltip]="'Delete Data'"

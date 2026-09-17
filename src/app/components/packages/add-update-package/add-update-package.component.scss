@@ -45,7 +45,7 @@
     flex-direction: column;
     gap: 4px;
     padding: 8px 10px;
-    background-color: var(--sidebar-bg);
+    background-color: var(--layout-bg);
     border-radius: 10px;
 }
 
@@ -62,7 +62,7 @@
 
 .intro-pricing-box {
     padding: 10px 12px;
-    background-color: var(--sidebar-bg);
+    background-color: var(--layout-bg);
     border-radius: 10px;
     border: 1px dashed var(--light-border);
 }

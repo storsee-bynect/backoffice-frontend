@@ -5,3 +5,28 @@
     transition: opacity 0.15s ease;
   }
 }
+
+.tx-invoice {
+  font-weight: 650;
+  color: #0f172a;
+}
+
+.tx-store {
+  font-weight: 650;
+  color: #0f172a;
+}
+
+.tx-sub,
+.tx-payid {
+  margin-top: 2px;
+  font-size: 11px;
+  color: #64748b;
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.table-single-btn.grey {
+  background: #f1f5f9;
+  color: #334155;
+}

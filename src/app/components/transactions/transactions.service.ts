@@ -17,6 +17,9 @@ export class TransactionService {
     getTransactionByStoreId(id) {
         return this.http.post<any>(urlConstant.TransactionsAPI.getTransactionByStoreId,{id});
     }
+    getTransactionInvoice(id) {
+        return this.http.get<any>(urlConstant.TransactionsAPI.getTransactionInvoice + id);
+    }
     addTransaction(data) {
         return this.http.post<any>(urlConstant.TransactionsAPI.addTransaction, data);
     }
