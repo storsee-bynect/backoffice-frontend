@@ -1,0 +1,198 @@
+<main>
+  <div class="popup-main store-wallet-popup">
+    <div class="popup-head">
+      <div class="popup-head-ttl">
+        <i class="fa-solid fa-wallet me-2"></i>
+        Store Wallet — {{ store?.name }}
+      </div>
+      <div class="popup-head-btn">
+        <button type="button" (click)="activeModal.close()"><i class="fa-solid fa-x"></i></button>
+      </div>
+    </div>
+
+    <div class="popup-body">
+      <div class="sw-summary">
+        <div class="sw-card">
+          <span>Prepaid</span>
+          <strong>{{ money(prepaidBalance) }}</strong>
+          <small>Not withdrawable by merchant</small>
+        </div>
+        <div class="sw-card sw-card--accent">
+          <span>Withdrawable</span>
+          <strong>{{ money(withdrawableBalance) }}</strong>
+          <small>COD collections</small>
+        </div>
+        <div class="sw-card">
+          <span>Total</span>
+          <strong>{{ money(totalBalance) }}</strong>
+          <small>INR (₹)</small>
+        </div>
+      </div>
+
+      <div class="sw-forms">
+        <section class="sw-panel">
+          <h3>Deposit</h3>
+          <div class="sw-row">
+            <label>
+              Amount (₹)
+              <input type="number" min="1" [(ngModel)]="depositAmount" />
+            </label>
+            <label>
+              Bucket
+              <select [(ngModel)]="depositBucket">
+                <option value="prepaid">Prepaid</option>
+                <option value="withdrawable">Withdrawable</option>
+              </select>
+            </label>
+            <label class="sw-grow">
+              Remark
+              <input type="text" [(ngModel)]="depositRemark" placeholder="Required reason / note" />
+            </label>
+            <button type="button" class="site-btn primary-color" (click)="doDeposit()" [disabled]="saving">Deposit</button>
+          </div>
+        </section>
+
+        <section class="sw-panel">
+          <h3>Admin adjust (debit)</h3>
+          <div class="sw-row">
+            <label>
+              Amount (₹)
+              <input type="number" min="1" [(ngModel)]="withdrawAmount" />
+            </label>
+            <label>
+              Bucket
+              <select [(ngModel)]="withdrawBucket">
+                <option value="withdrawable">Withdrawable</option>
+                <option value="prepaid">Prepaid</option>
+              </select>
+            </label>
+            <label class="sw-grow">
+              Remark
+              <input type="text" [(ngModel)]="withdrawRemark" placeholder="Required reason / note" />
+            </label>
+            <button type="button" class="site-btn dark-color" (click)="doWithdraw()" [disabled]="saving">Debit</button>
+          </div>
+        </section>
+      </div>
+
+      <section class="sw-panel">
+        <div class="sw-ledger-head">
+          <h3>Withdraw requests</h3>
+          <div class="sw-req-tools">
+            <select [(ngModel)]="requestFilter" (ngModelChange)="onRequestFilterChange()">
+              <option value="pending">Pending</option>
+              <option value="">All</option>
+              <option value="approved">Approved</option>
+              <option value="rejected">Rejected</option>
+            </select>
+            <button type="button" class="site-btn primary-color" (click)="loadWithdrawRequests(1)">Refresh</button>
+          </div>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-bordered text-nowrap mb-0 sw-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Amount</th>
+                <th>Remark</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for(row of withdrawRequests; track row.id){
+                <tr>
+                  <td>{{ row.created_at | date:'dd MMM yyyy, HH:mm' }}</td>
+                  <td class="is-debit">{{ money(row.amount) }}</td>
+                  <td>{{ row.remark || '—' }}</td>
+                  <td><span class="sw-status" [class]="statusClass(row.status)">{{ row.status }}</span></td>
+                  <td>
+                    @if(row.status === 'pending'){
+                      <button
+                        type="button"
+                        class="site-btn primary-color me-1"
+                        [disabled]="reviewingId === row.id"
+                        (click)="approveRequest(row)"
+                      >Approve</button>
+                      <button
+                        type="button"
+                        class="site-btn dark-color"
+                        [disabled]="reviewingId === row.id"
+                        (click)="rejectRequest(row)"
+                      >Reject</button>
+                    } @else {
+                      <span class="text-muted">{{ row.adminRemark || '—' }}</span>
+                    }
+                  </td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="5" class="text-center text-muted py-4">No withdraw requests.</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        @if(requestsPages > 1){
+          <div class="sw-pager">
+            <button type="button" class="site-btn primary-color" [disabled]="requestsPage <= 1" (click)="loadWithdrawRequests(requestsPage - 1)">Prev</button>
+            <span>Page {{ requestsPage }} / {{ requestsPages }}</span>
+            <button type="button" class="site-btn primary-color" [disabled]="requestsPage >= requestsPages" (click)="loadWithdrawRequests(requestsPage + 1)">Next</button>
+          </div>
+        }
+      </section>
+
+      <section class="sw-panel">
+        <div class="sw-ledger-head">
+          <h3>Ledger</h3>
+          <button type="button" class="site-btn primary-color" (click)="refresh()" [disabled]="loading">Refresh</button>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-bordered text-nowrap mb-0 sw-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Type</th>
+                <th>Bucket</th>
+                <th>Amount</th>
+                <th>Remark</th>
+                <th>By</th>
+                <th>Prepaid after</th>
+                <th>Withdrawable after</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for(row of ledger; track row.id){
+                <tr>
+                  <td>{{ row.created_at | date:'dd MMM yyyy, HH:mm' }}</td>
+                  <td>{{ row.entryType }}</td>
+                  <td>{{ row.bucket }}</td>
+                  <td [class]="entryClass(row)">{{ entrySign(row) }}{{ money(row.amount) }}</td>
+                  <td>{{ row.remark || '—' }}</td>
+                  <td>{{ row.createdBy }}</td>
+                  <td>{{ money(row.balanceAfterPrepaid) }}</td>
+                  <td>{{ money(row.balanceAfterWithdrawable) }}</td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="8" class="text-center text-muted py-4">No ledger entries yet.</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        @if(ledgerPages > 1){
+          <div class="sw-pager">
+            <button type="button" class="site-btn primary-color" [disabled]="ledgerPage <= 1" (click)="loadLedger(ledgerPage - 1)">Prev</button>
+            <span>Page {{ ledgerPage }} / {{ ledgerPages }}</span>
+            <button type="button" class="site-btn primary-color" [disabled]="ledgerPage >= ledgerPages" (click)="loadLedger(ledgerPage + 1)">Next</button>
+          </div>
+        }
+      </section>
+    </div>
+
+    <div class="popup-footer">
+      <button type="button" class="site-btn dark-color" (click)="activeModal.close()">Close</button>
+    </div>
+  </div>
+</main>

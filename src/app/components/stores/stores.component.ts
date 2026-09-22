@@ -10,6 +10,7 @@ import { ViewTemplateDetailComponent } from '../templates/view-template-detail/v
 import { StoreUsersListComponent } from './store-users-list/store-users-list.component';
 import { StorePlanHistoryComponent } from './store-plan-history/store-plan-history.component';
 import { StoreSettingsComponent } from './store-settings/store-settings.component';
+import { StoreWalletModalComponent } from './store-wallet/store-wallet-modal.component';
 import { formatPhoneDisplay } from '../../shared/constant/country-codes';
 
 @Component({
@@ -170,6 +171,15 @@ export class StoresComponent {
         this.getDataList();
       }
     }).catch(() => {});
+  }
+
+  openStoreWallet(store: any) {
+    const modalRef = this.modalService.open(StoreWalletModalComponent, {
+      size: 'xl',
+      backdrop: 'static',
+      centered: true,
+    });
+    modalRef.componentInstance.store = store;
   }
 
   deleteData(id: number) {

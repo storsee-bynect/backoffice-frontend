@@ -72,6 +72,7 @@ import { ViewLocationComponent } from './shared/components/view-location/view-lo
 import { StorePlanHistoryComponent } from './components/stores/store-plan-history/store-plan-history.component';
 import { StoreAssignPlanComponent } from './components/stores/store-plan-history/store-assign-plan/store-assign-plan.component';
 import { StoreSettingsComponent } from './components/stores/store-settings/store-settings.component';
+import { StoreWalletModalComponent } from './components/stores/store-wallet/store-wallet-modal.component';
 import { NotificationSettingsComponent } from './components/notification-settings/notification-settings.component';
 import { PushNotificationsComponent } from './components/push-notifications/push-notifications.component';
 import { AddUpdatePushCampaignComponent } from './components/push-notifications/add-update-push-campaign/add-update-push-campaign.component';
@@ -135,6 +136,7 @@ import { ShippingManagerComponent } from './components/shipping/shipping-manager
     StorePlanHistoryComponent,
     StoreAssignPlanComponent,
     StoreSettingsComponent,
+    StoreWalletModalComponent,
     ShippingManagerComponent
   ],
   imports: [

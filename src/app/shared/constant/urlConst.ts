@@ -111,6 +111,15 @@ function buildUrlConstant() {
       deleteStore: base + 'store/deleteStore/',
       renewStorePlan: base + 'store/renew-plan/',
     },
+    StoreWalletAPI: {
+      get: base + 'store-wallet/admin/',
+      ledger: base + 'store-wallet/admin/',
+      deposit: base + 'store-wallet/admin/',
+      withdraw: base + 'store-wallet/admin/',
+      withdrawRequests: base + 'store-wallet/admin/withdraw-requests',
+      approveWithdraw: base + 'store-wallet/admin/withdraw-requests/',
+      rejectWithdraw: base + 'store-wallet/admin/withdraw-requests/',
+    },
     TransactionsAPI: {
       getTransactions: base + 'transaction/getAllTransactions',
       getAllTransactionsByPage: base + 'transaction/getAllTransactionsByPage',
