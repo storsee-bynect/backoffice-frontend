@@ -1,0 +1,135 @@
+<main>
+  <div class="popup-main clone-layout-popup">
+    <div class="popup-head">
+      <div class="popup-head-ttl">
+        <i class="fa-solid fa-copy me-2"></i>
+        Clone layout / presets
+      </div>
+      <div class="popup-head-btn">
+        <button type="button" (click)="activeModal.dismiss()"><i class="fa-solid fa-x"></i></button>
+      </div>
+    </div>
+
+    <div class="popup-body">
+      <p class="cl-intro">
+        Copies <strong>theme layout + colors/tokens</strong> only — not products, orders, or customers.
+        Product picks in sections are cleared so the target store can re-link its own catalog.
+      </p>
+
+      <div class="cl-tabs">
+        <button type="button" [class.active]="tab === 'clone'" (click)="setTab('clone')">Clone store → store</button>
+        <button type="button" [class.active]="tab === 'save'" (click)="setTab('save')">Save as preset</button>
+        <button type="button" [class.active]="tab === 'apply'" (click)="setTab('apply')">Apply preset</button>
+      </div>
+
+      @if (errorMessage) {
+        <div class="cl-error">{{ errorMessage }}</div>
+      }
+
+      @if (tab === 'clone') {
+        <div class="cl-form">
+          <label class="cl-field">
+            <span>Source store (copy from)</span>
+            <select class="form-select" [(ngModel)]="cloneSourceId" [disabled]="storesLoading || isSaving">
+              <option [ngValue]="null">Select store…</option>
+              @for (s of stores; track s.id) {
+                <option [ngValue]="s.id">{{ storeLabel(s) }}</option>
+              }
+            </select>
+          </label>
+          <label class="cl-field">
+            <span>Target store (paste to)</span>
+            <select class="form-select" [(ngModel)]="cloneTargetId" [disabled]="storesLoading || isSaving">
+              <option [ngValue]="null">Select store…</option>
+              @for (s of stores; track s.id) {
+                <option [ngValue]="s.id">{{ storeLabel(s) }}</option>
+              }
+            </select>
+          </label>
+          <label class="cl-check"><input type="checkbox" [(ngModel)]="includeCustomCss" /> Include custom CSS</label>
+          <label class="cl-check"><input type="checkbox" [(ngModel)]="scrubProductRefs" /> Clear linked product IDs</label>
+          <label class="cl-check"><input type="checkbox" [(ngModel)]="useDraft" /> Prefer unpublished draft (if any)</label>
+          <p class="cl-warn">This replaces the target store’s current published layout.</p>
+        </div>
+      }
+
+      @if (tab === 'save') {
+        <div class="cl-form">
+          <label class="cl-field">
+            <span>Source store</span>
+            <select class="form-select" [(ngModel)]="saveStoreId" [disabled]="storesLoading || isSaving">
+              <option [ngValue]="null">Select store…</option>
+              @for (s of stores; track s.id) {
+                <option [ngValue]="s.id">{{ storeLabel(s) }}</option>
+              }
+            </select>
+          </label>
+          <label class="cl-field">
+            <span>Preset code</span>
+            <input
+              class="form-control"
+              type="text"
+              placeholder="DEMO_JEWELLERY"
+              [(ngModel)]="presetCode"
+              (ngModelChange)="onPresetCodeInput()"
+              [disabled]="isSaving"
+            />
+          </label>
+          <label class="cl-field">
+            <span>Label (optional)</span>
+            <input class="form-control" type="text" placeholder="Jewellery demo layout" [(ngModel)]="presetLabel" [disabled]="isSaving" />
+          </label>
+          <label class="cl-check"><input type="checkbox" [(ngModel)]="overwritePreset" /> Overwrite if code exists</label>
+          <label class="cl-check"><input type="checkbox" [(ngModel)]="scrubProductRefs" /> Clear linked product IDs</label>
+          <label class="cl-check"><input type="checkbox" [(ngModel)]="useDraft" /> Prefer unpublished draft (if any)</label>
+          <p class="cl-hint">Saved presets can be applied to any new store later.</p>
+        </div>
+      }
+
+      @if (tab === 'apply') {
+        <div class="cl-form">
+          <label class="cl-field">
+            <span>Preset</span>
+            <select class="form-select" [(ngModel)]="applyPresetCode" [disabled]="presetsLoading || isSaving">
+              <option value="">Select preset…</option>
+              @for (p of presets; track p.templateCode) {
+                <option [value]="p.templateCode">
+                  {{ p.label || p.templateCode }}{{ p.isBuiltin ? ' (built-in)' : '' }}{{ p.sourceStoreId ? ' · from store #' + p.sourceStoreId : '' }}
+                </option>
+              }
+            </select>
+          </label>
+          <label class="cl-field">
+            <span>Target store</span>
+            <select class="form-select" [(ngModel)]="applyStoreId" [disabled]="storesLoading || isSaving">
+              <option [ngValue]="null">Select store…</option>
+              @for (s of stores; track s.id) {
+                <option [ngValue]="s.id">{{ storeLabel(s) }}</option>
+              }
+            </select>
+          </label>
+          <p class="cl-warn">Applying a preset replaces the target store’s current published layout.</p>
+        </div>
+      }
+    </div>
+
+    <div class="popup-footer">
+      <button type="button" class="site-btn grey-color" (click)="activeModal.dismiss()" [disabled]="isSaving">Cancel</button>
+      @if (tab === 'clone') {
+        <button type="button" class="site-btn primary-color" [appBtnLoading]="isSaving" [disabled]="isSaving" (click)="runClone()">
+          Clone layout
+        </button>
+      }
+      @if (tab === 'save') {
+        <button type="button" class="site-btn primary-color" [appBtnLoading]="isSaving" [disabled]="isSaving" (click)="runSavePreset()">
+          Save preset
+        </button>
+      }
+      @if (tab === 'apply') {
+        <button type="button" class="site-btn primary-color" [appBtnLoading]="isSaving" [disabled]="isSaving" (click)="runApplyPreset()">
+          Apply preset
+        </button>
+      }
+    </div>
+  </div>
+</main>

@@ -111,6 +111,12 @@ function buildUrlConstant() {
       deleteStore: base + 'store/deleteStore/',
       renewStorePlan: base + 'store/renew-plan/',
     },
+    ThemeLayoutAPI: {
+      cloneLayout: base + 'theme/admin/clone-layout',
+      saveLayoutPreset: base + 'theme/admin/save-layout-preset',
+      listLayoutPresets: base + 'theme/admin/layout-presets',
+      applyLayoutPreset: base + 'theme/admin/apply-layout-preset',
+    },
     StoreWalletAPI: {
       get: base + 'store-wallet/admin/',
       ledger: base + 'store-wallet/admin/',
@@ -199,6 +205,15 @@ function buildUrlConstant() {
     },
     ShippingAPI: {
       adminBase: base + 'shipping/admin/',
+    },
+    LocationsAPI: {
+      overview: base + 'locations/admin/overview',
+      states: base + 'locations/admin/states',
+      cities: base + 'locations/admin/cities',
+      reseedIndia: base + 'locations/admin/reseed-india',
+      countries: base + 'locations/admin/countries',
+      adminStates: base + 'locations/admin/states',
+      adminCities: base + 'locations/admin/cities',
     },
   };
 }

@@ -1,0 +1,558 @@
+<app-breadcrumb [pageName]="sharedservice.pageName || 'Locations'" [icon]="sharedservice.pageDetail?.icon || 'map-location-dot'" />
+
+
+
+<div class="loc-page">
+
+  <div class="loc-toolbar">
+
+    <nav class="loc-crumb" aria-label="Location path">
+
+      @for (item of breadcrumb; track item.label; let last = $last) {
+
+        @if (!last && item.action) {
+
+          <button type="button" class="loc-crumb__link" (click)="item.action!()">{{ item.label }}</button>
+
+          <i class="fa-solid fa-chevron-right loc-crumb__sep" aria-hidden="true"></i>
+
+        } @else {
+
+          <span class="loc-crumb__current">{{ item.label }}</span>
+
+        }
+
+      }
+
+      <span class="loc-crumb__meta">
+
+        @if (level === 'countries') {
+
+          · {{ countries.length }} countr{{ countries.length !== 1 ? 'ies' : 'y' }}
+
+        } @else if (level === 'states') {
+
+          · {{ states.length }} state{{ states.length !== 1 ? 's' : '' }}
+
+        } @else {
+
+          · {{ citiesTotal }} cit{{ citiesTotal !== 1 ? 'ies' : 'y' }}
+
+        }
+
+      </span>
+
+    </nav>
+
+
+
+    <div class="loc-toolbar__right">
+
+      @if (level !== 'countries') {
+
+        <div class="loc-search">
+
+          <span><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i></span>
+
+          <input
+
+            type="search"
+
+            placeholder="Search…"
+
+            [(ngModel)]="searchTxt"
+
+            (keyup.enter)="onSearch()"
+
+          />
+
+        </div>
+
+      }
+
+      <button
+
+        type="button"
+
+        class="site-btn loc-btn"
+
+        [appBtnLoading]="isSeeding"
+
+        [disabled]="isSeeding"
+
+        (click)="reseedIndia()"
+
+        title="Sync India states & cities into DB"
+
+      >
+
+        <i class="fa-solid fa-cloud-arrow-down"></i>
+
+        <span>Sync</span>
+
+      </button>
+
+      <button type="button" class="site-btn primary-color loc-btn" (click)="openAdd()">
+
+        <i class="fa-solid fa-plus"></i>
+
+        <span>{{ addLabel }}</span>
+
+      </button>
+
+    </div>
+
+  </div>
+
+
+
+  @if (showForm) {
+
+    <section class="loc-form-card">
+
+      <div class="loc-form-card__head">
+
+        <h2>{{ formMode === 'edit' ? 'Edit' : 'Add' }} {{ formEntity }}</h2>
+
+        <button type="button" class="loc-icon-btn" (click)="closeForm()" aria-label="Close">
+
+          <i class="fa-solid fa-xmark"></i>
+
+        </button>
+
+      </div>
+
+      <div class="loc-form-grid">
+
+        <label class="form-inp-main">
+
+          <span class="form-label">Name <sup>*</sup></span>
+
+          <input class="form-control" type="text" [(ngModel)]="formName" placeholder="Name" />
+
+        </label>
+
+        @if (formEntity === 'country') {
+
+          <label class="form-inp-main">
+
+            <span class="form-label">ISO2</span>
+
+            <input class="form-control" type="text" [(ngModel)]="formIso2" maxlength="8" placeholder="IN" />
+
+          </label>
+
+          <label class="form-inp-main">
+
+            <span class="form-label">Phone code</span>
+
+            <input class="form-control" type="text" [(ngModel)]="formPhoneCode" maxlength="8" placeholder="91" />
+
+          </label>
+
+        }
+
+        @if (formEntity === 'state') {
+
+          <label class="form-inp-main">
+
+            <span class="form-label">Code</span>
+
+            <input class="form-control" type="text" [(ngModel)]="formCode" maxlength="32" placeholder="MH" />
+
+          </label>
+
+        }
+
+        <label class="form-inp-main loc-check">
+
+          <input type="checkbox" [(ngModel)]="formActive" />
+
+          <span>Active</span>
+
+        </label>
+
+      </div>
+
+      <div class="loc-form-actions">
+
+        <button type="button" class="site-btn loc-btn" (click)="closeForm()">Cancel</button>
+
+        <button
+
+          type="button"
+
+          class="site-btn primary-color loc-btn"
+
+          [appBtnLoading]="isSaving"
+
+          [disabled]="isSaving"
+
+          (click)="saveForm()"
+
+        >
+
+          {{ formMode === 'edit' ? 'Update' : 'Save' }}
+
+        </button>
+
+      </div>
+
+    </section>
+
+  }
+
+
+
+  <section class="loc-card">
+
+    @if (isLoading) {
+
+      <app-box-view-skeleton />
+
+    } @else if (level === 'countries') {
+
+      @if (!countries.length) {
+
+        <div class="loc-empty">
+
+          <i class="fa-solid fa-globe"></i>
+
+          <p>No countries yet — Sync India or add one.</p>
+
+        </div>
+
+      } @else {
+
+        <div class="loc-table-wrap">
+
+          <table class="loc-table">
+
+            <thead>
+
+              <tr>
+
+                <th>Country</th>
+
+                <th>ISO</th>
+
+                <th>States</th>
+
+                <th>Cities</th>
+
+                <th>Status</th>
+
+                <th></th>
+
+              </tr>
+
+            </thead>
+
+            <tbody>
+
+              @for (c of countries; track c.id) {
+
+                <tr>
+
+                  <td>
+
+                    <button type="button" class="loc-name-btn" (click)="openCountry(c)">
+
+                      {{ c.name }}
+
+                      <i class="fa-solid fa-arrow-right"></i>
+
+                    </button>
+
+                  </td>
+
+                  <td>{{ c.iso2 || '—' }}</td>
+
+                  <td>{{ c.stateCount || 0 }}</td>
+
+                  <td>{{ c.cityCount || 0 }}</td>
+
+                  <td>
+
+                    <span class="loc-badge" [class.is-off]="!c.isActive">{{ c.isActive ? 'Active' : 'Off' }}</span>
+
+                  </td>
+
+                  <td class="loc-actions">
+
+                    <button type="button" class="loc-icon-btn" (click)="openEdit(c)" title="Edit">
+
+                      <i class="fa-regular fa-pen-to-square"></i>
+
+                    </button>
+
+                    <button
+
+                      type="button"
+
+                      class="loc-icon-btn is-danger"
+
+                      [appBtnLoading]="isBtnLoading('delete', c.id)"
+
+                      (click)="deleteRow(c)"
+
+                      title="Delete"
+
+                    >
+
+                      <i class="fa-regular fa-trash-can"></i>
+
+                    </button>
+
+                  </td>
+
+                </tr>
+
+              }
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+      }
+
+    } @else if (level === 'states') {
+
+      @if (!states.length) {
+
+        <div class="loc-empty">
+
+          <i class="fa-solid fa-map"></i>
+
+          <p>No states — add one or Sync India.</p>
+
+        </div>
+
+      } @else {
+
+        <div class="loc-table-wrap">
+
+          <table class="loc-table">
+
+            <thead>
+
+              <tr>
+
+                <th>State</th>
+
+                <th>Code</th>
+
+                <th>Cities</th>
+
+                <th>Status</th>
+
+                <th></th>
+
+              </tr>
+
+            </thead>
+
+            <tbody>
+
+              @for (s of states; track s.id) {
+
+                <tr>
+
+                  <td>
+
+                    <button type="button" class="loc-name-btn" (click)="openState(s)">
+
+                      {{ s.name }}
+
+                      <i class="fa-solid fa-arrow-right"></i>
+
+                    </button>
+
+                  </td>
+
+                  <td>{{ s.code || '—' }}</td>
+
+                  <td>{{ s.cityCount || 0 }}</td>
+
+                  <td>
+
+                    <span class="loc-badge" [class.is-off]="!s.isActive">{{ s.isActive ? 'Active' : 'Off' }}</span>
+
+                  </td>
+
+                  <td class="loc-actions">
+
+                    <button type="button" class="loc-icon-btn" (click)="openEdit(s)" title="Edit">
+
+                      <i class="fa-regular fa-pen-to-square"></i>
+
+                    </button>
+
+                    <button
+
+                      type="button"
+
+                      class="loc-icon-btn is-danger"
+
+                      [appBtnLoading]="isBtnLoading('delete', s.id)"
+
+                      (click)="deleteRow(s)"
+
+                      title="Delete"
+
+                    >
+
+                      <i class="fa-regular fa-trash-can"></i>
+
+                    </button>
+
+                  </td>
+
+                </tr>
+
+              }
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+      }
+
+    } @else {
+
+      @if (!cities.length) {
+
+        <div class="loc-empty">
+
+          <i class="fa-solid fa-city"></i>
+
+          <p>No cities for this state.</p>
+
+        </div>
+
+      } @else {
+
+        <div class="loc-table-wrap">
+
+          <table class="loc-table">
+
+            <thead>
+
+              <tr>
+
+                <th>City</th>
+
+                <th>Status</th>
+
+                <th></th>
+
+              </tr>
+
+            </thead>
+
+            <tbody>
+
+              @for (city of cities; track city.id) {
+
+                <tr>
+
+                  <td>{{ city.name }}</td>
+
+                  <td>
+
+                    <span class="loc-badge" [class.is-off]="!city.isActive">{{ city.isActive ? 'Active' : 'Off' }}</span>
+
+                  </td>
+
+                  <td class="loc-actions">
+
+                    <button type="button" class="loc-icon-btn" (click)="openEdit(city)" title="Edit">
+
+                      <i class="fa-regular fa-pen-to-square"></i>
+
+                    </button>
+
+                    <button
+
+                      type="button"
+
+                      class="loc-icon-btn is-danger"
+
+                      [appBtnLoading]="isBtnLoading('delete', city.id)"
+
+                      (click)="deleteRow(city)"
+
+                      title="Delete"
+
+                    >
+
+                      <i class="fa-regular fa-trash-can"></i>
+
+                    </button>
+
+                  </td>
+
+                </tr>
+
+              }
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+        @if (citiesTotal > citiesLimit) {
+
+          <div class="loc-pager">
+
+            <button
+
+              type="button"
+
+              class="site-btn loc-btn"
+
+              [disabled]="citiesPage <= 1 || isLoading"
+
+              (click)="onCitiesPage(citiesPage - 1)"
+
+            >
+
+              Prev
+
+            </button>
+
+            <span class="loc-pager__meta">{{ citiesPage }} / {{ Math.ceil(citiesTotal / citiesLimit) || 1 }}</span>
+
+            <button
+
+              type="button"
+
+              class="site-btn loc-btn"
+
+              [disabled]="citiesPage * citiesLimit >= citiesTotal || isLoading"
+
+              (click)="onCitiesPage(citiesPage + 1)"
+
+            >
+
+              Next
+
+            </button>
+
+          </div>
+
+        }
+
+      }
+
+    }
+
+  </section>
+
+</div>
+

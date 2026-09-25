@@ -11,6 +11,7 @@ import { StoreUsersListComponent } from './store-users-list/store-users-list.com
 import { StorePlanHistoryComponent } from './store-plan-history/store-plan-history.component';
 import { StoreSettingsComponent } from './store-settings/store-settings.component';
 import { StoreWalletModalComponent } from './store-wallet/store-wallet-modal.component';
+import { CloneLayoutModalComponent } from './clone-layout-modal/clone-layout-modal.component';
 import { formatPhoneDisplay } from '../../shared/constant/country-codes';
 
 @Component({
@@ -180,6 +181,19 @@ export class StoresComponent {
       centered: true,
     });
     modalRef.componentInstance.store = store;
+  }
+
+  openCloneLayout(store?: any, tab: 'clone' | 'save' | 'apply' = 'clone') {
+    const modalRef = this.modalService.open(CloneLayoutModalComponent, {
+      size: 'lg',
+      backdrop: 'static',
+      centered: true,
+    });
+    if (store?.id) {
+      modalRef.componentInstance.sourceStoreId = Number(store.id);
+    }
+    modalRef.componentInstance.initialTab = tab;
+    modalRef.result.then(() => {}).catch(() => {});
   }
 
   deleteData(id: number) {

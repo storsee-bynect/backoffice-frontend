@@ -73,6 +73,7 @@ import { StorePlanHistoryComponent } from './components/stores/store-plan-histor
 import { StoreAssignPlanComponent } from './components/stores/store-plan-history/store-assign-plan/store-assign-plan.component';
 import { StoreSettingsComponent } from './components/stores/store-settings/store-settings.component';
 import { StoreWalletModalComponent } from './components/stores/store-wallet/store-wallet-modal.component';
+import { CloneLayoutModalComponent } from './components/stores/clone-layout-modal/clone-layout-modal.component';
 import { NotificationSettingsComponent } from './components/notification-settings/notification-settings.component';
 import { PushNotificationsComponent } from './components/push-notifications/push-notifications.component';
 import { AddUpdatePushCampaignComponent } from './components/push-notifications/add-update-push-campaign/add-update-push-campaign.component';
@@ -81,6 +82,8 @@ import { AppNotificationsComponent } from './components/app-notifications/app-no
 import { AddUpdateAppNotificationComponent } from './components/app-notifications/add-update-app-notification/add-update-app-notification.component';
 import { AppNotificationReportComponent } from './components/app-notifications/app-notification-report/app-notification-report.component';
 import { ShippingManagerComponent } from './components/shipping/shipping-manager.component';
+import { SiteConfigurationComponent } from './components/site-configuration/site-configuration.component';
+import { LocationsComponent } from './components/locations/locations.component';
 
 @NgModule({
   declarations: [
@@ -137,7 +140,8 @@ import { ShippingManagerComponent } from './components/shipping/shipping-manager
     StoreAssignPlanComponent,
     StoreSettingsComponent,
     StoreWalletModalComponent,
-    ShippingManagerComponent
+    ShippingManagerComponent,
+    SiteConfigurationComponent
   ],
   imports: [
     OnlyNumberDirective,
@@ -162,7 +166,9 @@ import { ShippingManagerComponent } from './components/shipping/shipping-manager
     PushCampaignReportComponent,
     AppNotificationsComponent,
     AddUpdateAppNotificationComponent,
-    AppNotificationReportComponent
+    AppNotificationReportComponent,
+    LocationsComponent,
+    CloneLayoutModalComponent
   ],
   providers: [
     { provide: APP_INITIALIZER, useFactory: initAppConfig, deps: [ConfigService], multi: true },

@@ -35,4 +35,33 @@ export class StoreService {
     updateStoreSettings(storeId, data: any) {
         return this.http.put<any>(urlConstant.StoresAPI.updateStoreSettings + storeId, data);
     }
+
+    cloneStoreLayout(body: {
+        sourceStoreId: number;
+        targetStoreId: number;
+        includeCustomCss?: boolean;
+        useDraft?: boolean;
+        scrubProductRefs?: boolean;
+    }) {
+        return this.http.post<any>(urlConstant.ThemeLayoutAPI.cloneLayout, body);
+    }
+
+    saveLayoutPreset(body: {
+        storeId: number;
+        templateCode: string;
+        label?: string;
+        overwrite?: boolean;
+        useDraft?: boolean;
+        scrubProductRefs?: boolean;
+    }) {
+        return this.http.post<any>(urlConstant.ThemeLayoutAPI.saveLayoutPreset, body);
+    }
+
+    listLayoutPresets() {
+        return this.http.get<any>(urlConstant.ThemeLayoutAPI.listLayoutPresets);
+    }
+
+    applyLayoutPreset(body: { storeId: number; templateCode: string }) {
+        return this.http.post<any>(urlConstant.ThemeLayoutAPI.applyLayoutPreset, body);
+    }
 }

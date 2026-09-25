@@ -1,168 +1,194 @@
-<app-breadcrumb [pageName]="sharedservice.pageName" [icon]="sharedservice.pageDetail?.icon" />
-@if(isDataLoaded){
-    <div class="page-table-ttl">
-        Site Setting
-    </div>
-    <div class="page-table-main">
-        <div class="row m-0 p-0">
-            <div class="col-lg-4 col-12 mb-2">
-                <div class="uploaded-img-main uploaded-img-main--dark">
-                    @if(siteConfig.white_logo){
-                        <img [src]="siteConfig.white_logo" alt="white logo" class="uploaded-img" />
-                    }
-                </div>
-                <div class="form-inp-main">
-                    <label class="form-label">White Logo — for dark backgrounds (500 x 150)</label>
-                    <input class="form-control" name="#white-logo" type="file" (change)="uploadWhiteLogo($event)">
-                </div>
-            </div>
-            <div class="col-lg-4 col-12 mb-2">
-                <div class="uploaded-img-main">
-                    @if(siteConfig.logo){
-                        <img [src]="siteConfig.logo" alt="logo" class="uploaded-img" />
-                    }
-                </div>
-                <div class="form-inp-main">
-                    <label class="form-label">Logo — for light backgrounds (500 x 150)</label>
-                    <input class="form-control" name="#logo" type="file" (change)="uploadImage($event)">
-                </div>
-            </div>
-            <div class="col-lg-4 col-12 mb-2">
-                <div class="uploaded-img-main">
-                    @if(siteConfig.icon){
-                        <img [src]="siteConfig.icon" alt="icon" class="uploaded-img" />
-                    }
-                </div>
-                <div class="form-inp-main">
-                    <label class="form-label">Icon (512 x 512)</label>
-                    <input class="form-control" name="#0" type="file" (change)="uploadIcon($event)">
-                </div>
-            </div>
-            <div class="col-lg-6 col-12 mb-2">
-                <div class="form-inp-main">
-                    <label class="form-label">Name</label>
-                        <input class="form-control" type="text" placeholder="Enter Name" [(ngModel)]="siteConfig.siteName" />
-                </div>
-            </div>
-            <div class="col-lg-6 col-12 mb-2">
-                <div class="form-inp-main">
-                    <label class="form-label">Theme</label>
-                        <select class="form-select" [(ngModel)]="siteConfig.theme">
-                            <option [value]="null" [disabled]="true">-- Select Theme --</option>
-                            <option [value]="'Default'">Default</option>
-                            <option [value]="'Winter'">Winter</option>
-                            <option [value]="'Summer'">Summer</option>
-                            <option [value]="'Monsoon'">Monsoon</option>
-                            <option [value]="'Indian'">Indian</option>
-                            <option [value]="'Diwali'">Diwali</option>
-                            <option [value]="'Christmas'">Christmas</option>
-                        </select>
-                </div>
-            </div>
-            <div class="col-lg-6 col-12 mb-2">
-                <div class="form-inp-main">
-                    <label class="form-label">Email</label>
-                        <input class="form-control" type="text" placeholder="Enter Email" [(ngModel)]="siteConfig.email" />
-                </div>
-            </div>
-            <div class="col-lg-6 col-12 mb-2">
-                <div class="form-inp-main">
-                    <label class="form-label">Mobile</label>
-                        <input class="form-control" type="number" OnlyNumber placeholder="Enter Mobile" [(ngModel)]="siteConfig.mobile" />
-                </div>
-            </div>
-            <div class="col-lg-6 col-12 mb-2">
-                <div class="form-inp-main">
-                    <label class="form-label">Parent Company</label>
-                        <input class="form-control" type="text" placeholder="Enter Parent Company" [(ngModel)]="siteConfig.parentCompany" />
-                </div>
-            </div>
-            <div class="col-lg-6 col-12 mb-2">
-                <div class="form-inp-main">
-                    <label class="form-label">Version</label>
-                        <input class="form-control" type="text" placeholder="Enter Version" [(ngModel)]="siteConfig.version" />
-                </div>
-            </div>            
+<app-breadcrumb [pageName]="sharedservice.pageName || 'Site Configuration'" [icon]="sharedservice.pageDetail?.icon || 'sliders'" />
+
+@if (!isDataLoaded) {
+  <app-box-view-skeleton></app-box-view-skeleton>
+} @else {
+  <div class="sc-page">
+    <header class="sc-hero">
+      <div>
+        <h1>Site Configuration</h1>
+        <p>Platform branding, store domains, social links, and registration controls.</p>
+      </div>
+      <button
+        type="button"
+        class="site-btn primary-color"
+        (click)="updateSiteConfig()"
+        [appBtnLoading]="isSaving"
+        [disabled]="isSaving"
+      >
+        <span class="site-btn-icon"><i class="fa-solid fa-check"></i></span>
+        Save changes
+      </button>
+    </header>
+
+    <section class="sc-card">
+      <div class="sc-card__head">
+        <span class="sc-card__icon"><i class="fa-solid fa-image"></i></span>
+        <div>
+          <h2>Branding</h2>
+          <p>Logos and favicon used across the platform</p>
         </div>
-    </div>
-    <div class="page-table-ttl">
-        Store Configurations
-    </div>
-    <div class="page-table-main">
-        <div class="row m-0 p-0">
-            <div class="col-lg-6 col-12 mb-2">
-                <div class="form-inp-main">
-                    <label class="form-label">Store Base URL</label>
-                        <input class="form-control" type="text" placeholder="Enter Store Base URL" [(ngModel)]="siteConfig.storeBaseUrl" />
-                </div>
-            </div>
-            <div class="col-lg-6 col-12 mb-2">
-                <div class="form-inp-main">
-                    <label class="form-label">Store CNAME</label>
-                        <input class="form-control" type="text" placeholder="Enter Store CNAME" [(ngModel)]="siteConfig.cnameDomain" />
-                </div>
-            </div>
+      </div>
+      <div class="sc-brand-grid">
+        <div class="sc-brand-item">
+          <div class="uploaded-img-main uploaded-img-main--dark">
+            @if (siteConfig.white_logo) {
+              <img [src]="siteConfig.white_logo" alt="white logo" class="uploaded-img" />
+            }
+          </div>
+          <label class="form-label">White logo <em>500 × 150</em></label>
+          <input class="form-control" type="file" accept="image/png,image/jpeg,image/jpg,image/webp" (change)="uploadWhiteLogo($event)" />
         </div>
-    </div>
-    <div class="page-table-ttl">
-        Social Media
-    </div>
-    <div class="page-table-main">
-        <div class="row m-0 p-0">
-            <div class="col-lg-6 col-12 mb-2">
-                <div class="form-inp-main">
-                    <label class="form-label">Instagram URL</label>
-                        <input class="form-control" type="text" placeholder="Enter Instagram URL" [(ngModel)]="siteConfig.instagramURL" />
-                </div>
-            </div>
-            <div class="col-lg-6 col-12 mb-2">
-                <div class="form-inp-main">
-                    <label class="form-label">Facebook URL</label>
-                        <input class="form-control" type="text" placeholder="Enter Facebook URL" [(ngModel)]="siteConfig.facebookURL" />
-                </div>
-            </div>
-            <div class="col-lg-6 col-12 mb-2">
-                <div class="form-inp-main">
-                    <label class="form-label">Twitter URL</label>
-                        <input class="form-control" type="text" placeholder="Enter Twitter URL" [(ngModel)]="siteConfig.twitterURL" />
-                </div>
-            </div>
-            <div class="col-lg-6 col-12 mb-2">
-                <div class="form-inp-main">
-                    <label class="form-label">Linkedin URL</label>
-                        <input class="form-control" type="text" placeholder="Enter Linkedin URL" [(ngModel)]="siteConfig.linkedInURL" />
-                </div>
-            </div>
-            <div class="col-lg-6 col-12 mb-2">
-                <div class="form-inp-main">
-                    <label class="form-label">Youtube URL</label>
-                        <input class="form-control" type="text" placeholder="Enter Youtube URL" [(ngModel)]="siteConfig.youtubeURL" />
-                </div>
-            </div>
+        <div class="sc-brand-item">
+          <div class="uploaded-img-main">
+            @if (siteConfig.logo) {
+              <img [src]="siteConfig.logo" alt="logo" class="uploaded-img" />
+            }
+          </div>
+          <label class="form-label">Logo <em>500 × 150</em></label>
+          <input class="form-control" type="file" accept="image/png,image/jpeg,image/jpg,image/webp" (change)="uploadImage($event)" />
         </div>
-    </div>
-    <div class="page-table-ttl">
-        Authorizations
-    </div>
-    <div class="page-table-main">
-        <div class="row m-0 p-0">
-            <div class="col-lg-6 col-12 mb-2">
-                <div class="form-inp-main toggle-main">
-                    <label class="form-label">Enable Store Registration</label>
-                     <div>
-                        <div class="toggle-switch mt-1">
-                            <input class="toggle-input" id="toggle" type="checkbox" [(ngModel)]="siteConfig.enableStoreRegister">
-                            <label class="toggle-label" for="toggle"></label>
-                          </div>                
-                     </div>
-                </div>
-            </div>
+        <div class="sc-brand-item">
+          <div class="uploaded-img-main uploaded-img-main--icon">
+            @if (siteConfig.icon) {
+              <img [src]="siteConfig.icon" alt="icon" class="uploaded-img" />
+            }
+          </div>
+          <label class="form-label">Icon / favicon <em>square</em></label>
+          <input class="form-control" type="file" accept="image/png,image/jpeg,image/jpg,image/webp" (change)="uploadIcon($event)" />
         </div>
+      </div>
+    </section>
+
+    <section class="sc-card">
+      <div class="sc-card__head">
+        <span class="sc-card__icon"><i class="fa-solid fa-building"></i></span>
+        <div>
+          <h2>General</h2>
+          <p>Site identity and contact details</p>
+        </div>
+      </div>
+      <div class="sc-form-grid">
+        <label class="form-inp-main">
+          <span class="form-label">Site name <sup>*</sup></span>
+          <input class="form-control" type="text" placeholder="Platform name" [(ngModel)]="siteConfig.siteName" />
+        </label>
+        <label class="form-inp-main">
+          <span class="form-label">Theme</span>
+          <select class="form-select" [(ngModel)]="siteConfig.theme">
+            <option [ngValue]="null" disabled>-- Select theme --</option>
+            <option value="Default">Default</option>
+            <option value="Winter">Winter</option>
+            <option value="Summer">Summer</option>
+            <option value="Monsoon">Monsoon</option>
+            <option value="Indian">Indian</option>
+            <option value="Diwali">Diwali</option>
+            <option value="Christmas">Christmas</option>
+          </select>
+        </label>
+        <label class="form-inp-main">
+          <span class="form-label">Email <sup>*</sup></span>
+          <input class="form-control" type="email" placeholder="support@example.com" [(ngModel)]="siteConfig.email" />
+        </label>
+        <label class="form-inp-main">
+          <span class="form-label">Mobile <sup>*</sup></span>
+          <input class="form-control" type="text" OnlyNumber placeholder="10-digit mobile" [(ngModel)]="siteConfig.mobile" maxlength="10" />
+        </label>
+        <label class="form-inp-main">
+          <span class="form-label">Parent company <sup>*</sup></span>
+          <input class="form-control" type="text" placeholder="Company name" [(ngModel)]="siteConfig.parentCompany" />
+        </label>
+        <label class="form-inp-main">
+          <span class="form-label">Version <sup>*</sup></span>
+          <input class="form-control" type="text" placeholder="e.g. 1.0.0" [(ngModel)]="siteConfig.version" />
+        </label>
+      </div>
+    </section>
+
+    <section class="sc-card">
+      <div class="sc-card__head">
+        <span class="sc-card__icon"><i class="fa-solid fa-globe"></i></span>
+        <div>
+          <h2>Store domains</h2>
+          <p>Base URL and CNAME used for merchant storefronts</p>
+        </div>
+      </div>
+      <div class="sc-form-grid">
+        <label class="form-inp-main">
+          <span class="form-label">Store base URL <sup>*</sup></span>
+          <input class="form-control" type="text" placeholder="https://store.storsee.com" [(ngModel)]="siteConfig.storeBaseUrl" />
+        </label>
+        <label class="form-inp-main">
+          <span class="form-label">Store CNAME <sup>*</sup></span>
+          <input class="form-control" type="text" placeholder="store.storsee.com" [(ngModel)]="siteConfig.cnameDomain" />
+          <small class="form-hint">Merchants point their domain CNAME here (same host as web / store SPA).</small>
+        </label>
+      </div>
+    </section>
+
+    <section class="sc-card">
+      <div class="sc-card__head">
+        <span class="sc-card__icon"><i class="fa-solid fa-share-nodes"></i></span>
+        <div>
+          <h2>Social media</h2>
+          <p>Public profile links shown on the platform</p>
+        </div>
+      </div>
+      <div class="sc-form-grid">
+        <label class="form-inp-main">
+          <span class="form-label">Instagram</span>
+          <input class="form-control" type="url" placeholder="https://instagram.com/…" [(ngModel)]="siteConfig.instagramURL" />
+        </label>
+        <label class="form-inp-main">
+          <span class="form-label">Facebook</span>
+          <input class="form-control" type="url" placeholder="https://facebook.com/…" [(ngModel)]="siteConfig.facebookURL" />
+        </label>
+        <label class="form-inp-main">
+          <span class="form-label">Twitter / X</span>
+          <input class="form-control" type="url" placeholder="https://x.com/…" [(ngModel)]="siteConfig.twitterURL" />
+        </label>
+        <label class="form-inp-main">
+          <span class="form-label">LinkedIn</span>
+          <input class="form-control" type="url" placeholder="https://linkedin.com/…" [(ngModel)]="siteConfig.linkedInURL" />
+        </label>
+        <label class="form-inp-main">
+          <span class="form-label">YouTube</span>
+          <input class="form-control" type="url" placeholder="https://youtube.com/…" [(ngModel)]="siteConfig.youtubeURL" />
+        </label>
+      </div>
+    </section>
+
+    <section class="sc-card">
+      <div class="sc-card__head">
+        <span class="sc-card__icon"><i class="fa-solid fa-shield-halved"></i></span>
+        <div>
+          <h2>Authorizations</h2>
+          <p>Control who can create new stores</p>
+        </div>
+      </div>
+      <div class="sc-toggle-row">
+        <div>
+          <strong>Enable store registration</strong>
+          <span>Allow new merchants to sign up on the platform</span>
+        </div>
+        <div class="toggle-switch">
+          <input class="toggle-input" id="sc-enable-register" type="checkbox" [(ngModel)]="siteConfig.enableStoreRegister" />
+          <label class="toggle-label" for="sc-enable-register"></label>
+        </div>
+      </div>
+    </section>
+
+    <div class="sc-footer">
+      <button
+        type="button"
+        class="site-btn primary-color"
+        (click)="updateSiteConfig()"
+        [appBtnLoading]="isSaving"
+        [disabled]="isSaving"
+      >
+        <span class="site-btn-icon"><i class="fa-solid fa-check"></i></span>
+        Save changes
+      </button>
     </div>
-    <div class="d-flex justify-content-end mt-2">
-        <button type="button" class="site-btn primary-color ms-1" (click)="updateSiteConfig()" [appBtnLoading]="isSaving" [disabled]="isSaving">
-            <span class="site-btn-icon"><i class="fa-solid fa-check"></i></span>
-            Update
-        </button>
-    </div>
+  </div>
 }

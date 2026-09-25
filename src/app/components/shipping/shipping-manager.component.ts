@@ -103,6 +103,10 @@ export class ShippingManagerComponent implements OnInit {
   shipmentFilter = '';
   logFilter = '';
 
+  /** Platform Storsee Shipping master switch (default on). */
+  storseeEnabled = true;
+  isTogglingStorsee = false;
+
   constructor(
     public sharedservice: SharedService,
     private shipping: ShippingService
@@ -177,14 +181,52 @@ export class ShippingManagerComponent implements OnInit {
         this.overview = { stats: res?.data?.stats || {}, providers };
         this.providers = providers;
         this.initCredForms(providers);
+        if (res?.data?.platform?.storseeEnabled !== undefined) {
+          this.storseeEnabled = !!res.data.platform.storseeEnabled;
+        }
       },
       error: (e) => {
         this.loadError = e.error?.error || 'Failed to load shipping overview';
         this.overview = { stats: {} };
         this.sharedservice.showAlert(2, this.loadError);
         this.loadProviders();
+        this.loadPlatformSettings();
       },
     });
+  }
+
+  loadPlatformSettings() {
+    this.shipping.platformSettings().subscribe({
+      next: (res) => {
+        this.storseeEnabled = !!res?.data?.storseeEnabled;
+      },
+      error: () => {},
+    });
+  }
+
+  toggleStorseeShipping() {
+    const next = !this.storseeEnabled;
+    const msg = next
+      ? 'Enable Storsee Shipping for all stores?'
+      : 'Disable Storsee Shipping? All stores will be switched to their own shipping providers and must connect Shiprocket/NimbusPost.';
+    if (!confirm(msg)) return;
+
+    this.isTogglingStorsee = true;
+    this.shipping
+      .updatePlatformSettings({ storseeEnabled: next })
+      .pipe(finalize(() => (this.isTogglingStorsee = false)))
+      .subscribe({
+        next: (res) => {
+          this.storseeEnabled = !!res?.data?.storseeEnabled;
+          this.sharedservice.showAlert(
+            1,
+            this.storseeEnabled
+              ? 'Storsee Shipping enabled'
+              : 'Storsee Shipping disabled — stores must use own providers'
+          );
+        },
+        error: (e) => this.sharedservice.showAlert(2, e.error?.error || 'Update failed'),
+      });
   }
 
   private initCredForms(list: any[]) {

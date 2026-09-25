@@ -63,7 +63,10 @@ export class SiteConfigurationComponent {
       errTxt += 'Select Parent Company <br/>';
     }
     if (!this.siteConfig.storeBaseUrl) {
-      errTxt += 'Select Store Base URL <br/>';
+      errTxt += 'Enter Store Base URL <br/>';
+    }
+    if (!this.siteConfig.cnameDomain) {
+      errTxt += 'Enter Store CNAME (e.g. store.storsee.com) <br/>';
     }
     if (!this.siteConfig.version) {
       errTxt += 'Select Version <br/>';

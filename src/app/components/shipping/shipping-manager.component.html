@@ -16,6 +16,32 @@
     </div>
   </header>
 
+  <section class="ship-platform-card" [class.is-off]="!storseeEnabled">
+    <div class="ship-platform-card__body">
+      <div class="ship-platform-card__copy">
+        <div class="ship-platform-card__label">Storsee Shipping</div>
+        <h2>Platform fulfillment for stores</h2>
+        <p>
+          When enabled, merchants can use Storsee Shipping (wallet-billed). When disabled, every store must connect
+          their own Shiprocket / NimbusPost account.
+        </p>
+      </div>
+      <div class="ship-platform-card__switch">
+        <span class="ship-platform-card__state" [class.is-on]="storseeEnabled">
+          {{ storseeEnabled ? 'Enabled' : 'Disabled' }}
+        </span>
+        <button
+          type="button"
+          class="site-btn"
+          [class.dark-color]="storseeEnabled"
+          [appBtnLoading]="isTogglingStorsee"
+          (click)="toggleStorseeShipping()">
+          {{ storseeEnabled ? 'Disable Storsee Shipping' : 'Enable Storsee Shipping' }}
+        </button>
+      </div>
+    </div>
+  </section>
+
   <nav class="ship-tabs" aria-label="Shipping sections">
     @for (tab of tabs; track tab.key) {
       <button

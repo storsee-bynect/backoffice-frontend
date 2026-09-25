@@ -85,4 +85,12 @@ export class ShippingService {
   merchantConfigs() {
     return this.http.get<any>(this.base + 'merchant-configs');
   }
+
+  platformSettings() {
+    return this.http.get<any>(this.base + 'platform-settings');
+  }
+
+  updatePlatformSettings(body: { storseeEnabled: boolean }) {
+    return this.http.patch<any>(this.base + 'platform-settings', body);
+  }
 }
