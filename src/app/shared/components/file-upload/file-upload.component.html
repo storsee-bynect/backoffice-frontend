@@ -80,14 +80,14 @@
         </div>
         <div class="fu-info-tip">
           <i class="fa-light fa-lightbulb me-2"></i>
-          Tip: After selecting, you can crop to any size before uploading.
+          Tip: After selecting, crop the image before uploading.
         </div>
         @if(dimentions){
           <div class="fu-info-tip fu-info-tip--guide">
             <i class="fa-light fa-ruler-combined me-2"></i>
             <span>
-              <strong>Recommended size: {{ dimentions.width }} × {{ dimentions.height }} px</strong><br/>
-              Any size is accepted — square images look best here.
+              <strong>Required crop: {{ dimentions.width }} × {{ dimentions.height }} px (locked ratio)</strong><br/>
+              Aspect ratio is locked — you must crop to this ratio before upload.
             </span>
           </div>
         }
@@ -102,7 +102,11 @@
       <div class="fu-crop-topbar">
         <div class="fu-crop-hint">
           <i class="fa-light fa-crop-simple"></i>
-          Drag corners or edges to adjust the crop area · Move inside the box to reposition
+          @if (dimentions) {
+            Aspect locked to {{ dimentions.width }}:{{ dimentions.height }} — drag to reposition or resize
+          } @else {
+            Drag corners or edges to adjust the crop area · Move inside the box to reposition
+          }
         </div>
         <div class="fu-crop-size-badge">
           {{ crop.w | number:'1.0-0' }} × {{ crop.h | number:'1.0-0' }} px

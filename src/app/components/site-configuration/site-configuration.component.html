@@ -119,6 +119,11 @@
           <input class="form-control" type="text" placeholder="https://store.storsee.com" [(ngModel)]="siteConfig.storeBaseUrl" />
         </label>
         <label class="form-inp-main">
+          <span class="form-label">Dashboard base URL</span>
+          <input class="form-control" type="text" placeholder="https://app.storsee.com" [(ngModel)]="siteConfig.dashboardBaseUrl" />
+          <small class="form-hint">Merchant app URL used on landing for Sign in / Start free / onboarding links.</small>
+        </label>
+        <label class="form-inp-main">
           <span class="form-label">Store CNAME <sup>*</sup></span>
           <input class="form-control" type="text" placeholder="store.storsee.com" [(ngModel)]="siteConfig.cnameDomain" />
           <small class="form-hint">Merchants point their domain CNAME here (same host as web / store SPA).</small>

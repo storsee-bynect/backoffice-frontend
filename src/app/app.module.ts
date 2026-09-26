@@ -84,6 +84,8 @@ import { AppNotificationReportComponent } from './components/app-notifications/a
 import { ShippingManagerComponent } from './components/shipping/shipping-manager.component';
 import { SiteConfigurationComponent } from './components/site-configuration/site-configuration.component';
 import { LocationsComponent } from './components/locations/locations.component';
+import { BlogsComponent } from './components/blogs/blogs.component';
+import { AddUpdateBlogComponent } from './components/blogs/add-update-blog/add-update-blog.component';
 
 @NgModule({
   declarations: [
@@ -141,7 +143,9 @@ import { LocationsComponent } from './components/locations/locations.component';
     StoreSettingsComponent,
     StoreWalletModalComponent,
     ShippingManagerComponent,
-    SiteConfigurationComponent
+    SiteConfigurationComponent,
+    BlogsComponent,
+    AddUpdateBlogComponent,
   ],
   imports: [
     OnlyNumberDirective,

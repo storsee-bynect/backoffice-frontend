@@ -97,6 +97,11 @@ export class FileUploadComponent implements OnInit, OnDestroy, AfterViewInit {
     reader.readAsDataURL(file);
   }
 
+  private get aspectRatio(): number | null {
+    if (!this.dimentions?.width || !this.dimentions?.height) return null;
+    return this.dimentions.width / this.dimentions.height;
+  }
+
   // ─── Canvas / Crop ─────────────────────────────────────────────────────────
 
   private initCanvas(): void {
@@ -121,11 +126,31 @@ export class FileUploadComponent implements OnInit, OnDestroy, AfterViewInit {
     this.imgRect = { x: 0, y: 0, w: this.canvasW, h: this.canvasH };
     this.ctx = canvas.getContext('2d')!;
 
-    // default crop = full image selected (user can still resize/move)
-    this.crop = { x: 0, y: 0, w: this.canvasW, h: this.canvasH };
+    this.crop = this.defaultCropBox();
 
     this.drawCanvas();
     this.attachListeners(canvas);
+  }
+
+  /** Largest centered crop that fits the image, locked to dimentions aspect if set. */
+  private defaultCropBox(): CropBox {
+    const { x: ix, y: iy, w: iw, h: ih } = this.imgRect;
+    const ratio = this.aspectRatio;
+    if (!ratio) {
+      return { x: ix, y: iy, w: iw, h: ih };
+    }
+    let w = iw;
+    let h = w / ratio;
+    if (h > ih) {
+      h = ih;
+      w = h * ratio;
+    }
+    return {
+      x: ix + (iw - w) / 2,
+      y: iy + (ih - h) / 2,
+      w,
+      h,
+    };
   }
 
   private drawCanvas(): void {
@@ -218,22 +243,89 @@ export class FileUploadComponent implements OnInit, OnDestroy, AfterViewInit {
     const dx = mx - this.dragStart.mx, dy = my - this.dragStart.my;
     const { cx, cy, cw, ch } = this.dragStart;
     const { x: ix, y: iy, w: iw, h: ih } = this.imgRect;
-    const min = 20;
+    const min = 40;
+    const ratio = this.aspectRatio;
     let { x, y, w, h } = this.crop;
-    switch (this.dragging) {
-      case 'move': x = Math.max(ix, Math.min(ix + iw - cw, cx + dx)); y = Math.max(iy, Math.min(iy + ih - ch, cy + dy)); w = cw; h = ch; break;
-      case 'tl': x = Math.min(cx + cw - min, cx + dx); y = Math.min(cy + ch - min, cy + dy); w = cx + cw - x; h = cy + ch - y; break;
-      case 'tr': y = Math.min(cy + ch - min, cy + dy); w = Math.max(min, cw + dx); h = cy + ch - y; break;
-      case 'bl': x = Math.min(cx + cw - min, cx + dx); w = cx + cw - x; h = Math.max(min, ch + dy); break;
-      case 'br': w = Math.max(min, cw + dx); h = Math.max(min, ch + dy); break;
-      case 't': y = Math.min(cy + ch - min, cy + dy); h = cy + ch - y; break;
-      case 'b': h = Math.max(min, ch + dy); break;
-      case 'l': x = Math.min(cx + cw - min, cx + dx); w = cx + cw - x; break;
-      case 'r': w = Math.max(min, cw + dx); break;
+
+    if (this.dragging === 'move') {
+      x = Math.max(ix, Math.min(ix + iw - cw, cx + dx));
+      y = Math.max(iy, Math.min(iy + ih - ch, cy + dy));
+      w = cw;
+      h = ch;
+    } else if (ratio) {
+      // Keep fixed aspect ratio (e.g. 16:9) while resizing from any handle
+      let nextW = cw;
+      let nextH = ch;
+      switch (this.dragging) {
+        case 'tl':
+        case 'tr':
+        case 'bl':
+        case 'br':
+          nextW = Math.max(min, this.dragging.includes('l') ? cw - dx : cw + dx);
+          nextH = nextW / ratio;
+          break;
+        case 'l':
+        case 'r':
+          nextW = Math.max(min, this.dragging === 'l' ? cw - dx : cw + dx);
+          nextH = nextW / ratio;
+          break;
+        case 't':
+        case 'b':
+          nextH = Math.max(min, this.dragging === 't' ? ch - dy : ch + dy);
+          nextW = nextH * ratio;
+          break;
+      }
+      if (nextW > iw) { nextW = iw; nextH = nextW / ratio; }
+      if (nextH > ih) { nextH = ih; nextW = nextH * ratio; }
+
+      switch (this.dragging) {
+        case 'tl':
+          x = cx + cw - nextW;
+          y = cy + ch - nextH;
+          break;
+        case 'tr':
+          x = cx;
+          y = cy + ch - nextH;
+          break;
+        case 'bl':
+          x = cx + cw - nextW;
+          y = cy;
+          break;
+        case 'br':
+        case 'r':
+        case 'b':
+          x = cx;
+          y = cy;
+          break;
+        case 'l':
+          x = cx + cw - nextW;
+          y = cy + (ch - nextH) / 2;
+          break;
+        case 't':
+          x = cx + (cw - nextW) / 2;
+          y = cy + ch - nextH;
+          break;
+      }
+      w = nextW;
+      h = nextH;
+      x = Math.max(ix, Math.min(ix + iw - w, x));
+      y = Math.max(iy, Math.min(iy + ih - h, y));
+    } else {
+      switch (this.dragging) {
+        case 'tl': x = Math.min(cx + cw - min, cx + dx); y = Math.min(cy + ch - min, cy + dy); w = cx + cw - x; h = cy + ch - y; break;
+        case 'tr': y = Math.min(cy + ch - min, cy + dy); w = Math.max(min, cw + dx); h = cy + ch - y; break;
+        case 'bl': x = Math.min(cx + cw - min, cx + dx); w = cx + cw - x; h = Math.max(min, ch + dy); break;
+        case 'br': w = Math.max(min, cw + dx); h = Math.max(min, ch + dy); break;
+        case 't': y = Math.min(cy + ch - min, cy + dy); h = cy + ch - y; break;
+        case 'b': h = Math.max(min, ch + dy); break;
+        case 'l': x = Math.min(cx + cw - min, cx + dx); w = cx + cw - x; break;
+        case 'r': w = Math.max(min, cw + dx); break;
+      }
+      x = Math.max(ix, x); y = Math.max(iy, y);
+      if (x + w > ix + iw) w = ix + iw - x;
+      if (y + h > iy + ih) h = iy + ih - y;
     }
-    x = Math.max(ix, x); y = Math.max(iy, y);
-    if (x + w > ix + iw) w = ix + iw - x;
-    if (y + h > iy + ih) h = iy + ih - y;
+
     this.crop = { x, y, w, h };
     this.drawCanvas();
   }
@@ -257,8 +349,18 @@ export class FileUploadComponent implements OnInit, OnDestroy, AfterViewInit {
     const srcH = Math.round(this.crop.h * scaleY);
 
     const offscreen = document.createElement('canvas');
-    offscreen.width = srcW; offscreen.height = srcH;
-    offscreen.getContext('2d')!.drawImage(this.rawImage, srcX, srcY, srcW, srcH, 0, 0, srcW, srcH);
+    // Export at recommended output size when aspect is locked (e.g. 1280×720)
+    if (this.dimentions?.width && this.dimentions?.height) {
+      offscreen.width = this.dimentions.width;
+      offscreen.height = this.dimentions.height;
+    } else {
+      offscreen.width = srcW;
+      offscreen.height = srcH;
+    }
+    offscreen.getContext('2d')!.drawImage(
+      this.rawImage, srcX, srcY, srcW, srcH,
+      0, 0, offscreen.width, offscreen.height
+    );
 
     offscreen.toBlob((blob) => {
       this.zone.run(() => {

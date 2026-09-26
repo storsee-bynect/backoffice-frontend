@@ -24,6 +24,7 @@ import { AppNotificationsComponent } from "../../components/app-notifications/ap
 import { ShippingManagerComponent } from "../../components/shipping/shipping-manager.component";
 import { SiteConfigurationComponent } from "../../components/site-configuration/site-configuration.component";
 import { LocationsComponent } from "../../components/locations/locations.component";
+import { BlogsComponent } from "../../components/blogs/blogs.component";
 export const routing: Routes = [
     {
         path: '',
@@ -62,6 +63,9 @@ export const routing: Routes = [
     },{
         path: 'templates',
         component: TemplatesComponent
+    },{
+        path: 'blogs',
+        component: BlogsComponent
     },{
         path: 'packages',
         component: PackagesComponent

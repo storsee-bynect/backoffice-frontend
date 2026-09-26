@@ -8,6 +8,7 @@ export class siteConfigReqModel{
     theme : string = null;
     parentCompany : string;
     storeBaseUrl : string;
+    dashboardBaseUrl : string;
     cnameDomain : string;
     version : string;
     

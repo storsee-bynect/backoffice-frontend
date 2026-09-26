@@ -32,6 +32,7 @@ export class SiteConfigurationComponent {
       this.siteConfig.theme = config.theme;
       this.siteConfig.parentCompany = config.parentCompany;
       this.siteConfig.storeBaseUrl = config.storeBaseUrl;
+      this.siteConfig.dashboardBaseUrl = config.dashboardBaseUrl;
       this.siteConfig.cnameDomain = config.cnameDomain;
       this.siteConfig.version = config.version;
 

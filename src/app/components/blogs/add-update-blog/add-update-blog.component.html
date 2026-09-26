@@ -1,0 +1,136 @@
+<main>
+  <div class="popup-main blog-popup">
+    <div class="popup-head">
+      <div class="popup-head-ttl">{{ isEdit ? 'Update' : 'Create' }} Blog</div>
+      <div class="popup-head-btn">
+        <button type="button" (click)="activeModal.close()"><i class="fa-solid fa-x"></i></button>
+      </div>
+    </div>
+
+    <div class="popup-body">
+      @if (loadingFull) {
+        <div class="blog-loading">Loading blog…</div>
+      } @else {
+        <div class="row m-0 p-0">
+          <div class="col-lg-8 mb-2">
+            <div class="form-inp-main">
+              <label class="form-label">Title <span class="text-danger">*</span></label>
+              <input
+                class="form-control"
+                type="text"
+                placeholder="Enter blog title"
+                [(ngModel)]="dataReqModel.title"
+              />
+            </div>
+          </div>
+          <div class="col-lg-4 mb-2">
+            <div class="form-inp-main">
+              <label class="form-label">Status</label>
+              <select class="form-select" [(ngModel)]="dataReqModel.status">
+                <option [ngValue]="1">Published</option>
+                <option [ngValue]="0">Draft</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="col-12 mb-2">
+            <div class="form-inp-main">
+              <label class="form-label">Slug <small class="text-muted">(optional — auto from title)</small></label>
+              <input
+                class="form-control"
+                type="text"
+                placeholder="my-blog-post"
+                [(ngModel)]="dataReqModel.slug"
+              />
+            </div>
+          </div>
+
+          <div class="col-12 mb-2">
+            <div class="form-inp-main">
+              <label class="form-label">Excerpt</label>
+              <textarea
+                class="form-control"
+                rows="2"
+                placeholder="Short summary for listing cards"
+                [(ngModel)]="dataReqModel.excerpt"
+              ></textarea>
+            </div>
+          </div>
+
+          <div class="col-12 mb-3">
+            <div class="form-inp-main">
+              <label class="form-label">
+                Thumbnail <span class="text-danger">*</span>
+                <small class="text-muted">— mandatory 16:9 crop (1280×720)</small>
+              </label>
+              <div class="blog-thumb-row">
+                @if (dataReqModel.thumbnail) {
+                  <div class="blog-thumb-preview">
+                    <img [src]="dataReqModel.thumbnail" alt="Thumbnail" />
+                    <button type="button" class="blog-thumb-remove" (click)="removeThumbnail()">
+                      <i class="fa-solid fa-trash-can"></i>
+                    </button>
+                  </div>
+                }
+                <button
+                  type="button"
+                  class="site-btn primary-color"
+                  [appBtnLoading]="isUploadingThumb"
+                  [disabled]="isUploadingThumb"
+                  (click)="uploadThumbnail()"
+                >
+                  <span class="site-btn-icon"><i class="fa-solid fa-crop-simple"></i></span>
+                  {{ dataReqModel.thumbnail ? 'Change thumbnail' : 'Upload & crop 16:9' }}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12 mb-3">
+            <div class="form-inp-main">
+              <label class="form-label">Tags</label>
+              <div class="blog-tag-input">
+                @for (t of tagChips; track t) {
+                  <span class="blog-chip">
+                    {{ t }}
+                    <button type="button" (click)="removeTag(t)" aria-label="Remove tag">×</button>
+                  </span>
+                }
+                <input
+                  type="text"
+                  placeholder="Type tag + Enter"
+                  [(ngModel)]="tagInput"
+                  (keydown)="onTagKeydown($event)"
+                  (blur)="addTag()"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12 mb-2">
+            <div class="form-inp-main">
+              <label class="form-label">Content <span class="text-danger">*</span></label>
+              <st-editor [(ngModel)]="dataReqModel.content" [config]="editorConfig"></st-editor>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+
+    <div class="popup-footer">
+      <button type="button" class="site-btn grey-color" (click)="activeModal.close()" [disabled]="isSaving">
+        Close
+      </button>
+      <button
+        type="button"
+        class="site-btn primary-color ms-1"
+        (click)="validateData()"
+        [appBtnLoading]="isSaving"
+        [disabled]="isSaving || loadingFull"
+      >
+        <span class="site-btn-icon"><i class="fa-solid fa-check"></i></span>
+        {{ isEdit ? 'Update' : 'Create' }}
+      </button>
+    </div>
+  </div>
+</main>

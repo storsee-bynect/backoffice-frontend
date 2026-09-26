@@ -26,6 +26,13 @@ function buildUrlConstant() {
       getPolicies: base + 'policies/getPolicies',
       updatePolicies: base + 'policies/updatePolicies/1',
     },
+    BlogsAPI: {
+      getAllByPage: base + 'blogs/getAllBlogsByPage',
+      getById: base + 'blogs/getBlogById/',
+      create: base + 'blogs/createBlog',
+      update: base + 'blogs/updateBlog/',
+      delete: base + 'blogs/deleteBlog/',
+    },
     PushAPI: {
       settings: base + 'push/settings',
       generateVapidKeys: base + 'push/settings/generate-vapid-keys',
