@@ -21,6 +21,15 @@ export class AddUpdateStoreUserComponent {
 
   constructor(public sharedservice: SharedService, private storeuserservice: StoreuserService, private storeservice: StoreService, public activeModal: NgbActiveModal) { }
 
+  get isGoogleLinked(): boolean {
+    return !!this.data?.googleId;
+  }
+
+  get passwordPlaceholder(): string {
+    if (!this.isEdit) return 'Enter Password';
+    return this.data?.password ? 'Leave blank to keep current password' : 'Not set — enter a password';
+  }
+
   ngOnInit(): void {
     this.getRoles();
     if (this.data) {
@@ -54,8 +63,12 @@ export class AddUpdateStoreUserComponent {
     if (!this.dataReqModel.name) {
       errTxt += 'Enter Name <br/>'
     }
-    if (!this.dataReqModel.password) {
+    if (!this.isEdit && !this.dataReqModel.password) {
       errTxt += 'Enter Password <br/>'
+    }
+    const passwordChanged = this.dataReqModel.password && this.dataReqModel.password !== this.data?.password;
+    if (passwordChanged && String(this.dataReqModel.password).length < 6) {
+      errTxt += 'Password must be at least 6 characters <br/>'
     }
     if (!this.dataReqModel.email) {
       errTxt += 'Enter Email <br/>'
@@ -105,7 +118,7 @@ export class AddUpdateStoreUserComponent {
       if(err.status == 401){
         this.activeModal.close();
       }else{
-        this.sharedservice.showAlert(2, 'Something Went Wrong');
+        this.sharedservice.showAlert(2, err.error?.error || 'Something Went Wrong');
       }
     })
   }
@@ -125,7 +138,7 @@ export class AddUpdateStoreUserComponent {
       if(err.status == 401){
         this.activeModal.close();
       }else{
-        this.sharedservice.showAlert(2, 'Something Went Wrong');
+        this.sharedservice.showAlert(2, err.error?.error || 'Something Went Wrong');
       }
     })
   }

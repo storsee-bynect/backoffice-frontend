@@ -5,3 +5,46 @@
     transition: opacity 0.15s ease;
   }
 }
+
+.su-muted {
+  color: #94a3b8;
+  font-size: 0.8rem;
+  font-style: italic;
+}
+
+.su-login {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.su-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  background: #f1f5f9;
+  color: #475569;
+
+  i {
+    font-size: 0.65rem;
+  }
+
+  &--google {
+    background: #eff6ff;
+    color: #1d4ed8;
+  }
+
+  &--owner {
+    background: #fef3c7;
+    color: #92400e;
+  }
+
+  &--off {
+    background: #fef2f2;
+    color: #b91c1c;
+  }
+}

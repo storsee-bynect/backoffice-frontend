@@ -83,6 +83,7 @@ import { AddUpdateAppNotificationComponent } from './components/app-notification
 import { AppNotificationReportComponent } from './components/app-notifications/app-notification-report/app-notification-report.component';
 import { ShippingManagerComponent } from './components/shipping/shipping-manager.component';
 import { SiteConfigurationComponent } from './components/site-configuration/site-configuration.component';
+import { CredentialsComponent } from './components/credentials/credentials.component';
 import { LocationsComponent } from './components/locations/locations.component';
 import { BlogsComponent } from './components/blogs/blogs.component';
 import { AddUpdateBlogComponent } from './components/blogs/add-update-blog/add-update-blog.component';
@@ -144,6 +145,7 @@ import { AddUpdateBlogComponent } from './components/blogs/add-update-blog/add-u
     StoreWalletModalComponent,
     ShippingManagerComponent,
     SiteConfigurationComponent,
+    CredentialsComponent,
     BlogsComponent,
     AddUpdateBlogComponent,
   ],

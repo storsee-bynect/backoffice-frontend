@@ -19,5 +19,6 @@ export class siteConfigReqModel{
     youtubeURL : string;
 
     enableStoreRegister : boolean;
+    maxUsersPerStore : number = 5;
     enableMaintananceMode : boolean;
 }

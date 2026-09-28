@@ -18,6 +18,10 @@ function buildUrlConstant() {
       getSiteConfig: base + 'siteconfig/getSiteconfig',
       updateSiteConfig: base + 'siteconfig/updateSiteconfig/1',
     },
+    CredentialsAPI: {
+      getCredentials: base + 'credentials/getCredentials',
+      updateGoogleCredentials: base + 'credentials/updateGoogleCredentials',
+    },
     PaymentSettingAPI: {
       getPaymentSetting: base + 'paymentsetting/getPaymentsetting',
       updatePaymentSetting: base + 'paymentsetting/updatePaymentsetting/1',

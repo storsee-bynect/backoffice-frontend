@@ -181,6 +181,21 @@
           <label class="toggle-label" for="sc-enable-register"></label>
         </div>
       </div>
+      <div class="sc-toggle-row">
+        <div>
+          <strong>Max users per store</strong>
+          <span>Active dashboard users each store can have, including the owner (Google login counts as the owner's seat)</span>
+        </div>
+        <input
+          class="form-control sc-number-input"
+          type="number"
+          min="1"
+          max="1000"
+          step="1"
+          OnlyNumber
+          [(ngModel)]="siteConfig.maxUsersPerStore"
+        />
+      </div>
     </section>
 
     <div class="sc-footer">

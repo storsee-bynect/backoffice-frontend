@@ -23,6 +23,7 @@ import { PushNotificationsComponent } from "../../components/push-notifications/
 import { AppNotificationsComponent } from "../../components/app-notifications/app-notifications.component";
 import { ShippingManagerComponent } from "../../components/shipping/shipping-manager.component";
 import { SiteConfigurationComponent } from "../../components/site-configuration/site-configuration.component";
+import { CredentialsComponent } from "../../components/credentials/credentials.component";
 import { LocationsComponent } from "../../components/locations/locations.component";
 import { BlogsComponent } from "../../components/blogs/blogs.component";
 export const routing: Routes = [
@@ -111,6 +112,9 @@ export const routing: Routes = [
     },{
         path: 'site-configuration',
         component: SiteConfigurationComponent
+    },{
+        path: 'credentials',
+        component: CredentialsComponent
     },{
         path: '**',
         component: DashboardComponent

@@ -16,8 +16,22 @@
                 </div>
                 <div class="col-lg-6 col-12 mb-2">
                     <div class="form-inp-main">
-                        <label class="form-label">Password</label>
-                            <input class="form-control" type="text" placeholder="Enter Password" [(ngModel)]="dataReqModel.password" />
+                        <label class="form-label">
+                            Password
+                            @if(isEdit && isGoogleLinked){
+                                <span class="su-google-tag"><i class="fa-brands fa-google"></i> Google linked</span>
+                            }
+                        </label>
+                            <input class="form-control" type="text" [placeholder]="passwordPlaceholder" [(ngModel)]="dataReqModel.password" />
+                            @if(isEdit){
+                                <small class="form-hint">
+                                    @if(isGoogleLinked){
+                                        Google sign-in keeps working. Set a password to also allow email + password login.
+                                    }@else {
+                                        Leave blank to keep the current password.
+                                    }
+                                </small>
+                            }
                     </div>
                 </div>
                 <div class="col-lg-6 col-12 mb-2">
@@ -35,12 +49,15 @@
                 <div class="col-lg-6 col-12 mb-2">
                     <div class="form-inp-main">
                         <label class="form-label">Store</label>
-                        <select class="form-select" [(ngModel)]="dataReqModel.storeId" [disabled]="!!presetStoreId && !isEdit">
+                        <select class="form-select" [(ngModel)]="dataReqModel.storeId" [disabled]="isEdit || !!presetStoreId">
                             <option [value]="null">--- Select Store ---</option>
                             @for(item of storeList; track item){
                                 <option [value]="item.id">{{item.name}}</option>
                             }
                         </select>
+                        @if(isEdit){
+                            <small class="form-hint">A user stays with the store it was created for.</small>
+                        }
                     </div>
                 </div>
             </div>

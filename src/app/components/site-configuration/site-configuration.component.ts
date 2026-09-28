@@ -44,6 +44,7 @@ export class SiteConfigurationComponent {
       
       this.siteConfig.enableMaintananceMode = config.enableMaintananceMode;
       this.siteConfig.enableStoreRegister = config.enableStoreRegister;
+      this.siteConfig.maxUsersPerStore = Number(config.maxUsersPerStore) || 5;
       this.isDataLoaded = true;
     })
   }
@@ -100,6 +101,10 @@ export class SiteConfigurationComponent {
     }
     if (!this.siteConfig.youtubeURL) {
       errTxt += 'Enter Youtube URL <br/>';
+    }
+    const maxUsers = Number(this.siteConfig.maxUsersPerStore);
+    if (!Number.isInteger(maxUsers) || maxUsers < 1 || maxUsers > 1000) {
+      errTxt += 'Max Users Per Store must be between 1 and 1000 <br/>';
     }
     
     if (errTxt == '') {
