@@ -15,6 +15,12 @@ function asBool(val: unknown, defaultTrue = true): boolean {
   return Number(val) === 1;
 }
 
+const REASON_INACTIVE = 'Store marked inactive by platform administrator.';
+const REASON_LOCKED = 'Store locked by platform administrator.';
+const REASON_BLACKLISTED = 'Store blacklisted by platform administrator.';
+const REASON_DASHBOARD = 'Dashboard access disabled by platform administrator.';
+const AUTO_REASONS = [REASON_INACTIVE, REASON_LOCKED, REASON_BLACKLISTED, REASON_DASHBOARD];
+
 @Component({
   selector: 'app-store-settings',
   templateUrl: './store-settings.component.html',
@@ -22,6 +28,10 @@ function asBool(val: unknown, defaultTrue = true): boolean {
 })
 export class StoreSettingsComponent implements OnInit {
   @Input() store: any;
+
+  readonly maxLimit = 10000000;
+  readonly maxReason = 500;
+  readonly maxNotes = 5000;
 
   isSaving = false;
   fullAccess = true;
@@ -33,11 +43,12 @@ export class StoreSettingsComponent implements OnInit {
   allowDashboard = true;
   allowCheckout = true;
   allowProductAdd = true;
+  allowThemeEdit = true;
 
   useCustomProductLimit = false;
   useCustomOrderLimit = false;
-  productLimit = 150;
-  maxOrders = 100;
+  productLimit: number | null = 150;
+  maxOrders: number | null = 100;
 
   lockReason = '';
   adminNotes = '';
@@ -57,8 +68,9 @@ export class StoreSettingsComponent implements OnInit {
     this.allowDashboard = asBool(this.store.allowDashboard, true);
     this.allowCheckout = asBool(this.store.allowCheckout, true);
     this.allowProductAdd = asBool(this.store.allowProductAdd, true);
-    this.lockReason = String(this.store.lockReason || '').trim();
-    this.adminNotes = String(this.store.adminNotes || '').trim();
+    this.allowThemeEdit = asBool(this.store.allowThemeEdit, true);
+    this.lockReason = String(this.store.lockReason || '').trim().slice(0, this.maxReason);
+    this.adminNotes = String(this.store.adminNotes || '').trim().slice(0, this.maxNotes);
 
     const pl = Number(this.store.productLimit || 0);
     const mo = Number(this.store.maxOrders || 0);
@@ -78,6 +90,11 @@ export class StoreSettingsComponent implements OnInit {
     return !value || value <= 0 ? 'Unlimited' : String(value);
   }
 
+  isValidLimit(value: unknown): boolean {
+    const n = Number(value);
+    return value !== null && value !== '' && Number.isInteger(n) && n >= 1 && n <= this.maxLimit;
+  }
+
   syncFullAccessFlag() {
     this.fullAccess =
       !this.isLocked &&
@@ -86,7 +103,8 @@ export class StoreSettingsComponent implements OnInit {
       this.allowStorefront &&
       this.allowDashboard &&
       this.allowCheckout &&
-      this.allowProductAdd;
+      this.allowProductAdd &&
+      this.allowThemeEdit;
   }
 
   onFullAccessChange(enabled: boolean) {
@@ -99,13 +117,9 @@ export class StoreSettingsComponent implements OnInit {
   onActiveChange(enabled: boolean) {
     if (!enabled) {
       if (!this.lockReason.trim()) {
-        this.lockReason = 'Store marked inactive by platform administrator.';
+        this.lockReason = REASON_INACTIVE;
       }
-    } else if (
-      this.lockReason === 'Store marked inactive by platform administrator.' &&
-      !this.isLocked &&
-      !this.isBlacklisted
-    ) {
+    } else if (this.lockReason === REASON_INACTIVE && !this.isLocked && !this.isBlacklisted) {
       this.lockReason = '';
     }
     this.syncFullAccessFlag();
@@ -116,12 +130,12 @@ export class StoreSettingsComponent implements OnInit {
       this.allowDashboard = false;
       this.allowStorefront = false;
       if (!this.lockReason.trim()) {
-        this.lockReason = 'Store locked by platform administrator.';
+        this.lockReason = REASON_LOCKED;
       }
     } else if (!this.isBlacklisted) {
       this.allowStorefront = true;
       this.allowDashboard = true;
-      if (this.lockReason === 'Store locked by platform administrator.') {
+      if (this.lockReason === REASON_LOCKED) {
         this.lockReason = '';
       }
     }
@@ -136,8 +150,9 @@ export class StoreSettingsComponent implements OnInit {
       this.allowDashboard = false;
       this.allowCheckout = false;
       this.allowProductAdd = false;
-      if (!this.lockReason.trim() || this.lockReason === 'Store locked by platform administrator.') {
-        this.lockReason = 'Store blacklisted by platform administrator.';
+      this.allowThemeEdit = false;
+      if (!this.lockReason.trim() || this.lockReason === REASON_LOCKED) {
+        this.lockReason = REASON_BLACKLISTED;
       }
     } else {
       this.isLocked = false;
@@ -146,11 +161,8 @@ export class StoreSettingsComponent implements OnInit {
       this.allowDashboard = true;
       this.allowCheckout = true;
       this.allowProductAdd = true;
-      if (
-        this.lockReason === 'Store blacklisted by platform administrator.' ||
-        this.lockReason === 'Store locked by platform administrator.' ||
-        this.lockReason === 'Store marked inactive by platform administrator.'
-      ) {
+      this.allowThemeEdit = true;
+      if (AUTO_REASONS.includes(this.lockReason)) {
         this.lockReason = '';
       }
     }
@@ -158,6 +170,11 @@ export class StoreSettingsComponent implements OnInit {
   }
 
   onFeatureChange() {
+    if (!this.allowDashboard && !this.lockReason.trim()) {
+      this.lockReason = REASON_DASHBOARD;
+    } else if (this.allowDashboard && this.lockReason === REASON_DASHBOARD && !this.needsReason) {
+      this.lockReason = '';
+    }
     this.syncFullAccessFlag();
   }
 
@@ -169,6 +186,7 @@ export class StoreSettingsComponent implements OnInit {
     this.allowDashboard = true;
     this.allowCheckout = true;
     this.allowProductAdd = true;
+    this.allowThemeEdit = true;
     this.lockReason = '';
     this.fullAccess = true;
   }
@@ -177,16 +195,26 @@ export class StoreSettingsComponent implements OnInit {
     if (!this.store?.id) return;
     if (this.isSaving) return;
 
-    if (this.useCustomProductLimit && (!this.productLimit || this.productLimit < 1)) {
-      this.sharedservice.showAlert(2, 'Enter a valid product limit (minimum 1) or choose Unlimited');
+    if (this.useCustomProductLimit && !this.isValidLimit(this.productLimit)) {
+      this.sharedservice.showAlert(2, `Product limit must be a whole number between 1 and ${this.maxLimit}, or choose Unlimited`);
       return;
     }
-    if (this.useCustomOrderLimit && (!this.maxOrders || this.maxOrders < 1)) {
-      this.sharedservice.showAlert(2, 'Enter a valid order limit (minimum 1) or choose Unlimited');
+    if (this.useCustomOrderLimit && !this.isValidLimit(this.maxOrders)) {
+      this.sharedservice.showAlert(2, `Order limit must be a whole number between 1 and ${this.maxLimit}, or choose Unlimited`);
       return;
     }
-    if (this.needsReason && !this.lockReason.trim()) {
+    const reason = this.lockReason.trim();
+    const notes = this.adminNotes.trim();
+    if (this.needsReason && !reason) {
       this.sharedservice.showAlert(2, 'Please enter a reason — it is shown to the store owner after login.');
+      return;
+    }
+    if (reason.length > this.maxReason) {
+      this.sharedservice.showAlert(2, `Reason must be ${this.maxReason} characters or fewer`);
+      return;
+    }
+    if (notes.length > this.maxNotes) {
+      this.sharedservice.showAlert(2, `Admin notes must be ${this.maxNotes} characters or fewer`);
       return;
     }
 
@@ -199,10 +227,11 @@ export class StoreSettingsComponent implements OnInit {
       allowDashboard: this.allowDashboard,
       allowCheckout: this.allowCheckout,
       allowProductAdd: this.allowProductAdd,
+      allowThemeEdit: this.allowThemeEdit,
       productLimit: this.useCustomProductLimit ? Number(this.productLimit) : 0,
       maxOrders: this.useCustomOrderLimit ? Number(this.maxOrders) : 0,
-      lockReason: this.lockReason.trim(),
-      adminNotes: this.adminNotes.trim(),
+      lockReason: reason,
+      adminNotes: notes,
     };
 
     this.storeservice.updateStoreSettings(this.store.id, body).pipe(

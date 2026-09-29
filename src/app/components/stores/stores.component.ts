@@ -160,6 +160,11 @@ export class StoresComponent {
     modalRef.componentInstance.store = store;
   }
 
+  sessionCount(store: any): number {
+    const n = Number(store?.sessions);
+    return Number.isFinite(n) && n > 0 ? Math.floor(n) : 0;
+  }
+
   openStoreSettings(store: any) {
     const modalRef = this.modalService.open(StoreSettingsComponent, {
       size: 'xl',

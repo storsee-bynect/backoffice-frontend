@@ -108,7 +108,7 @@
                                         }
                                     </div>
                                 </td>
-                                <td>{{item.sessions}}</td>
+                                <td class="text-nowrap" [title]="(item.sessions || 0) + ' sessions'">{{ sessionCount(item) | number }}</td>
                                 <td>
                                     <div class="table-btns-main">
                                         @if (isBtnLoading('delete', item.id)) {
