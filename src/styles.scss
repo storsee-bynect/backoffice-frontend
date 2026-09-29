@@ -149,6 +149,49 @@ body {
 html {  
     overflow: hidden !important;
 }
+
+/*
+ * Global background scroll lock. The dashboard never scrolls <body>; the page
+ * scrolls inside `.content-main-inner`, so that is what gets frozen while any
+ * modal / drawer is open. Add new overlays' OPEN-state selector here.
+ */
+$scroll-lock-overlays: (
+    '.modal.show',
+    'ngb-modal-window',
+    '.offcanvas.show',
+    '.offcanvas.showing',
+    '[data-scroll-lock]'
+);
+$scroll-lock-list: '';
+@each $sel in $scroll-lock-overlays {
+    $scroll-lock-list: if($scroll-lock-list == '', $sel, '#{$scroll-lock-list}, #{$sel}');
+}
+
+body:has(#{$scroll-lock-list}) {
+    overflow: hidden !important;
+
+    .content-main-inner {
+        overflow: hidden !important;
+    }
+}
+
+// Sidebar is docked on desktop (and `.show` by default) — it's only an overlay on small screens.
+@media (max-width: 992px) {
+    body:has(.sidebar-main.show) {
+        overflow: hidden !important;
+
+        .content-main-inner {
+            overflow: hidden !important;
+        }
+    }
+}
+
+.modal,
+.modal-body,
+.popup-body,
+.offcanvas-body {
+    overscroll-behavior: contain;
+}
 sup{
     color: var(--red-color) !important;
 }

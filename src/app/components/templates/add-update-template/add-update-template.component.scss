@@ -2,13 +2,20 @@
   display: block;
 }
 
+// Header and footer stay pinned; only the body scrolls, so the actions never fall off-screen.
+// 3.5rem = Bootstrap's top + bottom .modal-dialog margin.
 .tpl-modal__shell {
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 3.5rem);
+  max-height: calc(100dvh - 3.5rem);
   background: var(--white);
   border-radius: 16px;
   overflow: hidden;
 }
 
 .tpl-modal__header {
+  flex-shrink: 0;
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
@@ -79,9 +86,11 @@
 }
 
 .tpl-modal__body {
+  flex: 1 1 auto;
+  min-height: 0;
   padding: 20px 24px;
-  max-height: min(72vh, 680px);
   overflow-y: auto;
+  overscroll-behavior: contain;
 
   &::-webkit-scrollbar {
     width: 5px;
@@ -94,9 +103,11 @@
 }
 
 .tpl-modal__footer {
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: flex-end;
+  flex-wrap: wrap;
   gap: 8px;
   padding: 14px 24px;
   border-top: 1px solid var(--light-border);

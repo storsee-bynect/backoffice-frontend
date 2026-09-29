@@ -95,7 +95,6 @@ export class SharedService {
     }
 
     applySiteBrand(pageTitle?: string | null): void {
-        this.applyFavicon(this.siteConfig?.icon);
         this.applyDocumentTitle(pageTitle);
     }
 

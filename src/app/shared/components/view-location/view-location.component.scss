@@ -1,0 +1,10 @@
+// Leaflet injects markers outside Angular's view encapsulation.
+::ng-deep .vl-red-pin {
+  background: transparent;
+  border: 0;
+
+  svg {
+    display: block;
+    filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.35));
+  }
+}

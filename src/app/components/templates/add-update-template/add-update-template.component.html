@@ -186,7 +186,7 @@
 
     <footer class="tpl-modal__footer">
       <button type="button" class="site-btn grey-color" (click)="activeModal.close()" [disabled]="isSaving">Cancel</button>
-      <button type="button" class="site-btn primary-color ms-2" (click)="validateData()" [appBtnLoading]="isSaving" [disabled]="isSaving">
+      <button type="button" class="site-btn primary-color" (click)="validateData()" [appBtnLoading]="isSaving" [disabled]="isSaving">
         <span class="site-btn-icon"><i class="fa-solid fa-check"></i></span>
         {{ isEdit ? 'Save changes' : 'Create template' }}
       </button>
