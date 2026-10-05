@@ -272,6 +272,23 @@ export class StoresComponent {
     return formatPhoneDisplay(item?.countryCode, item?.phone);
   }
 
+  /** Verified custom domain wins; otherwise platform store base URL + slug. */
+  storeWebsiteUrl(item: any): string {
+    const customDomain = String(item?.customDomain || '').trim().replace(/\/+$/, '');
+    if (customDomain) {
+      return /^https?:\/\//i.test(customDomain) ? customDomain : `https://${customDomain}`;
+    }
+    const slug = String(item?.slug || '').trim();
+    if (!slug) return '';
+    let base = String(this.sharedservice.siteConfig?.storeBaseUrl || 'https://store.storsee.com').trim();
+    if (!/^https?:\/\//i.test(base)) base = `https://${base}`;
+    return `${base.replace(/\/+$/, '')}/${encodeURIComponent(slug)}`;
+  }
+
+  storeWebsiteLabel(url: string): string {
+    return String(url || '').replace(/^https?:\/\//i, '');
+  }
+
   getExpireDate(item: any): Date | null {
     return this.parseExpireDate(item?.expireDate);
   }
