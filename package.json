@@ -1,10 +1,10 @@
 {
-  "name": "teamcamp",
+  "name": "storsee-backoffice",
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "dev": "ng serve --port 4001",
+    "dev": "ng serve --port 7474",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
