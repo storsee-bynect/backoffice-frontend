@@ -30,13 +30,14 @@
                         <th class="sr-th">Sr No.</th>
                         <th>Name</th>
                         <th>Mobile</th>
+                        <th>Email</th>
+                        <th>Business</th>
+                        <th>Form / Page</th>
                         <th>Address</th>
                         <th>Source</th>
                         <th>Date</th>
                         <th>Status</th>
-                        @if(sharedservice.isPageDelete){
-                            <th>Action</th>
-                        }
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -46,7 +47,18 @@
                         <td class="sr-no-td">{{(i+1)}}</td>
                         <td>{{item.name}}</td>
                         <td>+91 {{item.mobile}} <span [ngbTooltip]="'Send Message'" class="text-side-icon" (click)="sharedservice.openURL('https://wa.me/+91{{item.mobile}}')"><i class="fa-brands fa-whatsapp"></i></span></td>
-                        <td>{{item.city}}, {{item.country}}</td>
+                        <td>{{item.email || item.meta?.email || '-'}}</td>
+                        <td>{{item.meta?.business || '-'}}</td>
+                        <td>
+                            {{item.meta?.form || '-'}}
+                            @if(item.meta?.page){
+                                <div class="text-muted small">{{item.meta.page}}</div>
+                            }
+                            @if(item.meta?.tracking){
+                                <div class="text-muted small" [ngbTooltip]="item.meta.tracking">UTM tracked</div>
+                            }
+                        </td>
+                        <td>{{item.city || '-'}}{{item.country ? ', ' + item.country : ''}}</td>
                         <td>
                             {{item.source == 1 ? 'Cold Calling / Telemarketing' : item.source == 2 ? 'Direct' : item.source == 3 ? 'Email Marketing' : item.source == 4 ? 'Expo / Seminar' : item.source == 5 ? 'Google' : item.source == 6 ? 'Other' : item.source == 7 ? 'Reference' : item.source == 8 ? 'Social Media' : item.source == 9 ? 'Website' : 'Digital Marketing'}}
                         </td>
@@ -58,10 +70,9 @@
                                 </span>
                             </div>
                         </td>
-                        @if(sharedservice.isPageDelete){
                             <td>
                                 <div class="table-btns-main">
-                                    <button [ngbTooltip]="'View Notes'" class="table-single-btn primary" (click)="sharedservice.viewContent(item.notes)"><i class="fa-solid fa-eye"></i></button>
+                                    <button [ngbTooltip]="'View Full Details'" class="table-single-btn primary" (click)="viewDetails(item)"><i class="fa-solid fa-eye"></i></button>
                                     @if(sharedservice.isPageUpdate){
                                         <button [ngbTooltip]="'Update Data'" class="table-single-btn primary ms-1" (click)="addUpdateData(true,item)"><i class="fa-solid fa-pencil"></i></button>
                                     }
@@ -70,7 +81,6 @@
                                     }
                                 </div>
                             </td>
-                        }
                     </tr>
                     }
                 </tbody>

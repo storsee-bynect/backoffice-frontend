@@ -60,7 +60,7 @@ export class LeadsComponent {
     ).subscribe({
       next: (res: any) => {
         if (res) {
-          this.dataList = res.data;
+          this.dataList = (res.data || []).map((d: any) => ({ ...d, meta: this.parseNotes(d.notes) }));
           this.totalCount = res.totalCount;
           if (res?.stats) {
             this.stats = {
@@ -82,6 +82,30 @@ export class LeadsComponent {
         this.sharedservice.showAlert(2, 'Technical Issue Found !');
       }
     });
+  }
+
+  /** Website leads store extra fields as `Key: value` lines in notes (see api-backend leadsController). */
+  private parseNotes(notes: string): Record<string, string> {
+    const meta: Record<string, string> = {};
+    for (const line of String(notes || '').split('\n')) {
+      const i = line.indexOf(':');
+      if (i > 0) meta[line.slice(0, i).trim().toLowerCase()] = line.slice(i + 1).trim();
+    }
+    return meta;
+  }
+
+  viewDetails(item: any) {
+    const esc = (v: any) => String(v ?? '').replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
+    const rows: [string, any][] = [
+      ['Name', item.name],
+      ['Mobile', item.mobile],
+      ['Email', item.email],
+      ['City', [item.city, item.country].filter(Boolean).join(', ')],
+      ['Date', item.date],
+    ];
+    const head = rows.filter(([, v]) => v).map(([k, v]) => `<b>${k}:</b> ${esc(v)}`).join('<br>');
+    const notes = esc(item.notes).replace(/\n/g, '<br>');
+    this.sharedservice.viewContent(`${head}${notes ? '<hr>' + notes : ''}`);
   }
 
   filterData() {
