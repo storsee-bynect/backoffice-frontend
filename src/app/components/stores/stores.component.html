@@ -44,6 +44,7 @@
                             <th>Website</th>
                             <th>Template</th>
                             <th>Business Type</th>
+                            <th>Industry</th>
                                 <th>Plan Expiry</th>
                             <th>Products</th>
                             <th>Orders/mo</th>
@@ -73,6 +74,7 @@
                                 </td>
                                 <td>{{item.templateName}} <span [ngbTooltip]="'View Template'" (click)="viewTemplate(item.templateId)" class="text-side-icon"><i class="fa-light fa-eye"></i></span></td>
                                 <td>{{item.type == 1 ? 'B2C' : item.type == 2 ? 'B2B' : 'B2C & B2B'}}</td>
+                                <td>{{item.industryName || 'Not selected'}}</td>
                                 <td>
                                     <div class="plan-cell">
                                         @if(getExpireDate(item); as expDate){

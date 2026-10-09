@@ -1,4 +1,5 @@
 import { Routes } from "@angular/router";
+import { IndustriesComponent } from '../../components/industries/industries.component';
 import { DashboardComponent } from "../../components/dashboard/dashboard.component";
 import { UsersComponent } from "../../components/users/users.component";
 import { RolesComponent } from "../../components/roles/roles.component";
@@ -73,6 +74,9 @@ export const routing: Routes = [
     },{
         path: 'stores',
         component: StoresComponent
+    },{
+        path: 'industries',
+        component: IndustriesComponent
     },{
         path: 'contact-leads',
         component: ContactLeadsComponent

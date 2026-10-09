@@ -41,6 +41,12 @@
                     </div>
                     <div class="col-lg-6 col-12 mb-2">
                         <div class="form-inp-main">
+                            <label class="form-label">Industry</label>
+                            <input class="form-control" disabled [ngModel]="singleData.industryName || 'Not selected'" />
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-12 mb-2">
+                        <div class="form-inp-main">
                             <label class="form-label">Business Type</label>
                                 <select class="form-select" [disabled]="true" [(ngModel)]="singleData.type">
                                     <option [value]="null" [disabled]="true">-- Select Business Type --</option>

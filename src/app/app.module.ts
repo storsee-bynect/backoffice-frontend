@@ -8,6 +8,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { IndustriesComponent } from './components/industries/industries.component';
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { HeaderComponent } from './shared/components/header/header.component';
@@ -91,6 +92,7 @@ import { AddUpdateBlogComponent } from './components/blogs/add-update-blog/add-u
 @NgModule({
   declarations: [
     AppComponent,
+    IndustriesComponent,
     HeaderComponent,
     FooterComponent,
     LayoutComponent,

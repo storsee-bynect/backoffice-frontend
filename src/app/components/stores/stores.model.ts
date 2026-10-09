@@ -1,4 +1,5 @@
 export class StoreReqModel{
+    industryId: number | null = null;
     name: string;
     email: string;
     type: number = null;

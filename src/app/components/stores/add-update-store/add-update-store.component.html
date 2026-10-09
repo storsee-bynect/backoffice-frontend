@@ -54,6 +54,17 @@
                 </div>
                 <div class="col-lg-6 col-12 mb-2">
                     <div class="form-inp-main">
+                        <label class="form-label" for="store-industry">Industry</label>
+                        <select id="store-industry" class="form-select" [(ngModel)]="dataReqModel.industryId" [disabled]="industriesLoading || industriesError">
+                            <option [ngValue]="null" [disabled]="!!data?.industryId">-- Select Industry --</option>
+                            @for(item of industryList; track item.id){<option [ngValue]="item.id">{{item.name}}{{item.inactive ? ' (inactive)' : ''}}</option>}
+                        </select>
+                        @if(industriesLoading){<small class="text-muted">Loading industries...</small>}
+                        @if(industriesError){<button type="button" class="site-btn grey-color mt-1" (click)="loadIndustries()">Retry industries</button>}
+                    </div>
+                </div>
+                <div class="col-lg-6 col-12 mb-2">
+                    <div class="form-inp-main">
                         <label class="form-label">Template</label>
                             <select class="form-select" [(ngModel)]="dataReqModel.selectedTemplate">
                                 <option [value]="null" [disabled]="true">-- Select Template --</option>

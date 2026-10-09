@@ -1,4 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { IndustriesService } from '../../industries/industries.service';
 import { finalize } from 'rxjs/operators';
 import { StoreReqModel } from '../stores.model';
 import { SharedService } from '../../../shared/services/shared.service';
@@ -17,6 +18,9 @@ export class AddUpdateStoreComponent implements OnInit {
   @Input() isEdit;
   @Input() data;
   templateList : any[] = [];
+  industryList: any[] = [];
+  industriesLoading = false;
+  industriesError = false;
   packageList : any[] = [];
   dataReqModel: StoreReqModel = new StoreReqModel();
 
@@ -29,12 +33,13 @@ export class AddUpdateStoreComponent implements OnInit {
     return phoneMaxLength(this.dataReqModel.countryCode);
   }
 
-  constructor(public sharedservice: SharedService, private storeservice: StoreService, private packageservice: PackageService, private templateservice: TemplateService, public activeModal: NgbActiveModal) { }
+  constructor(public sharedservice: SharedService, private storeservice: StoreService, private packageservice: PackageService, private templateservice: TemplateService, public activeModal: NgbActiveModal, private industries: IndustriesService) { }
 
   ngOnInit(): void {
     this.dataReqModel.ip = this.sharedservice.ip;
     this.getTemplateList();
     this.getPackageList();
+    this.loadIndustries();
     if (this.data) {
       this.isEdit = true;
       this.dataReqModel.email = this.data.email;
@@ -48,10 +53,26 @@ export class AddUpdateStoreComponent implements OnInit {
       this.dataReqModel.sessions = this.data.sessions;
       this.dataReqModel.slug = this.data.slug;
       this.dataReqModel.type = this.data.type;
+      this.dataReqModel.industryId = Number(this.data.industryId) || null;
       this.dataReqModel.activePackageId = this.data.activePackageId;
       this.dataReqModel.productLimit = this.data.productLimit ?? 0;
       this.dataReqModel.maxOrders = this.data.maxOrders ?? 0;
     }
+  }
+
+  loadIndustries(): void {
+    this.industriesLoading = true;
+    this.industriesError = false;
+    this.industries.active().pipe(finalize(() => this.industriesLoading = false)).subscribe({
+      next: (res) => {
+        this.industryList = res.data || [];
+        const id = Number(this.data?.industryId);
+        if (id && !this.industryList.some((item) => Number(item.id) === id)) {
+          this.industryList.push({ id, name: this.data.industryName || 'Current industry', inactive: true });
+        }
+      },
+      error: () => this.industriesError = true,
+    });
   }
 
   getTemplateList(){
@@ -100,6 +121,7 @@ export class AddUpdateStoreComponent implements OnInit {
 
   validateData() {
     let errTxt = '';
+    if (!this.isEdit && !this.dataReqModel.industryId) errTxt += 'Select Industry <br/>';
 
     if (!this.dataReqModel.name) {
       errTxt += 'Enter Name <br/>'
