@@ -3,7 +3,7 @@
     <div class="popup-head">
       <div class="popup-head-ttl">{{ isEdit ? 'Update' : 'Create' }} Blog</div>
       <div class="popup-head-btn">
-        <button type="button" (click)="activeModal.close()"><i class="fa-solid fa-x"></i></button>
+        <button type="button" (click)="activeModal.close()"><span class="icon-wrap"><i class="fa-solid fa-x"></i></span></button>
       </div>
     </div>
 
@@ -68,7 +68,7 @@
                   <div class="blog-thumb-preview">
                     <img [src]="dataReqModel.thumbnail" alt="Thumbnail" />
                     <button type="button" class="blog-thumb-remove" (click)="removeThumbnail()">
-                      <i class="fa-solid fa-trash-can"></i>
+                      <span class="icon-wrap"><i class="fa-solid fa-trash-can"></i></span>
                     </button>
                   </div>
                 }

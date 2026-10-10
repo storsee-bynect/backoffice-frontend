@@ -16,13 +16,13 @@
       [disabled]="isSearchLoading || isListLoading"
       (click)="filterData()"
     >
-      <i class="fa-solid fa-magnifying-glass"></i>
+      <span class="icon-wrap"><i class="fa-solid fa-magnifying-glass"></i></span>
     </button>
   </div>
   @if (sharedservice.isPageInsert) {
     <div class="page-top-btns-main d-flex justify-content-end">
       <button class="site-btn dark-color ms-1" (click)="addUpdateData(false)">
-        <div class="site-btn-icon"><i class="fa-solid fa-plus"></i></div>
+        <div class="site-btn-icon"><span class="icon-wrap"><i class="fa-solid fa-plus"></i></span></div>
         Create
       </button>
     </div>
@@ -99,7 +99,7 @@
                         class="table-single-btn primary"
                         (click)="addUpdateData(true, item)"
                       >
-                        <i class="fa-solid fa-pencil"></i>
+                        <span class="icon-wrap"><i class="fa-solid fa-pencil"></i></span>
                       </button>
                     }
                     @if (sharedservice.isPageDelete) {
@@ -109,7 +109,7 @@
                         [appBtnLoading]="isBtnLoading('delete', item.id)"
                         (click)="deleteData(item.id)"
                       >
-                        <i class="fa-solid fa-trash-can"></i>
+                        <span class="icon-wrap"><i class="fa-solid fa-trash-can"></i></span>
                       </button>
                     }
                   </div>

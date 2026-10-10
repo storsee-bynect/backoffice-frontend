@@ -49,7 +49,7 @@
         class="ship-tabs__btn"
         [class.is-active]="activeTab === tab.key"
         (click)="setTab(tab.key)">
-        <i class="fa-solid" [ngClass]="tab.icon"></i>
+        <span class="icon-wrap"><i class="fa-solid" [ngClass]="tab.icon"></i></span>
         <span>{{ tab.label }}</span>
       </button>
     }
@@ -62,7 +62,7 @@
     } @else {
       @if (loadError) {
         <div class="ship-empty">
-          <i class="fa-solid fa-triangle-exclamation"></i>
+          <span class="icon-wrap"><i class="fa-solid fa-triangle-exclamation"></i></span>
           <h3>Couldn’t load shipping data</h3>
           <p>{{ loadError }}</p>
           <button type="button" class="site-btn dark-color mt-2" (click)="loadOverview()">Retry</button>
@@ -201,7 +201,7 @@
                   [(ngModel)]="credForm(p.id).password"
                   autocomplete="new-password" />
                 <button type="button" class="ship-pass__toggle" (click)="showPassword[p.id] = !showPassword[p.id]">
-                  <i class="fa-solid" [ngClass]="showPassword[p.id] ? 'fa-eye-slash' : 'fa-eye'"></i>
+                  <span class="icon-wrap"><i class="fa-solid" [ngClass]="showPassword[p.id] ? 'fa-eye-slash' : 'fa-eye'"></i></span>
                 </button>
               </div>
             </div>
@@ -497,7 +497,7 @@
         </div>
       } @else {
         <div class="ship-empty ship-empty--compact mt-3">
-          <i class="fa-solid fa-calculator"></i>
+          <span class="icon-wrap"><i class="fa-solid fa-calculator"></i></span>
           <p>Enter pincodes and calculate to see Shiprocket rates with Storsee margin.</p>
         </div>
       }
@@ -551,7 +551,7 @@
         </div>
       } @else {
         <div class="ship-empty">
-          <i class="fa-solid fa-box-open"></i>
+          <span class="icon-wrap"><i class="fa-solid fa-box-open"></i></span>
           <h3>No shipments yet</h3>
           <p>Merchant-created Shiprocket AWBs will appear here.</p>
         </div>
@@ -652,7 +652,7 @@
         </div>
       } @else {
         <div class="ship-empty">
-          <i class="fa-solid fa-terminal"></i>
+          <span class="icon-wrap"><i class="fa-solid fa-terminal"></i></span>
           <h3>No API logs yet</h3>
           <p>Auth, rates, and AWB calls will show here after you test Shiprocket.</p>
         </div>
@@ -705,7 +705,7 @@
         </div>
       } @else {
         <div class="ship-empty">
-          <i class="fa-solid fa-satellite-dish"></i>
+          <span class="icon-wrap"><i class="fa-solid fa-satellite-dish"></i></span>
           <h3>No webhook events</h3>
           <p>Shiprocket status callbacks will land here once shipments move.</p>
         </div>
@@ -751,7 +751,7 @@
         </div>
       } @else {
         <div class="ship-empty">
-          <i class="fa-solid fa-money-bill-transfer"></i>
+          <span class="icon-wrap"><i class="fa-solid fa-money-bill-transfer"></i></span>
           <h3>No remittance rows</h3>
           <p>COD remittance records will appear after delivered COD shipments settle.</p>
         </div>

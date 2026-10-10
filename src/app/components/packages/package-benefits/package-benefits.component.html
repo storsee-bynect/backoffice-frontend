@@ -3,7 +3,7 @@
         <div class="popup-head">
             <div class="popup-head-ttl">{{ name }} — Benefits</div>
             <div class="popup-head-btn">
-                <button (click)="activeModal.close()"><i class="fa-solid fa-x"></i></button>
+                <button (click)="activeModal.close()"><span class="icon-wrap"><i class="fa-solid fa-x"></i></span></button>
             </div>
         </div>
         <div class="popup-body">
@@ -11,7 +11,7 @@
                 <div class="benefits-list">
                     @for(item of data; track item; let i = $index){
                         <div class="benefit-row">
-                            <div class="benefit-check"><i class="fa-solid fa-check"></i></div>
+                            <div class="benefit-check"><span class="icon-wrap"><i class="fa-solid fa-check"></i></span></div>
                             <span>{{ item.text }}</span>
                         </div>
                     }

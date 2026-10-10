@@ -2,11 +2,11 @@
   <div class="popup-main store-settings-popup">
     <div class="popup-head">
       <div class="popup-head-ttl">
-        <i class="fa-solid fa-shield-halved me-2"></i>
+        <span class="icon-wrap"><i class="fa-solid fa-shield-halved me-2"></i></span>
         Store Settings
       </div>
       <div class="popup-head-btn">
-        <button (click)="activeModal.close()"><i class="fa-solid fa-x"></i></button>
+        <button (click)="activeModal.close()"><span class="icon-wrap"><i class="fa-solid fa-x"></i></span></button>
       </div>
     </div>
 
@@ -14,7 +14,7 @@
       <!-- Store summary -->
       <div class="ss-store-card">
         <div class="ss-store-card__icon">
-          <i class="fa-solid fa-store"></i>
+          <span class="icon-wrap"><i class="fa-solid fa-store"></i></span>
         </div>
         <div class="ss-store-card__body">
           <div class="ss-store-card__name">{{ store?.name }}</div>
@@ -37,21 +37,21 @@
       </div>
 
       <div class="ss-info-banner">
-        <i class="fa-solid fa-circle-info"></i>
+        <span class="icon-wrap"><i class="fa-solid fa-circle-info"></i></span>
         <span>Plans include unlimited products &amp; orders. Restrict individual stores from here — lock, blacklist, or set custom caps.</span>
       </div>
 
       <!-- Security switches -->
       <div class="ss-block">
         <div class="ss-block__head">
-          <i class="fa-solid fa-user-shield"></i>
+          <span class="icon-wrap"><i class="fa-solid fa-user-shield"></i></span>
           <span>Security controls</span>
         </div>
         <div class="ss-security-grid">
           <div class="ss-security-card" [class.ss-security-card--on]="fullAccess">
             <div class="ss-security-card__top">
               <div class="ss-security-card__icon ss-security-card__icon--green">
-                <i class="fa-solid fa-unlock-keyhole"></i>
+                <span class="icon-wrap"><i class="fa-solid fa-unlock-keyhole"></i></span>
               </div>
               <label class="toggle-switch">
                 <input type="checkbox" class="toggle-input" [(ngModel)]="fullAccess" (ngModelChange)="onFullAccessChange($event)" />
@@ -65,7 +65,7 @@
           <div class="ss-security-card" [class.ss-security-card--warn]="isLocked">
             <div class="ss-security-card__top">
               <div class="ss-security-card__icon ss-security-card__icon--amber">
-                <i class="fa-solid fa-lock"></i>
+                <span class="icon-wrap"><i class="fa-solid fa-lock"></i></span>
               </div>
               <label class="toggle-switch">
                 <input type="checkbox" class="toggle-input" [(ngModel)]="isLocked" (ngModelChange)="onLockChange($event)" [disabled]="isBlacklisted" />
@@ -79,7 +79,7 @@
           <div class="ss-security-card" [class.ss-security-card--danger]="isBlacklisted">
             <div class="ss-security-card__top">
               <div class="ss-security-card__icon ss-security-card__icon--red">
-                <i class="fa-solid fa-ban"></i>
+                <span class="icon-wrap"><i class="fa-solid fa-ban"></i></span>
               </div>
               <label class="toggle-switch">
                 <input type="checkbox" class="toggle-input" [(ngModel)]="isBlacklisted" (ngModelChange)="onBlacklistChange($event)" />
@@ -95,13 +95,13 @@
       <!-- Feature controls -->
       <div class="ss-block">
         <div class="ss-block__head">
-          <i class="fa-solid fa-sliders"></i>
+          <span class="icon-wrap"><i class="fa-solid fa-sliders"></i></span>
           <span>Feature controls</span>
         </div>
         <div class="ss-toggle-grid">
           <div class="ss-toggle-row">
             <div class="ss-toggle-row__info">
-              <i class="fa-solid fa-circle-check ss-toggle-row__icon ss-toggle-row__icon--green"></i>
+              <span class="icon-wrap"><i class="fa-solid fa-circle-check ss-toggle-row__icon ss-toggle-row__icon--green"></i></span>
               <div>
                 <div class="ss-toggle-row__label">Store active</div>
                 <div class="ss-toggle-row__hint">Store visible on platform</div>
@@ -115,7 +115,7 @@
 
           <div class="ss-toggle-row">
             <div class="ss-toggle-row__info">
-              <i class="fa-solid fa-shop ss-toggle-row__icon"></i>
+              <span class="icon-wrap"><i class="fa-solid fa-shop ss-toggle-row__icon"></i></span>
               <div>
                 <div class="ss-toggle-row__label">Allow storefront</div>
                 <div class="ss-toggle-row__hint">Customer can open the shop</div>
@@ -129,7 +129,7 @@
 
           <div class="ss-toggle-row">
             <div class="ss-toggle-row__info">
-              <i class="fa-solid fa-gauge-high ss-toggle-row__icon"></i>
+              <span class="icon-wrap"><i class="fa-solid fa-gauge-high ss-toggle-row__icon"></i></span>
               <div>
                 <div class="ss-toggle-row__label">Allow dashboard</div>
                 <div class="ss-toggle-row__hint">Store owner can sign in</div>
@@ -143,7 +143,7 @@
 
           <div class="ss-toggle-row">
             <div class="ss-toggle-row__info">
-              <i class="fa-solid fa-bag-shopping ss-toggle-row__icon"></i>
+              <span class="icon-wrap"><i class="fa-solid fa-bag-shopping ss-toggle-row__icon"></i></span>
               <div>
                 <div class="ss-toggle-row__label">Allow checkout</div>
                 <div class="ss-toggle-row__hint">Customers can place orders</div>
@@ -157,7 +157,7 @@
 
           <div class="ss-toggle-row">
             <div class="ss-toggle-row__info">
-              <i class="fa-solid fa-box-open ss-toggle-row__icon"></i>
+              <span class="icon-wrap"><i class="fa-solid fa-box-open ss-toggle-row__icon"></i></span>
               <div>
                 <div class="ss-toggle-row__label">Allow add products</div>
                 <div class="ss-toggle-row__hint">Store can add new products</div>
@@ -171,7 +171,7 @@
 
           <div class="ss-toggle-row">
             <div class="ss-toggle-row__info">
-              <i class="fa-solid fa-palette ss-toggle-row__icon"></i>
+              <span class="icon-wrap"><i class="fa-solid fa-palette ss-toggle-row__icon"></i></span>
               <div>
                 <div class="ss-toggle-row__label">Can edit theme</div>
                 <div class="ss-toggle-row__hint">Store can customise &amp; publish its theme</div>
@@ -188,14 +188,14 @@
       <!-- Limits override -->
       <div class="ss-block">
         <div class="ss-block__head">
-          <i class="fa-solid fa-chart-line"></i>
+          <span class="icon-wrap"><i class="fa-solid fa-chart-line"></i></span>
           <span>Admin limits override</span>
         </div>
         <div class="ss-limits-grid">
           <div class="ss-limit-card">
             <div class="ss-limit-card__head">
               <div class="ss-limit-card__title">
-                <i class="fa-solid fa-box"></i> Product limit
+                <span class="icon-wrap"><i class="fa-solid fa-box"></i></span> Product limit
               </div>
               <label class="toggle-switch">
                 <input type="checkbox" class="toggle-input" [(ngModel)]="useCustomProductLimit" />
@@ -212,7 +212,7 @@
               }
             } @else {
               <div class="ss-limit-unlimited">
-                <i class="fa-solid fa-infinity"></i> Unlimited products
+                <span class="icon-wrap"><i class="fa-solid fa-infinity"></i></span> Unlimited products
               </div>
             }
           </div>
@@ -220,7 +220,7 @@
           <div class="ss-limit-card">
             <div class="ss-limit-card__head">
               <div class="ss-limit-card__title">
-                <i class="fa-solid fa-cart-shopping"></i> Order limit / month
+                <span class="icon-wrap"><i class="fa-solid fa-cart-shopping"></i></span> Order limit / month
               </div>
               <label class="toggle-switch">
                 <input type="checkbox" class="toggle-input" [(ngModel)]="useCustomOrderLimit" />
@@ -237,7 +237,7 @@
               }
             } @else {
               <div class="ss-limit-unlimited">
-                <i class="fa-solid fa-infinity"></i> Unlimited orders
+                <span class="icon-wrap"><i class="fa-solid fa-infinity"></i></span> Unlimited orders
               </div>
             }
           </div>
@@ -247,7 +247,7 @@
       <!-- Notes -->
       <div class="ss-block ss-block--last">
         <div class="ss-block__head">
-          <i class="fa-solid fa-note-sticky"></i>
+          <span class="icon-wrap"><i class="fa-solid fa-note-sticky"></i></span>
           <span>Notes</span>
         </div>
         <div class="row m-0">

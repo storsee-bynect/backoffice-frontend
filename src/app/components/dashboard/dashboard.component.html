@@ -12,7 +12,7 @@
         </div>
         <button type="button" class="dash-link" [appBtnLoading]="isReloadLoading" [disabled]="isReloadLoading" (click)="loadDashboard(true)">
           Refresh
-          <i class="fa-solid fa-rotate"></i>
+          <span class="icon-wrap"><i class="fa-solid fa-rotate"></i></span>
         </button>
       </div>
     </section>
@@ -295,7 +295,7 @@
           </div>
           <a routerLink="/stores" class="dash-link">
             View all
-            <i class="fa-regular fa-arrow-right"></i>
+            <span class="icon-wrap"><i class="fa-regular fa-arrow-right"></i></span>
           </a>
         </div>
 
@@ -304,13 +304,13 @@
             @for (item of dashboardData.recentStores; track item.id) {
               <div class="dash-upcoming-row" routerLink="/stores">
                 <div class="dash-upcoming-row__when">
-                  <i class="fa-regular fa-clock"></i>
+                  <span class="icon-wrap"><i class="fa-regular fa-clock"></i></span>
                   {{ item.created_at | date: 'dd MMM' }}
                 </div>
                 <div class="dash-upcoming-row__body">
                   <div class="name">{{ item.name || 'Store' }}</div>
                   <div class="date">
-                    <i class="fa-regular fa-envelope"></i>
+                    <span class="icon-wrap"><i class="fa-regular fa-envelope"></i></span>
                     {{ item.email }}
                   </div>
                 </div>
@@ -344,7 +344,7 @@
           </div>
           <a routerLink="/tickets" class="dash-link">
             All tickets
-            <i class="fa-regular fa-arrow-right"></i>
+            <span class="icon-wrap"><i class="fa-regular fa-arrow-right"></i></span>
           </a>
         </div>
         <div class="dash-upcoming-list">
@@ -354,7 +354,7 @@
               <div class="dash-upcoming-row__body">
                 <div class="name">{{ t.subject || 'Support ticket' }}</div>
                 <div class="date">
-                  <i class="fa-regular fa-calendar"></i>
+                  <span class="icon-wrap"><i class="fa-regular fa-calendar"></i></span>
                   {{ t.created_at | date: 'EEE, dd MMM yyyy' }}
                 </div>
               </div>

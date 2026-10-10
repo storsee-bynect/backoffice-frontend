@@ -9,7 +9,7 @@
             [appBtnLoading]="isSearchLoading"
             [disabled]="isSearchLoading || isListLoading"
             (click)="filterData()">
-            <i class="fa-solid fa-magnifying-glass"></i>
+            <span class="icon-wrap"><i class="fa-solid fa-magnifying-glass"></i></span>
         </button>
     </div>
 </div>
@@ -48,7 +48,7 @@
                     <td>{{item.reason}}</td>
                     <td>
                         <div class="table-btns-main">
-                            <button [ngbTooltip]="'View Message'" class="table-single-btn green ms-1" (click)="sharedservice.viewContent(item.message)"><i class="fa-solid fa-eye"></i></button>
+                            <button [ngbTooltip]="'View Message'" class="table-single-btn green ms-1" (click)="sharedservice.viewContent(item.message)"><span class="icon-wrap"><i class="fa-solid fa-eye"></i></span></button>
                         </div>
                     </td>
                     <td>{{item.created_at.split('T')[0]}} <span class="text-green">{{item.created_at.split('T')[1].split('.')[0].split(':')[0]}}:{{item.created_at.split('T')[1].split('.')[0].split(':')[1]}}</span></td>
@@ -60,7 +60,7 @@
                                     class="table-single-btn red ms-1"
                                     [appBtnLoading]="isBtnLoading('delete', item.id)"
                                     (click)="deleteData(item.id)">
-                                    <i class="fa-solid fa-trash-can"></i>
+                                    <span class="icon-wrap"><i class="fa-solid fa-trash-can"></i></span>
                                 </button>
                             </div>
                         </td>

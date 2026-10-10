@@ -121,7 +121,7 @@ export class BtnLoadingDirective implements OnChanges {
 
     const loadingSlot = document.createElement('span');
     loadingSlot.className = 'btn-icon-loading';
-    loadingSlot.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+    loadingSlot.innerHTML = '<span class="icon-wrap"><i class="fa-solid fa-spinner fa-spin"></i></span>';
     container.appendChild(loadingSlot);
   }
 
@@ -136,14 +136,14 @@ export class BtnLoadingDirective implements OnChanges {
 
     const loadingSlot = document.createElement('span');
     loadingSlot.className = 'btn-icon-loading';
-    loadingSlot.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+    loadingSlot.innerHTML = '<span class="icon-wrap"><i class="fa-solid fa-spinner fa-spin"></i></span>';
     host.insertBefore(loadingSlot, defaultSlot.nextSibling);
   }
 
   private addLoadingSlot(host: HTMLElement): void {
     const loadingSlot = document.createElement('span');
     loadingSlot.className = 'btn-icon-loading';
-    loadingSlot.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+    loadingSlot.innerHTML = '<span class="icon-wrap"><i class="fa-solid fa-spinner fa-spin"></i></span>';
     host.prepend(loadingSlot);
   }
 }

@@ -18,7 +18,7 @@
     <div class="ticket-search">
       <input type="text" class="form-control" placeholder="Search tickets…" [(ngModel)]="searchTxt" (keyup.enter)="filterData()" />
       <button type="button" class="square-btn site-btn primary-color" [appBtnLoading]="isSearchLoading" [disabled]="isSearchLoading || isListLoading" (click)="filterData()">
-        <i class="fa-solid fa-magnifying-glass"></i>
+        <span class="icon-wrap"><i class="fa-solid fa-magnifying-glass"></i></span>
       </button>
     </div>
   </div>

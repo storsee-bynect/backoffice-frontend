@@ -4,17 +4,17 @@
   <div class="fu-header">
     <div class="fu-header-left">
       <div class="fu-header-icon">
-        <i class="fa-light fa-cloud-arrow-up"></i>
+        <span class="icon-wrap"><i class="fa-light fa-cloud-arrow-up"></i></span>
       </div>
       <div>
         <div class="fu-header-title">Image Upload</div>
         <div class="fu-header-sub">
-          <i class="fa-light fa-folder me-1"></i>{{ directoryName || 'No directory set' }}
+          <span class="icon-wrap"><i class="fa-light fa-folder me-1"></i></span>{{ directoryName || 'No directory set' }}
         </div>
       </div>
     </div>
     <button class="fu-close-btn" (click)="close()">
-      <i class="fa-solid fa-xmark"></i>
+      <span class="icon-wrap"><i class="fa-solid fa-xmark"></i></span>
     </button>
   </div>
 
@@ -32,12 +32,12 @@
           (drop)="onDrop($event)"
           for="fu-file-input">
           <div class="fu-dz-icon-wrap">
-            <i class="fa-light fa-cloud-arrow-up fu-dz-icon"></i>
+            <span class="icon-wrap"><i class="fa-light fa-cloud-arrow-up fu-dz-icon"></i></span>
           </div>
           <div class="fu-dz-title">Drag &amp; drop your image here</div>
           <div class="fu-dz-or"><span>or</span></div>
           <div class="fu-dz-browse-btn">
-            <i class="fa-light fa-folder-open me-2"></i>Browse Files
+            <span class="icon-wrap"><i class="fa-light fa-folder-open me-2"></i></span>Browse Files
           </div>
           <div class="fu-dz-sub">PNG · JPG · WEBP · GIF</div>
           <input id="fu-file-input" type="file" accept="image/*" (change)="onFileInputChange($event)" />
@@ -47,7 +47,7 @@
       <!-- Right: info panel -->
       <div class="fu-select-right">
         <div class="fu-info-title">
-          <i class="fa-light fa-circle-info me-2"></i>How it works
+          <span class="icon-wrap"><i class="fa-light fa-circle-info me-2"></i></span>How it works
         </div>
         <div class="fu-info-steps">
           <div class="fu-info-step">
@@ -79,12 +79,12 @@
           </div>
         </div>
         <div class="fu-info-tip">
-          <i class="fa-light fa-lightbulb me-2"></i>
+          <span class="icon-wrap"><i class="fa-light fa-lightbulb me-2"></i></span>
           Tip: After selecting, crop the image before uploading.
         </div>
         @if(dimentions){
           <div class="fu-info-tip fu-info-tip--guide">
-            <i class="fa-light fa-ruler-combined me-2"></i>
+            <span class="icon-wrap"><i class="fa-light fa-ruler-combined me-2"></i></span>
             <span>
               <strong>Required crop: {{ dimentions.width }} × {{ dimentions.height }} px (locked ratio)</strong><br/>
               Aspect ratio is locked — you must crop to this ratio before upload.
@@ -101,7 +101,7 @@
     <div class="fu-body fu-body--crop">
       <div class="fu-crop-topbar">
         <div class="fu-crop-hint">
-          <i class="fa-light fa-crop-simple"></i>
+          <span class="icon-wrap"><i class="fa-light fa-crop-simple"></i></span>
           @if (dimentions) {
             Aspect locked to {{ dimentions.width }}:{{ dimentions.height }} — drag to reposition or resize
           } @else {
@@ -117,7 +117,7 @@
       </div>
       <div class="fu-crop-footer">
         <button class="fu-btn fu-btn--ghost" (click)="resetToSelect()" [disabled]="isUploading">
-          <i class="fa-light fa-arrow-left"></i> Change Image
+          <span class="icon-wrap"><i class="fa-light fa-arrow-left"></i></span> Change Image
         </button>
         <div class="fu-crop-footer-right">
           <button class="fu-btn fu-btn--primary" (click)="applyCrop()" [disabled]="isUploading">
@@ -141,13 +141,13 @@
         <div class="fu-done-preview-wrap">
           <img [src]="fileUrl" alt="Uploaded image" class="fu-done-preview" />
           <div class="fu-done-badge">
-            <i class="fa-solid fa-check"></i> Uploaded
+            <span class="icon-wrap"><i class="fa-solid fa-check"></i></span> Uploaded
           </div>
         </div>
       </div>
       <div class="fu-done-right">
         <div class="fu-done-circle">
-          <i class="fa-solid fa-check"></i>
+          <span class="icon-wrap"><i class="fa-solid fa-check"></i></span>
         </div>
         <div class="fu-done-title">Upload Complete!</div>
         <div class="fu-done-desc">Your image has been uploaded successfully. Copy the URL below or use it directly.</div>
@@ -155,15 +155,15 @@
         <div class="fu-done-url-row">
           <input class="fu-url-input" type="text" [value]="fileUrl" readonly />
           <button class="fu-btn fu-btn--icon" (click)="sharedservice.copyText(fileUrl)" [ngbTooltip]="'Copy URL'">
-            <i class="fa-light fa-copy"></i>
+            <span class="icon-wrap"><i class="fa-light fa-copy"></i></span>
           </button>
         </div>
         <div class="fu-done-actions">
           <button class="fu-btn fu-btn--ghost" (click)="resetToSelect()">
-            <i class="fa-light fa-plus"></i> Upload Another
+            <span class="icon-wrap"><i class="fa-light fa-plus"></i></span> Upload Another
           </button>
           <button class="fu-btn fu-btn--primary" (click)="close()">
-            <i class="fa-light fa-check"></i> Use This Image
+            <span class="icon-wrap"><i class="fa-light fa-check"></i></span> Use This Image
           </button>
         </div>
       </div>

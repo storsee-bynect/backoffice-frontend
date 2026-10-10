@@ -128,6 +128,23 @@
           <input class="form-control" type="text" placeholder="store.storsee.com" [(ngModel)]="siteConfig.cnameDomain" />
           <small class="form-hint">Merchants point their domain CNAME here (same host as web / store SPA).</small>
         </label>
+        <label class="form-inp-main">
+          <span class="form-label">Custom domain VPS IP addresses <sup>*</sup></span>
+          <input class="form-control" type="text" placeholder="187.127.155.122" [(ngModel)]="siteConfig.customDomainVpsIps" />
+          <small class="form-hint">Dedicated public IPv4/IPv6 addresses, separated by commas. Root-domain guides and DNS verification use these saved settings.</small>
+        </label>
+      </div>
+      <div class="sc-domain-help">
+        <h3>One-time platform DNS setup</h3>
+        <p>In the DNS provider managing your CNAME target, point <code>{{ siteConfig.cnameDomain || 'your CNAME target' }}</code> to your dedicated VPS IP using an A record (IPv4) or AAAA (IPv6). Keep DNS-only mode and remove conflicting address records for this hostname.</p>
+        <p>Saving this page configures the platform guide; it does not create records at your DNS provider. The target must resolve publicly before merchant CNAME connections work.</p>
+        <h3>Records shown to merchants</h3>
+        <ul>
+          <li>Root domain: A / Name <code>&#64;</code> / Value <code>{{ siteConfig.customDomainVpsIps?.split(',')?.[0] || 'your VPS IP' }}</code> (AAAA for IPv6).</li>
+          <li>www or another subdomain: CNAME / its hostname label / Value <code>{{ siteConfig.cnameDomain || 'your CNAME target' }}</code>.</li>
+          <li>Default TTL; Cloudflare DNS-only. Root and www are separate connections. Preserve email MX/TXT records and unrelated subdomains.</li>
+        </ul>
+        <p>The VPS must serve the published storefront and allow ports 80/443. Its domain worker handles routing, HTTPS issuance and certificate renewal automatically. No merchant SSL upload is needed.</p>
       </div>
     </section>
 

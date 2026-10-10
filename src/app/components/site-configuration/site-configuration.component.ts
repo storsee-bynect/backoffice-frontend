@@ -34,6 +34,7 @@ export class SiteConfigurationComponent {
       this.siteConfig.storeBaseUrl = config.storeBaseUrl;
       this.siteConfig.dashboardBaseUrl = config.dashboardBaseUrl;
       this.siteConfig.cnameDomain = config.cnameDomain;
+      this.siteConfig.customDomainVpsIps = config.customDomainVpsIps || '';
       this.siteConfig.version = config.version;
 
       this.siteConfig.facebookURL = config.facebookURL;
@@ -69,6 +70,9 @@ export class SiteConfigurationComponent {
     }
     if (!this.siteConfig.cnameDomain) {
       errTxt += 'Enter Store CNAME (e.g. store.storsee.com) <br/>';
+    }
+    if (!this.siteConfig.customDomainVpsIps?.trim()) {
+      errTxt += 'Enter the dedicated VPS IP for root domain connections <br/>';
     }
     if (!this.siteConfig.version) {
       errTxt += 'Select Version <br/>';

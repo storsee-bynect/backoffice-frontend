@@ -1,7 +1,7 @@
 <div class="ticket-chat-page">
   @if(isLoading && !ticket){
     <div class="ticket-chat-loading">
-      <i class="fa-regular fa-comments"></i>
+      <span class="icon-wrap"><i class="fa-regular fa-comments"></i></span>
       <span>Loading conversation…</span>
     </div>
   } @else if(isTechnicalIssue){
@@ -13,7 +13,7 @@
     <div class="ticket-chat-shell">
       <header class="ticket-chat-header">
         <button type="button" class="ticket-chat-icon-btn" (click)="goBack()" aria-label="Back">
-          <i class="fa-solid fa-arrow-left"></i>
+          <span class="icon-wrap"><i class="fa-solid fa-arrow-left"></i></span>
         </button>
         <div class="ticket-chat-header-main">
           <div class="ticket-chat-header-row">
@@ -30,12 +30,12 @@
         <div class="ticket-chat-header-actions">
           @if(isOpen() && sharedservice.isPageUpdate){
             <button type="button" class="ticket-chat-close-btn" [appBtnLoading]="isClosing" [disabled]="isClosing" (click)="closeTicket()">
-              <i class="fa-solid fa-circle-check"></i>
+              <span class="icon-wrap"><i class="fa-solid fa-circle-check"></i></span>
               <span>Close</span>
             </button>
           }
           <button type="button" class="ticket-chat-icon-btn" [appBtnLoading]="isRefreshing" [disabled]="isRefreshing" (click)="refresh()" aria-label="Refresh">
-            <i class="fa-solid fa-rotate"></i>
+            <span class="icon-wrap"><i class="fa-solid fa-rotate"></i></span>
           </button>
         </div>
       </header>
@@ -44,7 +44,7 @@
         <div class="ticket-chat-messages" #messagesPane>
           @if(messages.length === 0){
             <div class="ticket-chat-empty-inline">
-              <i class="fa-regular fa-comment-dots"></i>
+              <span class="icon-wrap"><i class="fa-regular fa-comment-dots"></i></span>
               <span>No messages yet.</span>
             </div>
           }
@@ -79,13 +79,13 @@
               [disabled]="isSending || !draft.trim()"
               (click)="sendMessage()"
               aria-label="Send">
-              <i class="fa-solid fa-paper-plane"></i>
+              <span class="icon-wrap"><i class="fa-solid fa-paper-plane"></i></span>
             </button>
           </div>
         </footer>
       } @else {
         <footer class="ticket-chat-closed-note">
-          <i class="fa-solid fa-lock"></i>
+          <span class="icon-wrap"><i class="fa-solid fa-lock"></i></span>
           <span>Ticket closed — read only</span>
         </footer>
       }

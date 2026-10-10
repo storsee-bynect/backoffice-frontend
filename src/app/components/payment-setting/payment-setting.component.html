@@ -45,7 +45,7 @@
           <div class="pay__fields">
             <div class="pay__field">
               <label class="pay__field-label" for="sa-rzp-key-id">
-                <i class="fa-regular fa-id-card"></i>
+                <span class="icon-wrap"><i class="fa-regular fa-id-card"></i></span>
                 Key ID
               </label>
               <input
@@ -61,7 +61,7 @@
 
             <div class="pay__field">
                 <label class="pay__field-label" for="sa-rzp-key-secret">
-                <i class="fa-solid fa-lock"></i>
+                <span class="icon-wrap"><i class="fa-solid fa-lock"></i></span>
                 Key Secret
               </label>
               <div class="pay__secret">
@@ -80,7 +80,7 @@
                   (click)="showSecret = !showSecret"
                   [attr.aria-label]="showSecret ? 'Hide secret' : 'Show secret'"
                 >
-                  <i class="fa-regular" [class.fa-eye]="!showSecret" [class.fa-eye-slash]="showSecret"></i>
+                  <span class="icon-wrap"><i class="fa-regular" [class.fa-eye]="!showSecret" [class.fa-eye-slash]="showSecret"></i></span>
                 </button>
               </div>
             </div>
@@ -88,7 +88,7 @@
         </div>
       } @else {
         <div class="pay__off-hint">
-          <i class="fa-regular fa-circle-info"></i>
+          <span class="icon-wrap"><i class="fa-regular fa-circle-info"></i></span>
           <span>Enable Razorpay to enter Key ID and Key Secret.</span>
         </div>
       }

@@ -10,6 +10,7 @@ export class siteConfigReqModel{
     storeBaseUrl : string;
     dashboardBaseUrl : string;
     cnameDomain : string;
+    customDomainVpsIps: string = '';
     version : string;
     
     instagramURL : string;

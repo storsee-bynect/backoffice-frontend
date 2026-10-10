@@ -23,7 +23,7 @@
         </span>
       </div>
       <div class="auth-visual__trust">
-        <div class="auth-trust-icon"><i class="fa-solid fa-lock"></i></div>
+        <div class="auth-trust-icon"><span class="icon-wrap"><i class="fa-solid fa-lock"></i></span></div>
         <p><strong>Authorized access only</strong> — platform administrator credentials required</p>
       </div>
     </div>
@@ -33,7 +33,7 @@
     <div class="auth-panel__top"></div>
     <div class="auth-panel__body">
       <div class="auth-admin-badge">
-        <i class="fa-solid fa-user-shield"></i>
+        <span class="icon-wrap"><i class="fa-solid fa-user-shield"></i></span>
         Platform Admin
       </div>
 
@@ -83,12 +83,12 @@
       </div>
 
       <button type="button" class="auth-submit" (click)="login()" [appBtnLoading]="isSaving" [disabled]="isSaving">
-        <i class="fa-solid fa-right-to-bracket"></i>
+        <span class="icon-wrap"><i class="fa-solid fa-right-to-bracket"></i></span>
         Sign in to admin
       </button>
 
       <div class="auth-secure-note">
-        <i class="fa-solid fa-circle-info"></i>
+        <span class="icon-wrap"><i class="fa-solid fa-circle-info"></i></span>
         <span>This portal is for platform administrators only. Store owners should use the merchant dashboard.</span>
       </div>
     </div>

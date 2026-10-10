@@ -4,7 +4,7 @@
   <div class="em-page">
     <header class="em-hero">
       <div class="em-hero__copy">
-        <div class="em-hero__icon" aria-hidden="true"><i class="fa-solid fa-bell"></i></div>
+        <div class="em-hero__icon" aria-hidden="true"><span class="icon-wrap"><i class="fa-solid fa-bell"></i></span></div>
         <div>
           <h2>Notification Settings</h2>
           <p>Chrome Web Push (VAPID) and Firebase App Push keys — stored in database only, not in env.</p>
@@ -15,7 +15,7 @@
     <section class="em-panel">
       <div class="em-panel__top">
         <div class="em-brand">
-          <div class="em-brand__logo"><i class="fa-brands fa-chrome"></i></div>
+          <div class="em-brand__logo"><span class="icon-wrap"><i class="fa-brands fa-chrome"></i></span></div>
           <div>
             <div class="em-brand__row">
               <h3>Chrome Web Push</h3>
@@ -72,7 +72,7 @@
     <section class="em-panel" [class.is-off]="!appSettings?.enabled">
       <div class="em-panel__top">
         <div class="em-brand">
-          <div class="em-brand__logo"><i class="fa-solid fa-fire"></i></div>
+          <div class="em-brand__logo"><span class="icon-wrap"><i class="fa-solid fa-fire"></i></span></div>
           <div>
             <div class="em-brand__row">
               <h3>Firebase App Push</h3>
@@ -133,7 +133,7 @@
           <div class="em-key-form">
             <div class="em-key-form__head">
               <h5>{{ editingKeyId ? 'Edit credential' : 'New credential' }}</h5>
-              <button type="button" class="em-key-form__close" (click)="cancelKeyForm()"><i class="fa-solid fa-xmark"></i></button>
+              <button type="button" class="em-key-form__close" (click)="cancelKeyForm()"><span class="icon-wrap"><i class="fa-solid fa-xmark"></i></span></button>
             </div>
             <div class="em-key-form__grid">
               <div class="em-field">
@@ -170,7 +170,7 @@
 
         @if (!keys.length && !showKeyForm) {
           <div class="em-empty">
-            <div class="em-empty__icon"><i class="fa-solid fa-key"></i></div>
+            <div class="em-empty__icon"><span class="icon-wrap"><i class="fa-solid fa-key"></i></span></div>
             <h5>No Firebase credentials yet</h5>
             <p>Add the STORSEE service account JSON from Firebase Console or APK/assets.</p>
             <button type="button" class="site-btn primary-color" (click)="openAddKey()">Add credential</button>
@@ -181,7 +181,7 @@
           <div class="em-key-list">
             @for (key of keys; track key.id) {
               <article class="em-key-card" [class.off]="!key.enabled">
-                <div class="em-key-card__icon"><i class="fa-solid fa-fire"></i></div>
+                <div class="em-key-card__icon"><span class="icon-wrap"><i class="fa-solid fa-fire"></i></span></div>
                 <div class="em-key-card__main">
                   <div class="em-key-card__top">
                     <span class="em-key-card__label">{{ key.label }}</span>
@@ -200,10 +200,10 @@
                   </label>
                   <div class="em-key-card__btns">
                     <button type="button" class="em-test-btn" [disabled]="testingId === key.id" (click)="testKey(key)">
-                      <i class="fa-solid fa-plug"></i> {{ testingId === key.id ? 'Testing…' : 'Test' }}
+                      <span class="icon-wrap"><i class="fa-solid fa-plug"></i></span> {{ testingId === key.id ? 'Testing…' : 'Test' }}
                     </button>
-                    <button type="button" class="em-icon-btn" (click)="openEditKey(key)"><i class="fa-solid fa-pen"></i></button>
-                    <button type="button" class="em-icon-btn danger" (click)="deleteKey(key)"><i class="fa-solid fa-trash"></i></button>
+                    <button type="button" class="em-icon-btn" (click)="openEditKey(key)"><span class="icon-wrap"><i class="fa-solid fa-pen"></i></span></button>
+                    <button type="button" class="em-icon-btn danger" (click)="deleteKey(key)"><span class="icon-wrap"><i class="fa-solid fa-trash"></i></span></button>
                   </div>
                 </div>
               </article>

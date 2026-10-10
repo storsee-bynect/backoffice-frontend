@@ -6,7 +6,7 @@
         <p class="push-modal__subtitle">Times are India Standard Time. The database stores them in UTC.</p>
       </div>
       <div class="popup-head-btn">
-        <button type="button" aria-label="Close" (click)="activeModal.close()"><i class="fa-solid fa-x"></i></button>
+        <button type="button" aria-label="Close" (click)="activeModal.close()"><span class="icon-wrap"><i class="fa-solid fa-x"></i></span></button>
       </div>
     </div>
 
@@ -18,7 +18,7 @@
             @if (faviconUrl) {
               <img [src]="faviconUrl" alt="" />
             } @else {
-              <i class="fa-solid fa-bell"></i>
+              <span class="icon-wrap"><i class="fa-solid fa-bell"></i></span>
             }
           </div>
           <div class="push-preview__copy">

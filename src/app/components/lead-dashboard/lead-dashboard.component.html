@@ -13,11 +13,11 @@
         <div class="dash-today__actions">
           <a routerLink="/leads" class="dash-link">
             All leads
-            <i class="fa-regular fa-arrow-right"></i>
+            <span class="icon-wrap"><i class="fa-regular fa-arrow-right"></i></span>
           </a>
           <button type="button" class="dash-link" [appBtnLoading]="isReloadLoading" [disabled]="isReloadLoading" (click)="loadDashboard(true)">
             Refresh
-            <i class="fa-solid fa-rotate"></i>
+            <span class="icon-wrap"><i class="fa-solid fa-rotate"></i></span>
           </button>
         </div>
       </div>
@@ -222,7 +222,7 @@
         </div>
         <a routerLink="/leads" class="dash-link">
           View all
-          <i class="fa-regular fa-arrow-right"></i>
+          <span class="icon-wrap"><i class="fa-regular fa-arrow-right"></i></span>
         </a>
       </div>
 
@@ -231,13 +231,13 @@
           @for (item of dashboardData.recentLeads; track item.id) {
             <div class="dash-upcoming-row" routerLink="/leads">
               <div class="dash-upcoming-row__when">
-                <i class="fa-regular fa-clock"></i>
+                <span class="icon-wrap"><i class="fa-regular fa-clock"></i></span>
                 {{ item.created_at | date: 'dd MMM' }}
               </div>
               <div class="dash-upcoming-row__body">
                 <div class="name">{{ item.name || 'Lead' }}</div>
                 <div class="date">
-                  <i class="fa-regular fa-phone"></i>
+                  <span class="icon-wrap"><i class="fa-regular fa-phone"></i></span>
                   {{ item.mobile || '—' }}
                   · {{ sourceLabel(item.source) }}
                 </div>

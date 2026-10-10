@@ -1146,3 +1146,5 @@ input[type=number] {
         font-size: 10px !important;
     }
 }
+/* Icon elements always have a span parent. */
+.icon-wrap { display: contents; }

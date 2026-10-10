@@ -3,13 +3,13 @@
 <div class="page-top-main">
     <div class="page-top-search-main d-flex">
         <input type="text" class="form-control" placeholder="Search" [(ngModel)]="searchTxt" (keyup.enter)="filterData()" />
-        <button type="button" class="square-btn site-btn primary-color ms-1" [appBtnLoading]="isSearchLoading" [disabled]="isSearchLoading || isListLoading" (click)="filterData()"><i
-                class="fa-solid fa-magnifying-glass"></i></button>
+        <button type="button" class="square-btn site-btn primary-color ms-1" [appBtnLoading]="isSearchLoading" [disabled]="isSearchLoading || isListLoading" (click)="filterData()"><span class="icon-wrap"><i
+                class="fa-solid fa-magnifying-glass"></i></span></button>
     </div>
     @if(sharedservice.isPageInsert){
     <div class="page-top-btns-main d-flex justify-content-end">
         <button class="site-btn dark-color ms-1" (click)="addUpdateData(false)">
-            <div class="site-btn-icon"><i class="fa-solid fa-plus"></i></div>
+            <div class="site-btn-icon"><span class="icon-wrap"><i class="fa-solid fa-plus"></i></span></div>
             Create
         </button>
     </div>
@@ -27,14 +27,14 @@
                 @if(sharedservice.isPageUpdate || sharedservice.isPageDelete){
                 <div class="table-btns-main justify-content-end">
                     <button [ngbTooltip]="'Preview URL'" (click)="sharedservice.openURL(item.url)"
-                        class="table-single-btn yellow"><i class="fa-solid fa-link"></i></button>
+                        class="table-single-btn yellow"><span class="icon-wrap"><i class="fa-solid fa-link"></i></span></button>
                     @if(sharedservice.isPageUpdate){
                     <button [ngbTooltip]="'Update Data'" (click)="addUpdateData(true,item)"
-                        class="table-single-btn primary ms-1"><i class="fa-solid fa-pencil"></i></button>
+                        class="table-single-btn primary ms-1"><span class="icon-wrap"><i class="fa-solid fa-pencil"></i></span></button>
                     }
                     @if(sharedservice.isPageDelete){
                     <button [ngbTooltip]="'Delete Data'" [appBtnLoading]="isBtnLoading('delete', item.id)" (click)="deleteData(item.id)"
-                        class="table-single-btn red ms-1"><i class="fa-solid fa-trash-can"></i></button>
+                        class="table-single-btn red ms-1"><span class="icon-wrap"><i class="fa-solid fa-trash-can"></i></span></button>
                     }
                 </div>
                 }

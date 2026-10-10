@@ -3,7 +3,7 @@
     <header class="tpl-modal__header">
       <div class="tpl-modal__header-text">
         <div class="tpl-modal__badge">
-          <i class="fa-solid fa-palette"></i>
+          <span class="icon-wrap"><i class="fa-solid fa-palette"></i></span>
         </div>
         <div>
           <h2>{{ isEdit ? 'Update Template' : 'Create Template' }}</h2>
@@ -11,7 +11,7 @@
         </div>
       </div>
       <button type="button" class="tpl-modal__close" (click)="activeModal.close()" aria-label="Close">
-        <i class="fa-solid fa-xmark"></i>
+        <span class="icon-wrap"><i class="fa-solid fa-xmark"></i></span>
       </button>
     </header>
 
@@ -21,7 +21,7 @@
         <div class="col-lg-5">
           <section class="tpl-card tpl-card--preview">
             <div class="tpl-card__label">
-              <i class="fa-solid fa-image"></i> Live preview
+              <span class="icon-wrap"><i class="fa-solid fa-image"></i></span> Live preview
             </div>
 
             <div class="tpl-live-card" [class.tpl-live-card--empty]="!dataReqModel.thumbnail">
@@ -32,7 +32,7 @@
                 </div>
               } @else {
                 <div class="tpl-live-card__placeholder">
-                  <i class="fa-light fa-image"></i>
+                  <span class="icon-wrap"><i class="fa-light fa-image"></i></span>
                   <span>Upload thumbnail to preview</span>
                 </div>
               }
@@ -70,14 +70,14 @@
         <div class="col-lg-7">
           @if(isSystemDefault){
             <div class="tpl-alert">
-              <i class="fa-solid fa-lock"></i>
+              <span class="icon-wrap"><i class="fa-solid fa-lock"></i></span>
               <span>System default template — unique code & pricing are locked.</span>
             </div>
           }
 
           <section class="tpl-card">
             <div class="tpl-card__head">
-              <i class="fa-solid fa-circle-info"></i>
+              <span class="icon-wrap"><i class="fa-solid fa-circle-info"></i></span>
               <span>Basic information</span>
             </div>
             <div class="row g-2">
@@ -118,7 +118,7 @@
 
           <section class="tpl-card">
             <div class="tpl-card__head">
-              <i class="fa-solid fa-indian-rupee-sign"></i>
+              <span class="icon-wrap"><i class="fa-solid fa-indian-rupee-sign"></i></span>
               <span>Pricing</span>
             </div>
             <div class="tpl-pricing-row">
@@ -145,7 +145,7 @@
 
           <section class="tpl-card">
             <div class="tpl-card__head">
-              <i class="fa-solid fa-store"></i>
+              <span class="icon-wrap"><i class="fa-solid fa-store"></i></span>
               <span>Store listing</span>
             </div>
             <div class="row g-2">
