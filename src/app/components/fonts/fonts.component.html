@@ -1,0 +1,61 @@
+<app-breadcrumb [pageName]="shared.pageName || 'Fonts'" [icon]="shared.pageDetail?.icon || 'font'" />
+
+<div class="fonts-toolbar">
+  <div class="fonts-description">
+    <p>Manage Google Fonts available to merchants.</p>
+    <span class="text-muted">Published font selections are preserved when a font is disabled.</span>
+  </div>
+  <span class="fonts-count">{{ total | number }} fonts</span>
+</div>
+
+<form class="fonts-search" (ngSubmit)="load(true)">
+  <div class="fonts-search-field">
+    <span class="search-icon"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i></span>
+    <input class="form-control" type="search" name="fontSearch" [(ngModel)]="search" placeholder="Search font family or category" aria-label="Search font family or category">
+  </div>
+  <button class="site-btn primary-color font-button" type="submit" [disabled]="loading">Search</button>
+</form>
+
+<div class="page-table-main fonts-table">
+  @if (failed) {
+    <div class="fonts-empty" role="alert">
+      <p>Could not load fonts.</p>
+      <button type="button" class="site-btn primary-color font-button" (click)="load()">Retry</button>
+    </div>
+  } @else {
+    <div class="table-responsive">
+      <table class="table table-bordered align-middle mb-0" aria-label="Available Google Fonts" [attr.aria-busy]="loading">
+        <thead><tr><th class="sr-th">Sr No.</th><th>Font family</th><th>Category</th><th>Status</th>@if (shared.isPageUpdate) {<th class="font-action-column">Availability</th>}</tr></thead>
+        <tbody>
+          @if (loading) {
+            @for (n of [1,2,3,4,5,6,7,8]; track n) {
+              <tr aria-hidden="true"><td [attr.colspan]="shared.isPageUpdate ? 5 : 4"><div class="font-row-skeleton"></div></td></tr>
+            }
+          } @else {
+            @for (font of rows; track font.id; let i = $index) {
+              <tr>
+                <td class="sr-no-td">{{ (page - 1) * limit + i + 1 }}</td>
+                <td><strong class="font-family">{{ font.family }}</strong></td>
+                <td><span class="font-category">{{ font.category }}</span></td>
+                <td><span class="font-status" [class.disabled]="font.isEnabled != 1"><span class="status-dot" aria-hidden="true"></span>{{ font.isEnabled == 1 ? 'Enabled' : 'Disabled' }}</span></td>
+                @if (shared.isPageUpdate) {
+                  <td><button type="button" class="font-toggle" [class.is-enabled]="font.isEnabled == 1" [disabled]="saving != null" (click)="toggle(font)" [attr.aria-label]="(font.isEnabled == 1 ? 'Disable ' : 'Enable ') + font.family">{{ saving === font.id ? 'Saving...' : (font.isEnabled == 1 ? 'Disable' : 'Enable') }}</button></td>
+                }
+              </tr>
+            } @empty {
+              <tr><td [attr.colspan]="shared.isPageUpdate ? 5 : 4"><div class="fonts-empty">No matching fonts. Try another family or category.</div></td></tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+    <div class="fonts-pagination">
+      <label for="fonts-page-size">Rows per page <select id="fonts-page-size" [(ngModel)]="limit" (ngModelChange)="load(true)" [disabled]="loading"><option [ngValue]="30">30</option><option [ngValue]="50">50</option><option [ngValue]="100">100</option></select></label>
+      <nav aria-label="Fonts pagination">
+        <button type="button" class="font-toggle" [disabled]="loading || page <= 1" (click)="move(page - 1)">Previous</button>
+        <span aria-live="polite">Page {{ page }} of {{ pages }}</span>
+        <button type="button" class="font-toggle" [disabled]="loading || page >= pages" (click)="move(page + 1)">Next</button>
+      </nav>
+    </div>
+  }
+</div>

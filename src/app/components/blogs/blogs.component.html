@@ -31,68 +31,28 @@
 
 @if (dataList.length > 0 && !isTechnicalIssue) {
   <div class="page-table-main" [class.is-list-loading]="isListLoading">
-    <div class="table-responsive">
-      <table class="table table-bordered text-nowrap mb-0">
-        <thead>
-          <tr>
-            <th class="sr-th">Sr No.</th>
-            <th>Thumbnail</th>
-            <th>Title</th>
-            <th>Tags</th>
-            <th>Status</th>
-            <th>Published</th>
-            @if (sharedservice.isPageUpdate || sharedservice.isPageDelete) {
-              <th>Action</th>
-            }
-          </tr>
-        </thead>
-        <tbody>
-          @for (
-            item of dataList
-              | paginate: { itemsPerPage: limit, currentPage: page, totalItems: totalCount };
-            track item.id;
-            let i = $index
-          ) {
-            <tr>
-              <td class="sr-no-td">{{ i + 1 }}</td>
-              <td>
-                @if (item.thumbnail) {
-                  <button
-                    type="button"
-                    class="blog-thumb-btn"
-                    (click)="sharedservice.viewImage(item.thumbnail)"
-                  >
-                    <img [src]="item.thumbnail" alt="" />
-                  </button>
-                } @else {
-                  —
+    <div class="blog-card-grid">
+      @for(item of dataList | paginate: {itemsPerPage:limit,currentPage:page,totalItems:totalCount};track item.id){
+        <article class="blog-card">
+          <button class="blog-cover" type="button" [disabled]="!item.thumbnail" (click)="sharedservice.viewImage(item.thumbnail)">@if(item.thumbnail){<img [src]="item.thumbnail" [alt]="item.title" loading="lazy">}@else{<span>No thumbnail</span>}</button>
+          <div class="blog-card-content"><div class="blog-card-meta"><span class="blog-status" [class.is-live]="item.status==1">{{item.status==1?'Published':'Draft'}}</span><small>{{item.published_at ? (item.published_at | date:'mediumDate') : 'Not published'}}</small></div>
+          <div class="blog-title-cell"><strong>{{item.title}}</strong><small>/blogs/{{item.slug}}</small></div>
+          <div class="blog-tags">@for(t of tagList(item.tags);track t){<span class="blog-tag">{{t}}</span>}</div>
+          <div class="blog-publishing-actions">
+                @for(app of publishingApps;track app.code) {
+                  @if(canPost(item,app)){<button type="button" class="blog-publish-btn" [disabled]="!!postingKey" (click)="post(item,app)"><img src="assets/img/apps/blogger.png" alt="">{{ postingKey === item.id + ':' + app.code ? 'Posting...' : 'Post to ' + app.name }}</button>}
+                  @if(postState(item,app.code);as state){
+                    <div class="blog-provider-state" [class.is-success]="state.status === 'succeeded'"><img src="assets/img/apps/blogger.png" [alt]="app.name">
+                    @if(state.status === 'succeeded'){<a [href]="state.remoteUrl" target="_blank" rel="noopener noreferrer">Succeeded · View post</a>}
+                    @else{<span [title]="state.error || ''">{{ state.status === 'uncertain' ? 'Check provider: delivery unconfirmed' : state.status === 'failed' ? 'Failed: ' + state.error : 'Posting to ' + app.name + '...' }}</span>}
+                    </div>
+                    @if(state.status === 'failed' && (!app.enabled || !app.connection?.connected)){<a routerLink="/blog-setting">Reconnect or enable {{ app.name }}</a>}
+                  }
                 }
-              </td>
-              <td>
-                <div class="blog-title-cell">
-                  <strong>{{ item.title }}</strong>
-                  <small>/blogs/{{ item.slug }}</small>
-                </div>
-              </td>
-              <td>
-                <div class="blog-tags">
-                  @for (t of tagList(item.tags); track t) {
-                    <span class="blog-tag">{{ t }}</span>
-                  }
-                  @if (!tagList(item.tags).length) {
-                    <span class="text-muted">—</span>
-                  }
-                </div>
-              </td>
-              <td>
-                <span class="blog-status" [class.is-live]="item.status == 1">
-                  {{ item.status == 1 ? 'Published' : 'Draft' }}
-                </span>
-              </td>
-              <td>{{ item.published_at ? (item.published_at | date: 'mediumDate') : '—' }}</td>
-              @if (sharedservice.isPageUpdate || sharedservice.isPageDelete) {
-                <td>
-                  <div class="table-btns-main">
+                @if(!hasActivePublisher){<a routerLink="/blog-setting">Connect publishing apps</a>}
+                @if(item.status != 1){<small class="text-muted">Publish your Storsee blog first.</small>}
+              </div>
+          @if(sharedservice.isPageUpdate || sharedservice.isPageDelete){<div class="blog-card-footer"><div class="table-btns-main">
                     @if (sharedservice.isPageUpdate) {
                       <button
                         [ngbTooltip]="'Update'"
@@ -112,13 +72,10 @@
                         <span class="icon-wrap"><i class="fa-solid fa-trash-can"></i></span>
                       </button>
                     }
-                  </div>
-                </td>
-              }
-            </tr>
-          }
-        </tbody>
-      </table>
+                  </div></div>}
+          </div>
+        </article>
+      }
     </div>
     <div class="main-pagination">
       <div class="data-limit-main">
@@ -139,7 +96,8 @@
       </div>
     </div>
   </div>
-} @else if (isTechnicalIssue || hasEverLoaded || !isListLoading) {
+} @else if(isListLoading && !hasEverLoaded){<div class="blog-card-grid">@for(n of [1,2,3,4,5,6];track n){<div class="blog-card blog-card-skeleton" aria-label="Loading blogs"><div class="skeleton-cover"></div><div class="skeleton-line"></div><div class="skeleton-line short"></div></div>}</div>}
+@else if (isTechnicalIssue || hasEverLoaded || !isListLoading) {
   <div class="no-data-found-main">
     <div class="no-data-found-img">
       @if (isTechnicalIssue) {

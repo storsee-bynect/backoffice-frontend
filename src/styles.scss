@@ -9,6 +9,9 @@ body {
 :disabled{
     opacity: 0.5 !important;
 }
+a{
+    text-decoration: none;
+}
 // ----------------------- Themes Start 
 .Default{
     --color: rgba(114, 114, 114, 0.13);

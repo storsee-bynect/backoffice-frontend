@@ -28,6 +28,8 @@ import { CredentialsComponent } from "../../components/credentials/credentials.c
 import { LocationsComponent } from "../../components/locations/locations.component";
 import { BlogsComponent } from "../../components/blogs/blogs.component";
 export const routing: Routes = [
+    {path:'blog-setting',loadComponent:()=>import('../../components/blog-setting/blog-setting.component').then(m=>m.BlogSettingComponent)},
+    { path: 'fonts', loadComponent: () => import('../../components/fonts/fonts.component').then(m => m.FontsComponent) },
     {
         path: '',
         redirectTo: '',
@@ -119,6 +121,9 @@ export const routing: Routes = [
     },{
         path: 'credentials',
         component: CredentialsComponent
+    },{
+        path: 'store-apps',
+        loadComponent: () => import('../../components/store-apps/store-apps.component').then(m => m.StoreAppsComponent)
     },{
         path: '**',
         component: DashboardComponent

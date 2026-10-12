@@ -1,0 +1,20 @@
+:host { display: block; width: 100%; min-width: 0; }
+.fonts-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin: 4px 0 16px; }
+.fonts-description { font-size: 13px; p { margin: 0 0 3px; font-weight: 500; } > span { font-size: 12px; } }
+.fonts-count { display: inline-flex; align-items: center; min-height: 24px; padding: 2px 10px; border: 1px solid #dce6fa; border-radius: 6px; background: #f1f5ff; color: #365d9e; font-size: 11px; font-weight: 600; white-space: nowrap; }
+.fonts-search { display: flex; align-items: center; gap: 8px; max-width: 620px; margin-bottom: 14px; }
+.fonts-search-field { position: relative; flex: 1; min-width: 0; .form-control { height: 32px; padding: 5px 32px; font-size: 12px; } }
+.search-icon { position: absolute; top: 50%; left: 11px; transform: translateY(-50%); color: #8390a3; font-size: 11px; pointer-events: none; }
+.font-button { height: 28px; padding: 0 12px; border-radius: 6px; font-size: 12px; }
+.fonts-table { table { min-width: 520px; } th { white-space: nowrap; } tbody tr:hover { background: #fafbfe; } }
+.font-family { font-size: 12px; font-weight: 600; }
+.font-category { display: inline-flex; align-items: center; padding: 2px 7px; border: 1px solid #e5e9f0; border-radius: 5px; color: #64748b; font-size: 10px; line-height: 16px; text-transform: capitalize; }
+.font-status { display: inline-flex; align-items: center; gap: 5px; font-size: 10px; font-weight: 600; padding: 2px 7px; line-height: 16px; background: #edf3ff; color: #365d9e; border-radius: 5px; white-space: nowrap; &.disabled { color: #768091; background: #f1f3f6; } }
+.status-dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+.font-toggle { display: inline-flex; align-items: center; justify-content: center; min-height: 25px; border: 1px solid #dbe5f6; border-radius: 5px; padding: 2px 10px; background: white; color: #365d9e; font-size: 11px; line-height: 18px; white-space: nowrap; &.is-enabled { color: #b84859; border-color: #eedde1; } &:hover:not(:disabled) { background: #f5f7fb; } }
+.font-action-column { width: 120px; }
+button { cursor: pointer; &:disabled { opacity: .5; cursor: default; } }
+.fonts-pagination { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; padding: 12px 14px; border-top: 1px solid var(--light-border); font-size: 11px; color: #64748b; label, nav { display: flex; align-items: center; gap: 10px; } select { height: 27px; padding: 2px 8px; border: 1px solid #dce5f2; border-radius: 5px; background: white; color: #526784; font-size: 11px; } }
+.font-row-skeleton { height: 22px; border-radius: 5px; background: #f0f3f8; }
+.fonts-empty { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 32px 16px; text-align: center; color: #64748b; font-size: 12px; p { margin: 0; } }
+@media (max-width: 600px) { .fonts-toolbar { align-items: flex-start; flex-wrap: wrap; } .fonts-search { max-width: none; } .fonts-pagination { justify-content: center; } }
