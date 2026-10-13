@@ -431,3 +431,37 @@
 @media (min-width: 992px) {
   .header-mobile-search-panel { display: none; }
 }
+
+/* Desktop controls live in the dark sidebar; mobile retains a compact top bar. */
+.header-collapse-btn{display:none}.header-compact-logo{display:none}.header-rail-search{display:none}
+@media(min-width:992px){
+ .app-header:not(.app-header--restricted){height:auto;display:flex;flex-direction:column;align-items:stretch;gap:14px}
+ .app-header:not(.app-header--restricted) .header-left{width:100%;justify-content:space-between;gap:4px;min-height:30px}
+ .header-logo-link img{height:26px;max-width:140px}
+ .header-collapse-btn{display:inline-flex;width:24px;height:26px;color:#9b9b9b;flex-shrink:0}
+ .app-header:not(.app-header--restricted) .header-center{padding:0;justify-content:stretch;flex:none}
+ .header-search-wrap{max-width:none;width:100%}
+ .header-search{height:30px;border-radius:10px;padding:0 8px;background:#303030;border-color:#3c3c3c;gap:6px}
+ .header-search-kbd{gap:2px}.header-kbd-key{background:transparent;border:0;min-width:0;padding:0;font-size:10px}
+ .header-search-dropdown{width:320px;right:auto;max-height:calc(100dvh - 180px);overflow:auto}
+ .header-right{position:fixed;bottom:10px;left:12px;width:calc(var(--shell-sidebar-width) - 24px);display:flex;flex-direction:column;align-items:stretch;gap:5px}
+ .header-store-btn{width:100%;max-width:none;justify-content:flex-start;height:30px;padding:0 4px;gap:8px}
+ .header-store-name{flex:1;text-align:left}.header-store-chevron{color:#a0a0a0}
+ .header-wallet-btn{min-height:26px;height:26px;font-size:11px;padding:0 8px;justify-content:flex-start;background:#1b1b1b}
+ .header-store-dropdown{top:auto;bottom:calc(100% + 6px);right:auto;left:0;width:230px}
+ .header-store-wrap::after{top:auto;bottom:100%;height:8px}
+ .app-header.header-is-collapsed:not(.app-header--restricted){
+  .header-logo-link img:not(.header-compact-logo){display:none}.header-compact-logo{display:inline-flex;width:22px;height:26px;align-items:center;justify-content:center;font-size:18px;font-weight:750;color:#60a5fa}
+  .header-collapse-btn{width:16px;font-size:11px}.header-center{display:none}
+  .header-rail-search{display:inline-flex;align-self:center;width:30px;height:30px;margin-top:0;color:#a5a5a5}
+  .header-right{align-items:center}.header-store-name,.header-store-chevron,.header-wallet-amt{display:none}
+  .header-store-btn{justify-content:center;padding:0;width:34px}.header-wallet-btn{padding:0;width:30px;justify-content:center}
+ }
+ .app-header--restricted{.header-right{position:static;flex-direction:row;width:auto}.header-store-dropdown{top:calc(100% + 6px);bottom:auto;right:0;left:auto}.header-logo-link img{max-width:160px}}
+}
+@media(max-width:991px){.header-logo-link img{height:24px;max-width:130px}.header-icon-btn{width:32px;height:32px}.header-wallet-btn{min-height:30px;padding:0 8px}.header-store-dropdown{max-width:calc(100vw - 24px)}}
+
+.header-search-dropdown{padding:5px;box-shadow:0 12px 36px #0003;border-color:#e5e7eb;border-radius:12px;max-height:min(430px,calc(100dvh - 150px));overflow-y:auto}.header-search-caption{display:flex;justify-content:space-between;padding:7px 9px 9px;color:#64748b;font-size:11px;font-weight:600;span{font-weight:400;color:#94a3b8}}.header-search-result{padding:9px;border-radius:8px;gap:10px;justify-content:flex-start;&:hover,&:focus-visible{background:#eff6ff;outline:none}.header-result-icon{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;flex-shrink:0;border-radius:7px;background:#f1f5f9;color:#64748b;font-size:12px}.header-result-copy{display:flex;flex-direction:column;flex:1;min-width:0;gap:2px}.header-search-result-label{color:#1e293b;font-size:12px;font-weight:600;white-space:normal;text-align:left}.header-search-result-group{color:#64748b;font-size:10px;text-align:left;overflow:hidden;text-overflow:ellipsis}.header-result-arrow{color:#94a3b8;font-size:10px}}.header-search-empty{display:flex;flex-direction:column;align-items:center;gap:5px;padding:24px 12px;color:#64748b;font-size:12px;strong{color:#334155;font-size:13px}}
+@media(max-width:991px){.header-search-dropdown--mobile{width:100%;max-height:calc(100dvh - 120px)}}
+
+@media(min-width:992px){.app-header.header-is-collapsed:not(.app-header--restricted){.header-left{justify-content:center}.header-collapse-btn{display:none}.header-compact-logo{width:28px;height:30px;object-fit:contain}.header-logo-link{cursor:pointer;padding:2px;border-radius:6px;&:focus-visible{outline:2px solid #60a5fa;outline-offset:2px}}}}

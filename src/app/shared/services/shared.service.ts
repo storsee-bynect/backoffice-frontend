@@ -12,7 +12,8 @@ import { FileUploadComponent } from '../components/file-upload/file-upload.compo
 })
 
 export class SharedService {
-    isSidebarOpen: boolean = true;
+    isSidebarOpen: boolean = false;
+    isSidebarCollapsed: boolean = false;
     siteConfig: any;
     userData: any;
     ip: any;

@@ -1151,3 +1151,7 @@ input[type=number] {
 }
 /* Icon elements always have a span parent. */
 .icon-wrap { display: contents; }
+
+@import './panel-buttons';
+
+@import './panel-controls';

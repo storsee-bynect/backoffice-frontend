@@ -51,6 +51,10 @@ export class SidebarComponent implements OnInit, OnDestroy {
   }
 
   toggleGroup(category: string, pages: any[]): void {
+    if (this.sharedservice.isSidebarCollapsed) {
+      this.sharedservice.isSidebarCollapsed = false;
+      this.expanded[category] = false;
+    }
     const wasOpen = this.expanded[category];
 
     // Close all, then open only this one

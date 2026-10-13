@@ -81,7 +81,7 @@
             </select>
         </div>
         <div class="pagination-inner">
-            <pagination-controls (pageChange)="onPageChange($event)" />
+            <pagination-controls (pageChange)="onPageChange($event)" [maxSize]="5" [responsive]="true" />
         </div>
     </div>
 </div>

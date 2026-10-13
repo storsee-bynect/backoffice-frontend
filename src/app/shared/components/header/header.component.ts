@@ -73,6 +73,8 @@ export class HeaderComponent implements OnInit {
       this.focusSearch();
     }
     if (event.key === 'Escape') {
+      this.sharedservice.isSidebarOpen = false;
+      this.isUserDropdownOpen = false;
       this.closeSearch();
     }
   }
@@ -90,7 +92,24 @@ export class HeaderComponent implements OnInit {
       setTimeout(() => this.searchInputMobile?.nativeElement?.focus(), 0);
       return;
     }
-    this.searchInputDesktop?.nativeElement?.focus();
+    this.focusSidebarSearch();
+  }
+
+  onLogoClick(event: Event): void {
+    if (this.sharedservice.deviceWidth >= 992 && this.sharedservice.isSidebarCollapsed) {
+      event.preventDefault();
+      this.sharedservice.isSidebarCollapsed = false;
+    }
+  }
+
+  focusSidebarSearch(): void {
+    this.sharedservice.isSidebarCollapsed = false;
+    setTimeout(() => this.searchInputDesktop?.nativeElement?.focus(), 0);
+  }
+
+  @HostListener('document:click', ['$event'])
+  closeAccountOutside(event: MouseEvent): void {
+    if (!(event.target instanceof Element) || !event.target.closest('.header-store-wrap')) this.isUserDropdownOpen = false;
   }
 
   toggleMobileSearch(): void {
@@ -109,14 +128,15 @@ export class HeaderComponent implements OnInit {
       this.showSearchResults = false;
       return;
     }
-    this.searchResults = this.searchIndex
+    const availablePages: HeaderSearchItem[] = (this.sharedservice.sidebarPages || []).flatMap((group: any) => (group.pages || []).map((page: any) => ({label:page.pagename,url:page.url,group:group.category})));
+    this.searchResults = (availablePages.length ? availablePages : this.searchIndex)
       .filter(item =>
         item.label.toLowerCase().includes(q) ||
         item.group.toLowerCase().includes(q) ||
         item.url.toLowerCase().includes(q)
       )
       .slice(0, 8);
-    this.showSearchResults = this.searchResults.length > 0;
+    this.showSearchResults = true;
   }
 
   onSearchFocus(): void {

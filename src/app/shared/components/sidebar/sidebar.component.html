@@ -1,11 +1,11 @@
 <div class="sidebar">
-  <nav class="sidebar-nav">
+  <nav class="sidebar-nav" aria-label="Main navigation">
     @for(group of sharedservice.sidebarPages; track group.category){
       @if(group.pages?.length > 0){
         <div class="nav-group" [class.is-expanded]="isExpanded(group.category)">
           <button
             type="button"
-            class="nav-item nav-parent"
+            class="nav-item nav-parent" [attr.title]="group.category" [attr.aria-label]="group.category" [attr.aria-expanded]="isExpanded(group.category)"
             [class.active]="isGroupActive(group.pages)"
             (click)="toggleGroup(group.category, group.pages)">
             <span class="nav-item-icon">
@@ -36,11 +36,4 @@
       }
     }
   </nav>
-
-  <div class="sidebar-bottom">
-    <button type="button" class="nav-item nav-item--logout" (click)="logout()">
-      <span class="nav-item-icon"><i class="fa-solid fa-right-from-bracket"></i></span>
-      <span class="nav-item-label">Logout</span>
-    </button>
-  </div>
 </div>

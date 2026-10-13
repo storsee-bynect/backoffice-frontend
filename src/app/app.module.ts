@@ -1,3 +1,4 @@
+import { PaginationRangeDirective } from './shared/directives/pagination-range.directive';
 import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { ConfigService } from './shared/services/config.service';
 
@@ -154,6 +155,7 @@ import { AddUpdateBlogComponent } from './components/blogs/add-update-blog/add-u
   imports: [
     OnlyNumberDirective,
     BtnLoadingDirective,
+    PaginationRangeDirective,
     FormsModule,
     BrowserModule,
     NgxPaginationModule,

@@ -7,7 +7,8 @@
     "dev": "ng serve --port 7474",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "test:shell": "ng test --watch=false --karma-config=karma.shell.conf.js --include=src/app/shared/components/layout/layout.component.spec.ts"
   },
   "private": true,
   "dependencies": {

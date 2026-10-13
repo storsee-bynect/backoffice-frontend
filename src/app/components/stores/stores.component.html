@@ -34,20 +34,17 @@
 }@else {
     <div class="page-table-main" [class.is-list-loading]="isListLoading">
             <div class="table-responsive">
-                <table class="table table-bordered text-nowrap mb-0">
+                <table class="table table-bordered stores-table mb-0">
                     <thead>
                         <tr>
                             <th class="sr-th">Sr No.</th>
+                            <th class="store-logo-th">Logo</th>
                             <th>Name</th>
                             <th>Email</th>
                             <th>Phone</th>
-                            <th>Website</th>
-                            <th>Template</th>
-                            <th>Business Type</th>
+                            <th>Domains</th>
                             <th>Industry</th>
-                                <th>Plan Expiry</th>
-                            <th>Products</th>
-                            <th>Orders/mo</th>
+                                <th>Expiry</th>
                             <th>Status</th>
                             <th>Sessions</th>
                             <th>Action</th>
@@ -58,22 +55,19 @@
                         item;let i=$index){
                             <tr [class.is-store-deleting]="isBtnLoading('delete', item.id)">
                                 <td class="sr-no-td">{{(i+1)}}</td>
-                                <td>{{item.name}}</td>
-                                <td>{{item.email}} <span [ngbTooltip]="'Send Mail'" class="text-side-icon" (click)="sharedservice.openURL('mailto:{{item.email}}')"><i class="fa-light fa-envelope"></i></span></td>
-                                <td>{{ formatPhone(item) }} <span [ngbTooltip]="'Send Message'" class="text-side-icon" (click)="sharedservice.openURL('https://wa.me/' + (item.countryCode || '91') + item.phone)"><i class="fa-brands fa-whatsapp"></i></span></td>
-                                <td>
-                                    @if(storeWebsiteUrl(item); as url){
-                                        <a class="store-website-link" [href]="url" target="_blank" rel="noopener noreferrer" [ngbTooltip]="'Open store preview'" container="body">
-                                            {{ storeWebsiteLabel(url) }}
-                                            <span class="icon-wrap"><i class="fa-light fa-arrow-up-right-from-square"></i></span>
-                                        </a>
-                                        <!-- <span [ngbTooltip]="'Copy URL'" class="text-side-icon" (click)="sharedservice.copyText(url)"><i class="fa-light fa-copy"></i></span> -->
-                                    }@else {
-                                        -
+                                <td class="store-logo-cell">
+                                    @if(item.storeLogo && !item.logoLoadFailed){
+                                        <span class="store-logo-frame"><img class="store-list-logo" [src]="item.storeLogo" [alt]="item.name + ' logo'" height="30" loading="lazy" decoding="async" (error)="item.logoLoadFailed = true" /></span>
+                                    }@else{
+                                        <span class="store-logo-placeholder" [attr.aria-label]="item.name + ': logo unavailable'">{{(item.name || 'S').charAt(0).toUpperCase()}}</span>
                                     }
                                 </td>
-                                <td>{{item.templateName}} <span [ngbTooltip]="'View Template'" (click)="viewTemplate(item.templateId)" class="text-side-icon"><i class="fa-light fa-eye"></i></span></td>
-                                <td>{{item.type == 1 ? 'B2C' : item.type == 2 ? 'B2B' : 'B2C & B2B'}}</td>
+                                <td>{{item.name}}</td>
+                                <td>{{item.email}}</td>
+                                <td>{{ formatPhone(item) }}</td>
+                                <td>
+                                    <div class="store-domains-cell"><button type="button" class="store-domains-btn" (click)="viewDomains(item)" [ngbTooltip]="'View domains'" [attr.aria-label]="'View domains for '+item.name" container="body"><span><i class="fa-solid fa-globe"></i></span></button>@if(item.slug){<a class="store-website-link" [href]="storePlatformUrl(item)" target="_blank" rel="noopener noreferrer" [title]="storePlatformUrl(item)">/{{item.slug}}</a>}@else{<span>-</span>}</div>
+                                </td>
                                 <td>{{item.industryName || 'Not selected'}}</td>
                                 <td>
                                     <div class="plan-cell">
@@ -99,8 +93,6 @@
                                         }
                                     </div>
                                 </td>
-                                <td>{{ item.productLimit == 0 ? '∞' : item.productLimit }}</td>
-                                <td>{{ item.maxOrders == 0 ? '∞' : item.maxOrders }}</td>
                                 <td>
                                     <div class="status-td d-flex flex-wrap gap-1">
                                         <span
@@ -158,7 +150,7 @@
                     </select>
                 </div>
                 <div class="pagination-inner">
-                    <pagination-controls (pageChange)="onPageChange($event)" />
+                    <pagination-controls (pageChange)="onPageChange($event)" [maxSize]="5" [responsive]="true" />
                 </div>
             </div>
     </div>

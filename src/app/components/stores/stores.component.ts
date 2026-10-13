@@ -1,3 +1,4 @@
+import { StoreDomainsModalComponent } from './store-domains-modal/store-domains-modal.component';
 import { Component } from '@angular/core';
 import { finalize } from 'rxjs/operators';
 import { actionKey, isActionLoading } from '../../shared/utils/action-loading.util';
@@ -283,6 +284,14 @@ export class StoresComponent {
     let base = String(this.sharedservice.siteConfig?.storeBaseUrl || 'https://store.storsee.com').trim();
     if (!/^https?:\/\//i.test(base)) base = `https://${base}`;
     return `${base.replace(/\/+$/, '')}/${encodeURIComponent(slug)}`;
+  }
+
+  storePlatformUrl(item: any): string { return this.storeWebsiteUrl({...item,customDomain:''}); }
+
+  viewDomains(item: any): void {
+    const ref=this.modalService.open(StoreDomainsModalComponent,{size:'lg',centered:true,scrollable:true});
+    ref.componentInstance.store=item;
+    ref.componentInstance.platformUrl=this.storePlatformUrl(item);
   }
 
   storeWebsiteLabel(url: string): string {

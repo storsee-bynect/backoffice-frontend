@@ -51,7 +51,7 @@
       @if(!rows.length){<p class="text-center my-4">No industries found.</p>}
       <div class="main-pagination">
         <select class="form-select w-auto" aria-label="Industries per page" [(ngModel)]="limit" [disabled]="loading" (ngModelChange)="filter()"><option [ngValue]="10">10</option><option [ngValue]="30">30</option><option [ngValue]="50">50</option></select>
-        <pagination-controls (pageChange)="changePage($event)" />
+        <pagination-controls (pageChange)="changePage($event)" [maxSize]="5" [responsive]="true" />
       </div>
     }
   </div>

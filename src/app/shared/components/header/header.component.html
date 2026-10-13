@@ -1,13 +1,15 @@
-<header class="app-header">
+<header class="app-header" [class.header-is-collapsed]="sharedservice.isSidebarCollapsed">
   <div class="header-left">
     @if(sharedservice.deviceWidth < 992){
-      <button type="button" class="header-icon-btn header-menu-btn" (click)="sharedservice.isSidebarOpen = !sharedservice.isSidebarOpen">
+      <button type="button" class="header-icon-btn header-menu-btn" aria-label="Toggle navigation" [attr.aria-expanded]="sharedservice.isSidebarOpen" (click)="sharedservice.isSidebarOpen = !sharedservice.isSidebarOpen">
         <span class="header-icon-inner"><i class="fa-solid fa-bars"></i></span>
       </button>
     }
-    <a class="header-logo-link" routerLink="/dashboard">
-      <img [src]="sharedservice.getSiteLogoDark()" alt="logo" />
+    <a class="header-logo-link" [routerLink]="sharedservice.isSidebarCollapsed && sharedservice.deviceWidth >= 992 ? null : ('/dashboard')" [attr.aria-label]="sharedservice.isSidebarCollapsed && sharedservice.deviceWidth >= 992 ? 'Expand navigation' : 'Storsee dashboard'" [attr.role]="sharedservice.isSidebarCollapsed && sharedservice.deviceWidth >= 992 ? 'button' : null" [attr.tabindex]="sharedservice.isSidebarCollapsed ? 0 : null" (click)="onLogoClick($event)" (keydown.enter)="onLogoClick($event)" (keydown.space)="onLogoClick($event)">
+      <img [src]="sharedservice.getSiteLogoDark()" alt="Storsee" />
+      <img class="header-compact-logo" [src]="sharedservice.siteConfig?.icon || 'assets/icons/favicon-32x32.png'" alt="Storsee" />
     </a>
+    <button type="button" class="header-icon-btn header-collapse-btn" [attr.aria-label]="sharedservice.isSidebarCollapsed ? 'Expand navigation' : 'Collapse navigation'" [attr.title]="sharedservice.isSidebarCollapsed ? 'Expand navigation' : 'Collapse navigation'" [attr.aria-expanded]="!sharedservice.isSidebarCollapsed" (click)="sharedservice.isSidebarCollapsed = !sharedservice.isSidebarCollapsed"><span><i class="fa-solid fa-table-columns"></i></span></button>
   </div>
 
   <!-- Desktop search -->
@@ -33,18 +35,18 @@
       </label>
 
       @if(showSearchResults){
-        <div class="header-search-dropdown">
+        <div class="header-search-dropdown" aria-label="Search results"><div class="header-search-caption">Pages <span>{{ searchResults.length }} results</span></div>
           @for(item of searchResults; track item.url){
             <button type="button" class="header-search-result" (click)="navigateSearch(item)">
-              <span class="header-search-result-label">{{ item.label }}</span>
-              <span class="header-search-result-group">{{ item.group }}</span>
+              <span class="header-result-icon"><i class="fa-solid fa-arrow-turn-down"></i></span><span class="header-result-copy"><span class="header-search-result-label">{{ item.label }}</span><span class="header-search-result-group">{{ item.group }}</span></span><span class="header-result-arrow" aria-hidden="true"><i class="fa-solid fa-arrow-right"></i></span>
             </button>
-          }
+          } @empty {<div class="header-search-empty"><strong>No matching pages</strong><span>Try another page name or section.</span></div>}
         </div>
       }
     </div>
   </div>
 
+<button type="button" class="header-icon-btn header-rail-search" aria-label="Search navigation" (click)="focusSidebarSearch()"><span><i class="fa-solid fa-magnifying-glass"></i></span></button>
   <div class="header-right">
     @if(sharedservice.deviceWidth < 992){
       <button type="button" class="header-icon-btn" (click)="toggleMobileSearch()">
@@ -53,8 +55,8 @@
     }
 
     <!-- Admin user dropdown -->
-    <div class="header-store-wrap" (mouseenter)="isUserDropdownOpen = true" (mouseleave)="isUserDropdownOpen = false">
-      <button type="button" class="header-store-btn" [class.is-open]="isUserDropdownOpen">
+    <div class="header-store-wrap">
+      <button type="button" class="header-store-btn" [class.is-open]="isUserDropdownOpen" [attr.aria-expanded]="isUserDropdownOpen" aria-label="Account menu" (click)="isUserDropdownOpen = !isUserDropdownOpen">
         <span class="header-store-badge">{{ adminInitials }}</span>
         <span class="header-store-name">{{ sharedservice.userData?.name || 'Admin' }}</span>
         <span class="header-store-chevron"><i class="fa-solid fa-chevron-down"></i></span>
@@ -121,13 +123,12 @@
       </label>
 
       @if(showSearchResults){
-        <div class="header-search-dropdown header-search-dropdown--mobile">
+        <div class="header-search-dropdown header-search-dropdown--mobile" aria-label="Search results"><div class="header-search-caption">Pages <span>{{ searchResults.length }} results</span></div>
           @for(item of searchResults; track item.url){
             <button type="button" class="header-search-result" (click)="navigateSearch(item)">
-              <span class="header-search-result-label">{{ item.label }}</span>
-              <span class="header-search-result-group">{{ item.group }}</span>
+              <span class="header-result-icon"><i class="fa-solid fa-arrow-turn-down"></i></span><span class="header-result-copy"><span class="header-search-result-label">{{ item.label }}</span><span class="header-search-result-group">{{ item.group }}</span></span><span class="header-result-arrow" aria-hidden="true"><i class="fa-solid fa-arrow-right"></i></span>
             </button>
-          }
+          } @empty {<div class="header-search-empty"><strong>No matching pages</strong><span>Try another page name or section.</span></div>}
         </div>
       }
     </div>

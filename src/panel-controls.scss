@@ -1,0 +1,103 @@
+// Consistent input depth and responsive pagination in both admin panels.
+:is(.form-control, .form-select, input:not([type='checkbox']):not([type='radio']):not([type='range']):not([type='color']):not([type='hidden']):not([type='file']), select, textarea) {
+  &:focus-visible { outline: 2px solid rgba(37,99,235,.5); outline-offset: 1px; }
+  &:disabled { cursor: not-allowed; }
+}
+:is(.form-control, .form-select) { border-radius: 8px; }
+.main-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  width: 100%;
+  min-width: 0;
+  padding: 14px 10px !important;
+  border-top: 1px solid #eef0f4;
+  .data-limit-main { flex: 0 0 auto; }
+  .data-limit-main select {
+    height: 32px;
+    min-width: 72px;
+    padding: 5px 28px 5px 10px;
+    font-size: 12px;
+    line-height: 1.4;
+    border-radius: 8px;
+    background-position: right 9px center;
+  }
+  .pagination-inner { min-width: 0; max-width: 100%; margin-left: auto; }
+  pagination-controls { display: block; max-width: 100%; }
+  .ngx-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin: 0 !important;
+    padding: 0 !important;
+    li { margin: 0 !important; padding: 0; border: 0; }
+    li a, li.current, li.disabled {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 30px;
+      min-height: 30px;
+      margin: 0 !important;
+      padding: 5px 9px;
+      border: 1px solid #e2e7ee;
+      border-radius: 8px;
+      font-size: 12px !important;
+      line-height: 1.4;
+      box-shadow: inset 0 1px 0 #ffffff70, inset 0 -1px 0 #0f172a0a, 0 1px 2px #0f172a05;
+    }
+    li a { background: linear-gradient(#fff,#fafbfc); color: #475569; }
+    li a:hover { background: #eff6ff; color: #2563eb; border-color: #bed3fb; }
+    li.current { background: #2563eb; border-color: #2563eb; color: #fff; cursor: default; }
+    li.disabled { background: #f8fafc; color: #a0a8b5; cursor: not-allowed; }
+    li a:focus-visible { outline: 2px solid #2563eb; outline-offset: 2px; }
+  }
+}
+@media(max-width:575px) {
+  .main-pagination {
+    padding: 12px 0 !important;
+    gap: 10px;
+    .data-limit-main { width: 100%; display: flex; justify-content: flex-start; }
+    .data-limit-main select { width: auto; }
+    .pagination-inner { width: 100%; margin-left: 0; }
+    .ngx-pagination { justify-content: center; gap: 4px; }
+    .ngx-pagination li a, .ngx-pagination li.current, .ngx-pagination li.disabled { min-height: 32px; padding: 5px 8px; }
+  }
+}
+.main-pagination .pagination-range{order:0;color:#64748b;font-size:12px;white-space:nowrap;font-variant-numeric:tabular-nums}.main-pagination .data-limit-main{order:1;margin-left:auto}.main-pagination .pagination-inner{order:2;margin-left:0}@media(max-width:575px){.main-pagination{justify-content:center}.main-pagination .pagination-range{width:100%;text-align:center}.main-pagination .data-limit-main{width:auto;margin-left:0;justify-content:center}.main-pagination .pagination-inner{width:100%;margin-left:0}.main-pagination .ngx-pagination{justify-content:center}}
+
+// Keep numbered pages visible instead of ngx-pagination's mobile fraction.
+.main-pagination .ngx-pagination.responsive .small-screen { display: none !important; }
+.main-pagination .ngx-pagination.responsive li:not(.small-screen):not(.pagination-previous):not(.pagination-next) { display: inline-flex !important; }
+.main-pagination .ngx-pagination::before, .main-pagination .ngx-pagination::after { display: none; }
+@media (max-width: 601px) {
+  .main-pagination {
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 0 !important;
+    .pagination-range { width: 100%; text-align: center; }
+    .data-limit-main { width: auto; margin: 0 auto; display: flex; justify-content: center; }
+    .data-limit-main select { height: 28px; min-width: 64px; padding-top: 3px; padding-bottom: 3px; }
+    .pagination-inner { width: 100%; margin: 0 !important; display: flex; justify-content: center; }
+    .ngx-pagination { justify-content: center !important; gap: 3px; }
+    .ngx-pagination li a, .ngx-pagination li.current, .ngx-pagination li.disabled {
+      min-width: 26px; min-height: 28px; padding: 3px 6px; border-radius: 7px; font-size: 11px !important;
+    }
+    .ngx-pagination .pagination-previous a::before, .ngx-pagination .pagination-previous.disabled::before { margin-right: 3px; }
+    .ngx-pagination .pagination-next a::after, .ngx-pagination .pagination-next.disabled::after { margin-left: 3px; }
+  }
+}
+
+@media (max-width: 601px) {
+  .main-pagination {
+    justify-content: space-between;
+    .pagination-range { width: auto; flex: 0 1 auto; text-align: left; }
+    .data-limit-main { width: auto; flex: 0 0 auto; margin: 0; justify-content: flex-end; }
+    .pagination-inner { flex: 0 0 100%; width: 100%; margin: 0 !important; justify-content: center; }
+  }
+}
+
+.main-pagination { padding-left: 7px !important; padding-right: 7px !important; }

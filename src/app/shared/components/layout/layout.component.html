@@ -1,12 +1,13 @@
-<div class="main-content">
+<div class="main-content" [class.sidebar-collapsed]="sharedservice.isSidebarCollapsed">
     <div class="main-header-wrapper">
         <app-header></app-header>
     </div>
+    @if(sharedservice.isSidebarOpen){<button type="button" class="sidebar-backdrop" aria-label="Close navigation" (click)="sharedservice.isSidebarOpen = false"></button>}
     <div class="main-ctx-wrapper">
         <div class="sidebar-main" [ngClass]="sharedservice.isSidebarOpen ? 'show' : ''">
             <app-sidebar></app-sidebar>
         </div>
-        <div class="content-main">
+        <div class="content-main" [attr.inert]="sharedservice.isSidebarOpen && sharedservice.deviceWidth < 992 ? '' : null">
             <div class="content-main-inner">
                 <router-outlet></router-outlet>
             </div>

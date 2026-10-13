@@ -96,7 +96,7 @@
             </select>
           </div>
           <div class="pagination-inner">
-            <pagination-controls (pageChange)="page = $event; getDataList()" />
+            <pagination-controls (pageChange)="page = $event; getDataList()" [maxSize]="5" [responsive]="true" />
           </div>
         </div>
       } @else {
