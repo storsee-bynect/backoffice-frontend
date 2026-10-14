@@ -1,36 +1,8 @@
-<div class="auth-page">
-  <aside class="auth-visual">
-    <div class="auth-visual__overlay"></div>
-    <div class="auth-visual__overlay-glow"></div>
-    <div class="auth-visual__brand">
-      <img [src]="sharedservice.getSiteLogoDark()" alt="Logo" />
-    </div>
-    <div class="auth-visual__copy">
-      <h2>Command your entire commerce platform</h2>
-      <p>Stores, plans, themes, payments, and security — full platform control from one professional admin console.</p>
-      <div class="auth-visual__pills">
-        <span class="auth-pill">
-          <span class="auth-pill-icon"><span><i class="fa-solid fa-store"></i></span></span>
-          Store management
-        </span>
-        <span class="auth-pill">
-          <span class="auth-pill-icon"><span><i class="fa-solid fa-shield-halved"></i></span></span>
-          RBAC &amp; security
-        </span>
-        <span class="auth-pill">
-          <span class="auth-pill-icon"><span><i class="fa-solid fa-chart-line"></i></span></span>
-          Analytics
-        </span>
-      </div>
-      <div class="auth-visual__trust">
-        <div class="auth-trust-icon"><span class="icon-wrap"><i class="fa-solid fa-lock"></i></span></div>
-        <p><strong>Authorized access only</strong> — platform administrator credentials required</p>
-      </div>
-    </div>
-  </aside>
+<div class="auth-page"><div class="auth-split-shell">
+  <aside class="auth-art-panel"><img class="auth-art-image" src="assets/img/auth-admin-control.png" alt="" aria-hidden="true" fetchpriority="high" /><span class="auth-art-eyebrow">STORSEE / PLATFORM ADMINISTRATION</span><div class="auth-art-copy"><h2>One platform.<br>A clear overview.</h2><p>Manage stores, plans and platform settings from your dedicated administrator workspace.</p><div class="auth-art-tags"><span>Store management</span><span>Platform control</span></div></div></aside>
 
   <main class="auth-panel">
-    <div class="auth-panel__top"></div>
+    <div class="auth-panel__top">@if(sharedservice.siteConfig?.logo || sharedservice.siteConfig?.white_logo){<img class="auth-logo" [src]="sharedservice.getSiteLogoLight()" alt="Storsee" />} @else {<span class="auth-wordmark">storsee<span>.</span></span>}</div>
     <div class="auth-panel__body">
       <div class="auth-admin-badge">
         <span class="icon-wrap"><i class="fa-solid fa-user-shield"></i></span>
@@ -43,11 +15,11 @@
       </div>
 
       <div class="auth-field">
-        <label>Email</label>
+        <label for="admin-login-email">Email</label>
         <div class="auth-input-wrap">
           <span class="auth-input-icon"><span><i class="fa-regular fa-envelope"></i></span></span>
           <input
-            type="email"
+            id="admin-login-email" type="email"
             placeholder="admin@company.com"
             [(ngModel)]="loginModel.email"
             (keypress)="getEnterEvent($event)"
@@ -56,11 +28,11 @@
       </div>
 
       <div class="auth-field">
-        <label>Password</label>
+        <label for="admin-login-password">Password</label>
         <div class="auth-input-wrap auth-input-wrap--has-eye">
           <span class="auth-input-icon"><span><i class="fa-regular fa-lock"></i></span></span>
           <input
-            [type]="passVisible ? 'text' : 'password'"
+            id="admin-login-password" [type]="passVisible ? 'text' : 'password'"
             placeholder="••••••••"
             [(ngModel)]="loginModel.password"
             (keypress)="getEnterEvent($event)"
@@ -92,5 +64,5 @@
         <span>This portal is for platform administrators only. Store owners should use the merchant dashboard.</span>
       </div>
     </div>
-  </main>
+  </main></div>
 </div>
