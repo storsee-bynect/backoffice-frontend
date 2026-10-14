@@ -21,10 +21,11 @@ export class CredentialsService {
   constructor(private http: HttpClient) {}
 
   getCredentials() {
-    return this.http.get<{ status: string; data: { google: GoogleCredentials } }>(
+    return this.http.get<{ status: string; data: { google: GoogleCredentials; otp:any } }>(
       urlConstant.CredentialsAPI.getCredentials
     );
   }
+  updateOtp(data:any){return this.http.put<any>(urlConstant.CredentialsAPI.getCredentials.replace('getCredentials','otp'),data);}
 
   updateGoogle(data: GoogleCredentialsUpdate) {
     return this.http.put<{ status: string; data: { google: GoogleCredentials } }>(

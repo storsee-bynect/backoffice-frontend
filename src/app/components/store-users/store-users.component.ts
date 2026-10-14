@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { finalize } from 'rxjs/operators';
 import { actionKey, isActionLoading } from '../../shared/utils/action-loading.util';
 import { SharedService } from '../../shared/services/shared.service';
@@ -14,6 +14,9 @@ import { ViewStoreDetailComponent } from '../stores/view-store-detail/view-store
   styleUrl: './store-users.component.scss'
 })
 export class StoreUsersComponent {
+  @ViewChild('otpHistoryModal') otpHistoryModal:any;
+  otpUser:any;otpRows:any[]=[];otpLoading=false;otpFailed=false;
+  viewOtp(user:any){this.otpUser=user;this.otpRows=[];this.otpLoading=true;this.otpFailed=false;this.modalService.open(this.otpHistoryModal,{size:'lg',centered:true});this.storeuserservice.otpHistory(user.id).pipe(finalize(()=>this.otpLoading=false)).subscribe({next:r=>this.otpRows=r.data||[],error:()=>this.otpFailed=true});}
   dataList: any = [];
 
   searchTxt: string = '';

@@ -425,3 +425,7 @@
     --tc-input-bg: color-mix(in srgb, var(--layout-bg, #f5f5f5) 80%, var(--black, #000) 8%);
   }
 }
+
+@import '../../../shared/styles/ticket-workspace.scss';
+
+:host { display: block; margin: 16px 0 0; width: 100%; height: clamp(420px,calc(100dvh - 160px),860px); max-height: none; --tc-canvas: #f8fafd; --tc-text: #4c6586; --tc-muted: #8da0b9; } @media(max-width:767px){:host { height: max(360px,calc(100dvh - 140px)); margin-top: 8px; }}

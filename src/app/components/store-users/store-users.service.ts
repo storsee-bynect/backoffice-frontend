@@ -11,6 +11,7 @@ export class StoreuserService {
     getStoreuserList() {
         return this.http.get<any>(urlConstant.StoreusersAPI.getStoreusers);
     }
+    otpHistory(id:number){return this.http.get<any>(urlConstant.StoreusersAPI.getAllStoreadminsByPage.replace('getAllStoreadminsByPage',id+'/otp-history'));}
     getAllStoreadminsByPage(page, limit, searchTxt) {
         return this.http.get<any>(urlConstant.StoreusersAPI.getAllStoreadminsByPage+`?limit=${limit}&page=${page}&searchtxt=${searchTxt}`);
     }

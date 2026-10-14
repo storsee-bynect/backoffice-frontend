@@ -21,6 +21,7 @@
         <span class="icon-wrap"><i class="fa-solid fa-magnifying-glass"></i></span>
       </button>
     </div>
+    @if(sharedservice.isPageInsert){<button type="button" class="site-btn primary-color ticket-create-btn" (click)="createTicket()"><span><i class="fa-light fa-plus"></i></span> Create Ticket</button>}
   </div>
 </div>
 
@@ -59,10 +60,10 @@
           <span class="ticket-status-badge" [class.is-open]="isOpen(item.status)" [class.is-closed]="!isOpen(item.status)">
             {{ isOpen(item.status) ? 'Open' : 'Closed' }}
           </span>
-          <span class="ticket-card-time">{{ formatDateTime(item.lastMessageAt || item.created_at) }}</span>
+          <span class="ticket-card-reference">#TK-{{item.id}}</span><span class="ticket-card-time">{{ formatDateTime(item.lastMessageAt || item.created_at) }}</span>
         </div>
 
-        <h3 class="ticket-card-title">{{ item.subject || 'Ticket' }}</h3>
+        <h3 class="ticket-card-title"><button type="button" class="ticket-title-link" (click)="openTicket(item.id)">{{ item.subject || 'Ticket' }}</button></h3>
         <p class="ticket-card-desc">{{ previewText(item.lastMessage) }}</p>
 
         <div class="ticket-card-tags">
@@ -88,7 +89,7 @@
       </div>
 
       <div class="ticket-card-actions">
-        <button type="button" class="ticket-btn ticket-btn-outline" (click)="openTicket(item.id)">Open</button>
+        <span class="ticket-message-count"><span><i class="fa-light fa-message"></i></span>{{ item.messageCount || 0 }} messages</span><button type="button" class="ticket-btn ticket-btn-outline" (click)="openTicket(item.id)">View conversation <span><i class="fa-light fa-arrow-up-right"></i></span></button>
         @if(isOpen(item.status) && sharedservice.isPageUpdate){
           <button
             type="button"

@@ -16,6 +16,8 @@ export class AddUpdateTicketComponent {
   dataReqModel: TicketReqModel = new TicketReqModel();
   storeList : any[] = [];
   isSaving = false;
+  storesLoading=false;
+  storesFailed=false;
 
   constructor(public sharedservice: SharedService, private ticketservice: TicketService, public activeModal: NgbActiveModal) { }
 
@@ -32,11 +34,8 @@ export class AddUpdateTicketComponent {
   }
 
   getStoresList(){
-    // this.storeservice.getStoresList().subscribe((res : any) => {
-    //   if(res){
-    //     this.storeList = res.data;
-    //   }
-    // })
+    this.storesLoading=true;this.storesFailed=false;
+    this.ticketservice.getStoresForTicket().pipe(finalize(()=>this.storesLoading=false)).subscribe({next:r=>this.storeList=r?.data||[],error:()=>this.storesFailed=true});
   }
 
   validateData() {
@@ -53,11 +52,7 @@ export class AddUpdateTicketComponent {
     }
 
     if (errTxt == '') {
-      if (this.isEdit) {
-        this.updateData();
-      } else {
-        this.addData();
-      }
+      this.addData();
     } else {
       this.sharedservice.showAlert(2, errTxt);
     }
@@ -71,27 +66,7 @@ export class AddUpdateTicketComponent {
     ).subscribe((res: any) => {
       if (res) {
         this.sharedservice.showAlert(1, 'Data Added Successfully');
-        this.activeModal.close(true);
-      } else {
-        this.sharedservice.showAlert(2, 'Something Went Wrong');
-      }
-    }, err => {
-      if(err.status == 401){
-        this.activeModal.close();
-      }else{
-        this.sharedservice.showAlert(2, 'Something Went Wrong');
-      }
-    })
-  }
-  updateData() {
-    if (this.isSaving) return;
-    this.isSaving = true;
-    this.ticketservice.updateTicket(this.data.id, this.dataReqModel).pipe(
-      finalize(() => this.isSaving = false)
-    ).subscribe((res: any) => {
-      if (res) {
-        this.sharedservice.showAlert(1, 'Data Updated Successfully');
-        this.activeModal.close(true);
+        this.activeModal.close({id:res.id||res.data?.id||res.data?.insertId});
       } else {
         this.sharedservice.showAlert(2, 'Something Went Wrong');
       }

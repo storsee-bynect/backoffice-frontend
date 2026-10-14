@@ -1,3 +1,4 @@
+import { AddUpdateTicketComponent } from './components/tickets/add-update-ticket/add-update-ticket.component';
 import { PaginationRangeDirective } from './shared/directives/pagination-range.directive';
 import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { ConfigService } from './shared/services/config.service';
@@ -114,6 +115,7 @@ import { AddUpdateBlogComponent } from './components/blogs/add-update-blog/add-u
     ViewImageComponent,
     ViewContentComponent,
     TicketsComponent,
+    AddUpdateTicketComponent,
     TicketChatComponent,
     CouponsComponent,
     AddUpdateCouponComponent,

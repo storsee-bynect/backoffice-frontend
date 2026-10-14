@@ -53,7 +53,7 @@
                             }
                         </td>
                         <td>
-                            <div class="su-login">
+                            <div class="su-login"><button class="su-otp-btn" type="button" (click)="viewOtp(item)" aria-label="View OTP history"><span><i class="fa-light fa-shield-keyhole"></i></span> OTP history</button>
                                 @if(item.googleId){
                                     <span class="su-badge su-badge--google" [ngbTooltip]="'Google: ' + (item.googleEmail || item.email)"><i class="fa-brands fa-google"></i> Google</span>
                                 }
@@ -136,3 +136,4 @@
         }
     </div>
 }
+<ng-template #otpHistoryModal let-modal><div class="popup-main"><div class="popup-head"><div class="popup-head-ttl">OTP history ? {{otpUser?.name}}</div><div class="popup-head-btn"><button (click)="modal.close()" aria-label="Close"><span><i class="fa-light fa-xmark"></i></span></button></div></div><div class="popup-body">@if(otpLoading){<app-table-view-skeleton />}@else if(otpFailed){<p>Could not load OTP history.</p>}@else{<div class="table-responsive"><table class="table mb-0"><thead><tr><th>Sent</th><th>Purpose</th><th>Mobile</th><th>Status</th><th>Attempts</th></tr></thead><tbody>@for(row of otpRows;track row.id){<tr><td>{{row.created_at|date:'medium'}}</td><td>{{row.purpose==='onboard'?'Onboarding':'Login'}}</td><td>{{row.mobile}}</td><td>{{row.status|titlecase}}</td><td>{{row.attempts}}</td></tr>}@empty{<tr><td colspan="5">No OTP history yet.</td></tr>}</tbody></table></div>}</div><div class="popup-footer"><button class="site-btn grey-color" (click)="modal.close()">Close</button></div></div></ng-template>

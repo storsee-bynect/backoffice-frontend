@@ -351,6 +351,7 @@ textarea{
     align-items: center;
     justify-content: center;
     font-size: 13px;
+    gap: 5px;
     padding: 0 15px;
     font-weight: 500;
     cursor: pointer;
@@ -925,61 +926,6 @@ td {
 
 // ---------------------- toastr end
 // ---------------------- Modal Start
-.popup-head {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 7px 10px;
-    border-bottom: 1px solid var(--light-border);
-
-    .popup-head-ttl {
-        font-size: 15px;
-        font-weight: 500;
-    }
-
-    .popup-head-btn {
-        button {
-            height: 30px;
-            width: 30px;
-            font-size: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 10px;
-            border: none;
-            background-color: var(--sidebar-bg);
-            color: var(--heading-font);
-        }
-    }
-}
-
-.popup-body {
-    max-height: 450px;
-    padding: 10px;
-    overflow-y: scroll;
-}
-
-.popup-body::-webkit-scrollbar {
-    width: 5px;
-    display: block !important;
-}
-
-.popup-body::-webkit-scrollbar-track {
-    background: var(--sidebar-bg) !important;
-}
-
-.popup-body::-webkit-scrollbar-thumb {
-    background: var(--secondary) !important;
-}
-
-.popup-footer {
-    display: flex;
-    align-items: center;
-    justify-content: end;
-    padding: 7px 10px;
-    border-top: 1px solid var(--light-border);
-}
-
 .modal-content {
     border-radius: 15px !important;
     overflow: hidden !important;
@@ -1155,3 +1101,5 @@ input[type=number] {
 @import './panel-buttons';
 
 @import './panel-controls';
+
+@import './app/shared/styles/popup-surfaces';

@@ -1,12 +1,14 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { urlConstant } from '../../shared/constant/urlConst';
+import {environment} from '../../shared/environment/environment';
 @Injectable({
     providedIn: 'root'
 })
 
 export class TicketService {
     constructor(private http: HttpClient) { }
+    getStoresForTicket(){return this.http.get<any>(environment.APIUrl+'tickets/stores');}
 
     private listQuery(page, limit, searchTxt, status = '') {
         const st = status ? `&status=${encodeURIComponent(status)}` : '';

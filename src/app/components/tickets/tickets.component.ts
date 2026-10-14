@@ -5,6 +5,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { SharedService } from '../../shared/services/shared.service';
 import { TicketService } from './tickets.service';
 import { DeleteConfirmationComponent } from '../../shared/components/delete-confirmation/delete-confirmation.component';
+import { AddUpdateTicketComponent } from './add-update-ticket/add-update-ticket.component';
 
 @Component({
   selector: 'app-tickets',
@@ -45,6 +46,11 @@ export class TicketsComponent {
 
   ngOnInit(): void {
     this.getDataList();
+  }
+  createTicket(){
+    if(!this.sharedservice.isPageInsert)return;
+    const modal=this.modalService.open(AddUpdateTicketComponent,{size:'lg',centered:true,backdrop:'static'});
+    modal.result.then(result=>{if(result?.id)this.openTicket(result.id);else if(result)this.getDataList();}).catch(()=>{});
   }
 
   getDataList(source: 'search' | 'page' | 'limit' | 'refresh' | 'filter' = 'refresh') {

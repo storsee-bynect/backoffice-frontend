@@ -28,3 +28,32 @@ button:focus-visible { outline: 2px solid #3981ed; outline-offset: 3px; }
 .auth-art-image { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center; }
 .auth-art-panel::before { z-index: 1; pointer-events: none; }
 .auth-art-eyebrow, .auth-art-copy { z-index: 2; }
+
+// Soft recessed authentication fields with distinct icon anchors.
+.auth-input-wrap {
+ background: linear-gradient(180deg,#f2f5fa 0%,#fafbfe 100%);
+ border: 1px solid #dfe6f0;
+ box-shadow: inset 0 2px 4px #2039690a,inset 0 1px 2px #20396906,0 1px 0 #fff;
+ transition: border-color .18s ease,box-shadow .18s ease;
+}
+.auth-input-wrap:focus-within {
+ border-color: #7ba6ec;
+ box-shadow: inset 0 1px 3px #20396908,0 0 0 3px #2563eb10;
+}
+.auth-input-wrap>.auth-input-icon {
+ display: inline-flex; flex: 0 0 30px; width: 30px; height: 30px;
+ align-items: center; justify-content: center; border-radius: 8px;
+ color: #53739f; background: linear-gradient(#fff,#edf2f9);
+ border: 1px solid #e0e7f1; box-shadow: 0 1px 2px #20396907;
+ font-size: 13px; transition: color .18s ease,background .18s ease;
+}
+.auth-input-wrap:focus-within>.auth-input-icon { color: #2563eb; background: #edf4ff; border-color: #d1e1fb; }
+.auth-input-icon>span { display: inline-flex; }
+
+// Bare icons keep recessed fields clean and understated.
+.auth-input-wrap>.auth-input-icon {
+ flex: 0 0 18px; width: 18px; height: auto; padding: 0;
+ background: transparent; border: 0; border-radius: 0; box-shadow: none;
+ color: #8290a5; font-size: 14px;
+}
+.auth-input-wrap:focus-within>.auth-input-icon { color: #326bd2; background: transparent; border: 0; box-shadow: none; }
