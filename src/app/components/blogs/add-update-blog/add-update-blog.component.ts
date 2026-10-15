@@ -141,7 +141,6 @@ export class AddUpdateBlogComponent implements OnInit {
         next: (res) => {
           if (res) {
             this.sharedservice.showAlert(1, 'Blog Added Successfully');
-            if(res.publishingErrors?.length)this.sharedservice.showAlert(2,'Saved to Storsee. '+res.publishingErrors.map((e:any)=>e.error).join(' '));
             this.activeModal.close(true);
           } else {
             this.sharedservice.showAlert(2, 'Something Went Wrong');
@@ -164,7 +163,6 @@ export class AddUpdateBlogComponent implements OnInit {
         next: (res) => {
           if (res) {
             this.sharedservice.showAlert(1, 'Blog Updated Successfully');
-            if(res.publishingErrors?.length)this.sharedservice.showAlert(2,'Saved to Storsee. '+res.publishingErrors.map((e:any)=>e.error).join(' '));
             this.activeModal.close(true);
           } else {
             this.sharedservice.showAlert(2, 'Something Went Wrong');

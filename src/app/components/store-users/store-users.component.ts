@@ -1,9 +1,10 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, OnDestroy, ViewChild } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { finalize } from 'rxjs/operators';
 import { actionKey, isActionLoading } from '../../shared/utils/action-loading.util';
 import { SharedService } from '../../shared/services/shared.service';
 import { StoreuserService } from './store-users.service';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { AddUpdateStoreUserComponent } from './add-update-store-user/add-update-store-user.component';
 import { DeleteConfirmationComponent } from '../../shared/components/delete-confirmation/delete-confirmation.component';
 import { ViewStoreDetailComponent } from '../stores/view-store-detail/view-store-detail.component';
@@ -13,10 +14,24 @@ import { ViewStoreDetailComponent } from '../stores/view-store-detail/view-store
   templateUrl: './store-users.component.html',
   styleUrl: './store-users.component.scss'
 })
-export class StoreUsersComponent {
+export class StoreUsersComponent implements OnDestroy {
   @ViewChild('otpHistoryModal') otpHistoryModal:any;
   otpUser:any;otpRows:any[]=[];otpLoading=false;otpFailed=false;
-  viewOtp(user:any){this.otpUser=user;this.otpRows=[];this.otpLoading=true;this.otpFailed=false;this.modalService.open(this.otpHistoryModal,{size:'lg',centered:true});this.storeuserservice.otpHistory(user.id).pipe(finalize(()=>this.otpLoading=false)).subscribe({next:r=>this.otpRows=r.data||[],error:()=>this.otpFailed=true});}
+  otpPage=1;otpLimit=10;otpTotal=0;
+  private otpRequest?:Subscription;private otpModal?:NgbModalRef;
+  ngOnDestroy(){this.otpRequest?.unsubscribe();this.otpModal?.close();}
+  viewOtp(user:any){
+    this.otpRequest?.unsubscribe();this.otpModal?.close();this.otpUser=user;this.otpRows=[];this.otpPage=1;this.otpTotal=0;
+    const modal=this.modalService.open(this.otpHistoryModal,{size:'xl',centered:true,windowClass:'otp-history-modal'});this.otpModal=modal;
+    const closed=()=>{if(this.otpModal===modal){this.otpRequest?.unsubscribe();this.otpModal=undefined;}};modal.result.then(closed,closed);
+    this.loadOtpPage(1);
+  }
+  loadOtpPage(page=this.otpPage){
+    if(!this.otpUser)return;this.otpRequest?.unsubscribe();this.otpLoading=true;this.otpFailed=false;this.otpPage=page;
+    const userId=this.otpUser.id;
+    this.otpRequest=this.storeuserservice.otpHistory(userId,page,this.otpLimit).pipe(finalize(()=>this.otpLoading=false)).subscribe({next:r=>{if(this.otpUser?.id!==userId)return;this.otpRows=r.data||[];this.otpTotal=r.totalCount||0;this.otpPage=r.currentPage||page;},error:()=>this.otpFailed=true});
+  }
+  changeOtpLimit(){this.loadOtpPage(1);}
   dataList: any = [];
 
   searchTxt: string = '';

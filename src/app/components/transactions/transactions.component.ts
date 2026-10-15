@@ -1,6 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, TemplateRef } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { finalize } from 'rxjs/operators';
+import { firstValueFrom } from 'rxjs';
+import { SiteConfigService } from '../../shared/services/site-config.service';
 import { actionKey, isActionLoading } from '../../shared/utils/action-loading.util';
 import { SharedService } from '../../shared/services/shared.service';
 import { TransactionService } from './transactions.service';
@@ -29,14 +31,20 @@ export class TransactionsComponent {
 
   stats = { total: 0, completed: 0, cancelled: 0, revenue: 0 };
   invoiceLoadingId: number | null = null;
+  selectedTransaction: any = null;
 
-  get countItems(): { label: string; value: number | string }[] {
-    return [
-      { label: 'Total', value: this.stats.total || 0 },
-      { label: 'Completed', value: this.stats.completed || 0 },
-      { label: 'Cancelled', value: this.stats.cancelled || 0 },
-      { label: 'Revenue', value: `₹${Number(this.stats.revenue || 0).toLocaleString('en-IN')}` },
-    ];
+  viewTransaction(item: any, template: TemplateRef<any>): void {
+    this.selectedTransaction = item;
+    this.modalService.open(template, { size: 'lg', centered: true, scrollable: true });
+  }
+
+  money(value: any): string {
+    return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 2 }).format(Number(value) || 0);
+  }
+
+  clearSearch(): void {
+    this.searchTxt = '';
+    this.filterData();
   }
 
   private storeIdFilter: number | null = null;
@@ -45,7 +53,8 @@ export class TransactionsComponent {
     public sharedservice: SharedService,
     private transactionservice: TransactionService,
     private modalService: NgbModal,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private siteConfigService: SiteConfigService
   ) {}
 
   ngOnInit(): void {
@@ -60,6 +69,7 @@ export class TransactionsComponent {
 
   getDataList(source: 'search' | 'page' | 'limit' | 'refresh' = 'refresh') {
     if (this.storeIdFilter) {
+      if (source === 'search' && !this.isListLoading) this.isSearchLoading = true;
       this.getStoreTransactions();
       return;
     }
@@ -110,9 +120,14 @@ export class TransactionsComponent {
     ).subscribe({
       next: (res: any) => {
         if (res && res.data) {
-          this.dataList = res.data;
-          this.totalCount = this.dataList.length;
-          const list = this.dataList || [];
+          const list = res.data || [];
+          const query = this.searchTxt.trim().toLowerCase();
+          const filtered = query ? list.filter((item: any) =>
+            ['invoiceNo', 'paymentId', 'storeName', 'storeEmail', 'storeSlug', 'plan', 'couponCode', 'type', 'note', 'amt']
+              .some(key => String(item[key] ?? '').toLowerCase().includes(query))) : list;
+          this.totalCount = filtered.length;
+          this.page = Math.min(this.page, Math.max(1, Math.ceil(this.totalCount / Number(this.limit))));
+          this.dataList = filtered.slice((this.page - 1) * Number(this.limit), this.page * Number(this.limit));
           this.stats = {
             total: list.length,
             completed: list.filter((t: any) => Number(t.status) === 1).length,
@@ -165,6 +180,7 @@ export class TransactionsComponent {
           ).subscribe({
             next: () => {
               this.sharedservice.showAlert(1, 'Deleted Successfully');
+              if (this.dataList.length === 1 && this.page > 1) this.page--;
               this.getDataList();
             },
             error: () => {
@@ -175,7 +191,7 @@ export class TransactionsComponent {
           this.sharedservice.showAlert(2, 'Delete Target Not Available');
         }
       }
-    });
+    }).catch(() => {});
   }
 
   formatDate(value: string): string {
@@ -197,73 +213,29 @@ export class TransactionsComponent {
     }
   }
 
-  downloadInvoice(item: any): void {
-    if (!item?.id || this.invoiceLoadingId) return;
+  async downloadInvoice(item: any): Promise<void> {
+    if (!item?.id || this.invoiceLoadingId !== null) return;
     this.invoiceLoadingId = item.id;
-
-    const invoiceOpts = {
-      logoUrl: this.sharedservice.getSiteLogoLight(),
-      siteName: this.sharedservice.siteConfig?.siteName || 'Storsee',
-      primaryColor: '#0b72e7',
-      supportEmail: this.sharedservice.siteConfig?.email,
-      supportPhone: this.sharedservice.siteConfig?.mobile,
-    };
-
-    const fallback = async () => {
-      await downloadPlanInvoicePdf(
-        {
-          invoiceNo: item.invoiceNo || `INV-${item.id}`,
-          storeName: item.storeName,
-          storeEmail: item.storeEmail,
-          storePhone: item.storePhone,
-          storeSlug: item.storeSlug,
-          plan: item.plan,
-          amount: Number(item.amt || 0),
-          discountAmt: Number(item.discountAmt || 0),
-          couponCode: item.couponCode,
-          paymentId: item.paymentId,
-          type: item.type,
-          status: Number(item.status) === 1 ? 'Paid' : 'Cancelled',
-          note: item.note,
-          created_at: item.created_at,
-        },
-        invoiceOpts
-      );
-      this.sharedservice.showAlert(1, 'Invoice downloaded');
-    };
-
-    this.transactionservice
-      .getTransactionInvoice(item.id)
-      .pipe(finalize(() => (this.invoiceLoadingId = null)))
-      .subscribe({
-        next: async (res: any) => {
-          try {
-            await downloadPlanInvoicePdf(
-              res?.data || {
-                ...item,
-                amount: item.amt,
-                status: Number(item.status) === 1 ? 'Paid' : 'Cancelled',
-              },
-              invoiceOpts
-            );
-            this.sharedservice.showAlert(1, 'Invoice downloaded');
-          } catch (err) {
-            console.error('Invoice PDF error', err);
-            try {
-              await fallback();
-            } catch {
-              this.sharedservice.showAlert(2, 'Could not generate invoice');
-            }
-          }
-        },
-        error: async (err) => {
-          console.error('Invoice API error', err);
-          try {
-            await fallback();
-          } catch {
-            this.sharedservice.showAlert(2, 'Could not generate invoice');
-          }
-        },
+    try {
+      const [configuration, transaction] = await Promise.all([
+        firstValueFrom(this.siteConfigService.getSiteConfig()) as Promise<any>,
+        firstValueFrom(this.transactionservice.getTransactionInvoice(item.id))
+      ]);
+      const config = configuration?.data?.[0];
+      if (!config || !transaction?.data) throw new Error('Invoice information is unavailable');
+      await downloadPlanInvoicePdf(transaction.data, {
+        logoUrl: 'assets/img/storsee-invoice-logo.png',
+        siteName: config.siteName || 'Storsee',
+        primaryColor: '#0b72e7',
+        supportEmail: config.email,
+        supportPhone: config.mobile,
+        companyName: config.parentCompany,
       });
+      this.sharedservice.showAlert(1, 'Invoice downloaded');
+    } catch {
+      this.sharedservice.showAlert(2, 'Could not generate invoice. Please try again.');
+    } finally {
+      this.invoiceLoadingId = null;
+    }
   }
 }

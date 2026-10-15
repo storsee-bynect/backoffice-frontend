@@ -1,5 +1,5 @@
 import { StoreDomainsModalComponent } from './store-domains-modal/store-domains-modal.component';
-import { Component } from '@angular/core';
+import { Component, TemplateRef } from '@angular/core';
 import { finalize } from 'rxjs/operators';
 import { actionKey, isActionLoading } from '../../shared/utils/action-loading.util';
 import { DeleteConfirmationComponent } from '../../shared/components/delete-confirmation/delete-confirmation.component';
@@ -22,6 +22,39 @@ import { formatPhoneDisplay } from '../../shared/constant/country-codes';
 })
 export class StoresComponent {
   dataList: any = [];
+  suspensionReports: any[] = [];
+  suspensionReportsLoading = false;
+  suspensionReportsError = false;
+  suspensionStore: any = null;
+  suspensionReason = '';
+  suspensionSaving = false;
+  suspensionError = '';
+
+  openSuspension(store: any, template: TemplateRef<any>): void {
+    if (!this.sharedservice.isPageUpdate) return;
+    this.suspensionStore = store;
+    this.suspensionReports = [];
+    this.suspensionReportsLoading = true;
+    this.suspensionReportsError = false;
+    this.storeservice.abuseReports(store.id).subscribe({next:res=>{if(this.suspensionStore?.id === store.id){this.suspensionReports=res.data||[];this.suspensionReportsLoading=false;}},error:()=>{this.suspensionReportsError=true;this.suspensionReportsLoading=false;}});
+    this.suspensionReason = Number(store.isSuspended) === 1 ? '' : (store.suspensionReason || '');
+    this.suspensionError = '';
+    this.modalService.open(template, {size:'md',centered:true,backdrop:'static',keyboard:false});
+  }
+
+  saveSuspension(modal: any): void {
+    if (this.suspensionSaving || !this.suspensionStore || !this.sharedservice.isPageUpdate) return;
+    const suspended = Number(this.suspensionStore.isSuspended) !== 1;
+    const reason = this.suspensionReason.trim();
+    if (suspended && !reason) {this.suspensionError = 'Enter a reason for suspending this store.'; return;}
+    this.suspensionSaving = true;
+    this.suspensionError = '';
+    this.storeservice.setSuspension(this.suspensionStore.id,suspended,reason).pipe(finalize(()=>this.suspensionSaving=false)).subscribe({
+      next:res=>{Object.assign(this.suspensionStore,res.data);modal.close();this.sharedservice.showAlert(1,res.message);this.getDataList();},
+      error:err=>this.suspensionError=err.error?.error || 'Could not update store suspension. Please try again.'
+    });
+  }
+
 
   searchTxt: string = '';
   page: number = 1;

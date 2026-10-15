@@ -38,20 +38,6 @@
           <div class="blog-card-content"><div class="blog-card-meta"><span class="blog-status" [class.is-live]="item.status==1">{{item.status==1?'Published':'Draft'}}</span><small>{{item.published_at ? (item.published_at | date:'mediumDate') : 'Not published'}}</small></div>
           <div class="blog-title-cell"><strong>{{item.title}}</strong><small>/blogs/{{item.slug}}</small></div>
           <div class="blog-tags">@for(t of tagList(item.tags);track t){<span class="blog-tag">{{t}}</span>}</div>
-          <div class="blog-publishing-actions">
-                @for(app of publishingApps;track app.code) {
-                  @if(canPost(item,app)){<button type="button" class="blog-publish-btn" [disabled]="!!postingKey" (click)="post(item,app)"><img src="assets/img/apps/blogger.png" alt="">{{ postingKey === item.id + ':' + app.code ? 'Posting...' : 'Post to ' + app.name }}</button>}
-                  @if(postState(item,app.code);as state){
-                    <div class="blog-provider-state" [class.is-success]="state.status === 'succeeded'"><img src="assets/img/apps/blogger.png" [alt]="app.name">
-                    @if(state.status === 'succeeded'){<a [href]="state.remoteUrl" target="_blank" rel="noopener noreferrer">Succeeded · View post</a>}
-                    @else{<span [title]="state.error || ''">{{ state.status === 'uncertain' ? 'Check provider: delivery unconfirmed' : state.status === 'failed' ? 'Failed: ' + state.error : 'Posting to ' + app.name + '...' }}</span>}
-                    </div>
-                    @if(state.status === 'failed' && (!app.enabled || !app.connection?.connected)){<a routerLink="/blog-setting">Reconnect or enable {{ app.name }}</a>}
-                  }
-                }
-                @if(!hasActivePublisher){<a routerLink="/blog-setting">Connect publishing apps</a>}
-                @if(item.status != 1){<small class="text-muted">Publish your Storsee blog first.</small>}
-              </div>
           @if(sharedservice.isPageUpdate || sharedservice.isPageDelete){<div class="blog-card-footer"><div class="table-btns-main">
                     @if (sharedservice.isPageUpdate) {
                       <button

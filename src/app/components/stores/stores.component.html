@@ -104,6 +104,7 @@
                                         >
                                             {{item.isActive ? 'Active' : 'Inactive'}}
                                         </span>
+                                        @if(item.isSuspended){<span class="status-table red" [ngbTooltip]="item.suspensionReason || 'Suspended'">Suspended</span>}
                                         @if(item.isLocked){
                                             <span class="status-table red" [ngbTooltip]="item.lockReason || 'Locked'">Locked</span>
                                         }
@@ -118,7 +119,8 @@
                                         @if (isBtnLoading('delete', item.id)) {
                                           <span class="store-deleting-label">Deleting…</span>
                                         }@else{
-                                            <button type="button" [ngbTooltip]="'Store Settings'" class="table-single-btn primary ms-0" (click)="openStoreSettings(item)" [disabled]="isStoreBusy(item.id)"><span class="icon-wrap"><i class="fa-solid fa-shield-halved"></i></span></button>
+                                            @if(sharedservice.isPageUpdate){<button type="button" class="table-single-btn ms-0" [ngbTooltip]="item.isSuspended ? 'Unsuspend store' : 'Suspend store'" [disabled]="isStoreBusy(item.id)" (click)="openSuspension(item,suspensionDialog)"><span><i [class]="item.isSuspended ? 'fa-solid fa-circle-play' : 'fa-solid fa-ban'"></i></span></button>}
+                                            <button type="button" [ngbTooltip]="'Store Settings'" class="table-single-btn primary ms-1" (click)="openStoreSettings(item)" [disabled]="isStoreBusy(item.id)"><span class="icon-wrap"><i class="fa-solid fa-shield-halved"></i></span></button>
                                             <button type="button" [ngbTooltip]="'Clone / save layout'" class="table-single-btn primary ms-1" (click)="openCloneLayout(item, 'clone')" [disabled]="isStoreBusy(item.id)"><span class="icon-wrap"><i class="fa-solid fa-copy"></i></span></button>
                                             <button type="button" [ngbTooltip]="'Wallet'" class="table-single-btn green ms-1" (click)="openStoreWallet(item)" [disabled]="isStoreBusy(item.id)"><span class="icon-wrap"><i class="fa-solid fa-wallet"></i></span></button>
                                             <button type="button" [ngbTooltip]="'View Store Users'" class="table-single-btn green ms-1" (click)="viewStoreUsers(item.id)" [disabled]="isStoreBusy(item.id)"><span class="icon-wrap"><i class="fa-solid fa-users"></i></span></button>
@@ -187,3 +189,22 @@
         }
     </div>
 }
+
+<ng-template #suspensionDialog let-modal>
+  <div class="popup-main suspension-dialog" [class.is-restoring]="suspensionStore?.isSuspended">
+    <div class="popup-head"><div class="popup-title suspension-title"><span class="suspension-title__icon"><i [class]="suspensionStore?.isSuspended ? 'fa-solid fa-circle-check' : 'fa-solid fa-shield-halved'" aria-hidden="true"></i></span>{{suspensionStore?.isSuspended ? 'Restore store access' : 'Suspend store'}}</div><button type="button" class="btn-close" aria-label="Close" [disabled]="suspensionSaving" (click)="modal.dismiss()"></button></div>
+    <div class="popup-body">
+      <div class="suspension-store"><span class="suspension-store__icon"><i class="fa-solid fa-store" aria-hidden="true"></i></span><div><strong>{{suspensionStore?.name}}</strong><span>{{suspensionStore?.slug ? '/' + suspensionStore.slug : 'Store #' + suspensionStore?.id}}</span></div><span class="suspension-badge">{{suspensionStore?.isSuspended ? 'Suspended' : 'Access review'}}</span></div>
+      <p class="suspension-description">{{suspensionStore?.isSuspended ? 'Remove the suspension and restore access with the existing store settings.' : 'Pause public access and merchant operations for this store until you restore it.'}}</p>
+      <div class="suspension-impact"><span><i [class]="suspensionStore?.isSuspended ? 'fa-regular fa-circle-check' : 'fa-regular fa-circle-info'" aria-hidden="true"></i></span><p>{{suspensionStore?.isSuspended ? 'Products, orders and domain connections are retained. Other existing restrictions still apply.' : 'Storefronts, checkout and downloads will be blocked. The merchant can still sign in and contact support.'}}</p></div>
+      <div class="suspension-field"><label for="suspension-reason">{{suspensionStore?.isSuspended ? 'Resolution note' : 'Suspension reason'}}<span>{{suspensionStore?.isSuspended ? 'Optional' : 'Required'}}</span></label><textarea id="suspension-reason" class="form-control" rows="3" maxlength="500" [(ngModel)]="suspensionReason" [disabled]="suspensionSaving" [attr.aria-invalid]="suspensionError ? true : null" aria-describedby="suspension-reason-hint" [placeholder]="suspensionStore?.isSuspended ? 'Add a brief resolution note...' : 'Explain why this store is being suspended...'"></textarea><div class="suspension-field__meta"><small id="suspension-reason-hint">{{suspensionStore?.isSuspended ? 'Saved in the store access history.' : 'The merchant will see this reason.'}}</small><small>{{suspensionReason.length}} / 500</small></div></div>
+      <details class="suspension-reports"><summary><span><i class="fa-regular fa-flag" aria-hidden="true"></i></span>Recent abuse reports<span class="suspension-reports__count">{{suspensionReportsLoading ? '?' : suspensionReports.length}}</span><span class="suspension-reports__chevron"><i class="fa-solid fa-chevron-down" aria-hidden="true"></i></span></summary>
+        @if(suspensionReportsLoading){<div class="suspension-report-loading" role="status" aria-label="Loading abuse reports"><span></span><span></span></div>}
+        @else if(suspensionReportsError){<p class="suspension-report-error">Could not load reports. Reopen this dialog to retry.</p>}
+        @else{<div class="suspension-report-list">@for(report of suspensionReports;track report.id){<article class="suspension-report"><strong>{{report.email}}</strong><time>{{report.created_at | date:'medium'}}</time><p>{{report.message}}</p></article>}@empty{<p class="suspension-report-empty">No abuse reports received for this store.</p>}</div>}
+      </details>
+      @if(suspensionError){<p class="suspension-error" role="alert"><span><i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i></span>{{suspensionError}}</p>}
+    </div>
+    <div class="popup-footer"><button type="button" class="site-btn" [disabled]="suspensionSaving" (click)="modal.dismiss()">Cancel</button><button type="button" class="site-btn primary-color" [disabled]="suspensionSaving" [appBtnLoading]="suspensionSaving" (click)="saveSuspension(modal)">{{suspensionStore?.isSuspended ? 'Restore access' : 'Suspend store'}}</button></div>
+  </div>
+</ng-template>

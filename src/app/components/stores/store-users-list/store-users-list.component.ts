@@ -1,4 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { finalize } from 'rxjs/operators';
 import { StoreuserService } from '../../store-users/store-users.service';
 import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { SharedService } from '../../../shared/services/shared.service';
@@ -15,6 +16,8 @@ export class StoreUsersListComponent implements OnInit{
   page: number = 1;
   @Input() storeId;
   usersList : any[] = [];
+  isLoading = true;
+  loadFailed = false;
 
   constructor(
     private storeuserservice: StoreuserService,
@@ -28,11 +31,16 @@ export class StoreUsersListComponent implements OnInit{
   }
 
   getUsersByStoreId(){
-    this.storeuserservice.getStoreusersByStoreId(this.storeId).subscribe((res : any) => {
+    this.isLoading = true;
+    this.loadFailed = false;
+    this.storeuserservice.getStoreusersByStoreId(this.storeId).pipe(
+      finalize(() => this.isLoading = false)
+    ).subscribe((res : any) => {
       if(res){
-        this.usersList = res.data;
+        this.usersList = res.data || [];
       }
     }, err => {
+      this.loadFailed = true;
       if(err.status == 401){
         this.activeModal.close();
       }else{

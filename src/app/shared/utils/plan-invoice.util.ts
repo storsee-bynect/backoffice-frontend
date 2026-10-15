@@ -1,543 +1,177 @@
-import { jsPDF } from 'jspdf';
-import html2canvas from 'html2canvas';
+﻿import { jsPDF } from 'jspdf';
 
 export type PlanInvoiceData = {
-  invoiceNo?: string;
-  storeName?: string;
-  storeEmail?: string;
-  storePhone?: string;
-  storeSlug?: string;
-  plan?: string;
-  packageName?: string;
-  packageLabel?: string;
-  amount?: number;
-  discountAmt?: number;
-  couponCode?: string;
-  paymentId?: string;
-  type?: string;
-  status?: string;
-  note?: string;
-  created_at?: string;
+  invoiceNo?: string; storeName?: string; storeEmail?: string; storePhone?: string;
+  storeSlug?: string; plan?: string; packageName?: string; packageLabel?: string;
+  amount?: number; discountAmt?: number; couponCode?: string; paymentId?: string;
+  type?: string; status?: string; note?: string; created_at?: string;
 };
-
 export type PlanInvoiceOptions = {
-  logoUrl?: string;
-  siteName?: string;
-  primaryColor?: string;
-  supportEmail?: string;
-  supportPhone?: string;
+  logoUrl?: string; siteName?: string; primaryColor?: string;
+  supportEmail?: string; supportPhone?: string; companyName?: string;
 };
 
-const BRAND = {
-  primary: '#0b72e7',
-  primaryDeep: '#0856b5',
-  ink: '#111827',
-  muted: '#6b7280',
-  line: '#e5e7eb',
-  soft: '#f8fafc',
-  ok: '#047857',
-  okBg: '#ecfdf5',
-};
+/** Vector text stays crisp when printed; long content flows onto additional A4 pages. */
+export async function createPlanInvoicePdf(invoice: PlanInvoiceData, options: PlanInvoiceOptions = {}): Promise<jsPDF> {
+  const pdf = new jsPDF({ unit: 'mm', format: 'a4', compress: true });
+  const brand = options.siteName?.trim() || 'Storsee';
+  const reference = invoice.invoiceNo?.trim() || 'Invoice';
+  const primary = /^#[0-9a-f]{6}$/i.test(options.primaryColor || '') ? options.primaryColor! : '#2563eb';
+  const ink = '#20252d', muted = '#737b87', lineColor = '#e6e9ee';
+  const amount = finiteAmount(invoice.amount), discount = finiteAmount(invoice.discountAmt);
+  const paid = ['paid', 'completed'].includes(String(invoice.status || '').toLowerCase());
+  const status = invoice.status || 'Not specified';
+  const navy = '#142443';
+  let y = 24;
+  const logo = await loadLogo(options.logoUrl || 'assets/img/storsee-invoice-logo.png')
+    || await loadLogo('assets/img/storsee-invoice-logo.png');
+  if (!logo) throw new Error('The invoice logo could not be loaded.');
+  pdf.setProperties({ title: `${reference} | ${brand}`, subject: 'Subscription invoice', author: brand, creator: brand });
 
-/** Professional Storsee subscription invoice PDF. */
-export async function downloadPlanInvoicePdf(
-  invoice: PlanInvoiceData,
-  options: PlanInvoiceOptions = {}
-): Promise<void> {
-  const primary = options.primaryColor || BRAND.primary;
-  const siteName = options.siteName || 'Storsee';
-  const resolvedLogo = resolveAssetUrl(options.logoUrl);
-  const logoUrl = (await toDataUrlSafe(resolvedLogo)) || resolvedLogo;
-  const html = buildInvoiceHtml(invoice, { ...options, logoUrl, siteName, primaryColor: primary });
-
-  const host = document.createElement('div');
-  host.setAttribute('id', 'plan-invoice-render-host');
-  host.style.cssText = 'position:fixed;left:-10000px;top:0;width:794px;background:#fff;z-index:-1;';
-  host.innerHTML = html;
-  document.body.appendChild(host);
-
-  try {
-    const paper = host.querySelector('.pi-paper') as HTMLElement;
-    await waitForImages(paper);
-
-    const canvas = await html2canvas(paper, {
-      scale: 2,
-      useCORS: true,
-      allowTaint: true,
-      backgroundColor: '#ffffff',
-      logging: false,
-      windowWidth: 794,
-    });
-
-    const imgData = canvas.toDataURL('image/jpeg', 0.98);
-    const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-    const pageWidth = pdf.internal.pageSize.getWidth();
-    const pageHeight = pdf.internal.pageSize.getHeight();
-    const imgWidth = pageWidth;
-    const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-    let heightLeft = imgHeight;
-    let position = 0;
-    pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
-    heightLeft -= pageHeight;
-
-    while (heightLeft > 1) {
-      position = heightLeft - imgHeight;
-      pdf.addPage();
-      pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
-    }
-
-    const invoiceNo = invoice.invoiceNo || `INV-${Date.now()}`;
-    pdf.save(`${invoiceNo}.pdf`);
-  } finally {
-    host.remove();
+  function text(value: unknown, x: number, top: number, size = 10, color = ink, bold = false, align: 'left' | 'right' = 'left') {
+    pdf.setFont('helvetica', bold ? 'bold' : 'normal'); pdf.setFontSize(size); pdf.setTextColor(color);
+    pdf.text(String(value ?? ''), x, top, { align });
   }
+  function rule(top: number) { pdf.setDrawColor(lineColor); pdf.setLineWidth(.25); pdf.line(18, top, 192, top); }
+  function polygon(points: number[][], color: string) {
+    pdf.setFillColor(color);
+    pdf.lines(points.slice(1).map((point, i) => [point[0] - points[i][0], point[1] - points[i][1]]), points[0][0], points[0][1], [1, 1], 'F', true);
+  }
+  function placeLogo(x: number, top: number, maxWidth = 56, maxHeight = 16) {
+    const width = Math.min(maxWidth, maxHeight * logo!.width / logo!.height);
+    pdf.addImage(logo!.data, 'PNG', x, top, width, width * logo!.height / logo!.width);
+  }
+  function nextPage() {
+    pdf.addPage(); y = 29;
+    placeLogo(18, 10, 38, 10); text(reference, 192, 17, 9, muted, false, 'right'); rule(23);
+  }
+  function room(height: number) { if (y + height > 266) nextPage(); }
+  function wrapped(value: unknown, x: number, width: number, size = 10, color = ink, bold = false): number {
+    pdf.setFont('helvetica', bold ? 'bold' : 'normal'); pdf.setFontSize(size);
+    const lines = pdf.splitTextToSize(String(value ?? ''), width) as string[];
+    for (const part of lines) { room(5); text(part, x, y, size, color, bold); y += size * .45 + 1; }
+    return lines.length;
+  }
+  function field(label: string, value: unknown) {
+    room(17); text(label.toUpperCase(), 18, y, 7.5, muted, true); y += 5;
+    wrapped(value || 'Not provided', 18, 174, 9.5); y += 5;
+  }
+
+  // White logo area and contrasting angular navy/blue banner, in the brand palette.
+  polygon([[119, 0], [210, 0], [210, 45], [140, 45]], navy);
+  polygon([[113, 0], [117, 0], [138, 45], [134, 45]], primary);
+  polygon([[0, 0], [105, 0], [108, 3], [0, 3]], primary);
+  placeLogo(18, 16, 62, 17);
+  text('INVOICE', 192, 25, 25, '#ffffff', true, 'right');
+  text('SUBSCRIPTION BILLING', 192, 33, 7.5, '#d7e5ff', false, 'right');
+  y = 40;
+  wrapped(options.companyName || brand, 18, 94, 9, ink, true);
+  // Configured company contacts also appear on every page in the footer.
+  y = Math.max(y + 5, 56); rule(y); y += 8;
+
+  text('INVOICE NUMBER', 18, y, 7.5, muted, true);
+  text('ISSUED ON', 112, y, 7.5, muted, true); y += 6;
+  const top = y;
+  wrapped(reference, 18, 85, 11, ink, true);
+  const refBottom = y; y = top;
+  wrapped(invoiceDate(invoice.created_at), 112, 80, 10);
+  y = Math.max(y, refBottom) + 10;
+
+  const statusColor = paid ? '#167647' : '#965331';
+  pdf.setFillColor(paid ? '#edf8f1' : '#fff4e9'); pdf.roundedRect(18, y - 4, 174, 19, 2, 2, 'F');
+  text('PAYMENT STATUS', 23, y + 2, 7.5, statusColor, true);
+  text(status.toUpperCase(), 23, y + 8, 10, statusColor, true);
+  text(paid ? 'Payment received' : 'Payment not confirmed', 187, y + 5, 9, statusColor, false, 'right'); y += 24;
+
+  const billingTop = y;
+  text('BILLED TO', 18, y, 7.5, muted, true); y += 5;
+  wrapped(invoice.storeName || 'Store', 18, 80, 10, ink, true); y += 3;
+  if (invoice.storeEmail) { wrapped(invoice.storeEmail, 18, 80, 9, muted); }
+  if (invoice.storePhone) { wrapped(invoice.storePhone, 18, 80, 9, muted); }
+  if (invoice.storeSlug) { wrapped(`Store /${invoice.storeSlug}`, 18, 80, 9, muted); }
+  const billingBottom = y;
+  y = billingTop;
+  text('PAYMENT DETAILS', 112, y, 7.5, muted, true); y += 6;
+  if (invoice.type) wrapped(invoice.type, 112, 80, 9.5);
+  if (invoice.paymentId) wrapped(invoice.paymentId, 112, 80, 8.5, muted);
+  if (invoice.couponCode) wrapped('Coupon: ' + invoice.couponCode, 112, 80, 8.5, muted);
+  y = Math.max(y, billingBottom) + 8; room(40);
+  pdf.setFillColor(navy); pdf.rect(18, y - 5, 174, 12, 'F');
+  polygon([[18, y - 5], [24, y + 1], [18, y + 7]], primary);
+  text('DESCRIPTION', 28, y + 2, 8, '#ffffff', true);
+  text('QTY', 135, y + 2, 8, muted, true, 'right');
+  text('AMOUNT (INR)', 188, y + 2, 8, muted, true, 'right'); y += 15;
+  const itemTop = y;
+  text('1', 135, itemTop, 10, ink, false, 'right');
+  text(money(amount + discount), 188, itemTop, 10, ink, true, 'right');
+  wrapped(invoice.plan || invoice.packageName || 'Subscription plan', 22, 100, 11, ink, true);
+  if (invoice.packageLabel) wrapped(invoice.packageLabel, 22, 100, 9, muted);
+  y += 6; rule(y); y += 8;
+
+  room(discount > 0 ? 45 : 34);
+  text('Subtotal', 113, y, 9, muted); text(money(amount + discount), 188, y, 10, ink, false, 'right'); y += 9;
+  if (discount > 0) { text('Discount', 113, y, 9, muted); text(`- ${money(discount)}`, 188, y, 10, '#167647', false, 'right'); y += 9; }
+  polygon([[108, y - 4], [192, y - 4], [192, y + 11], [102, y + 11]], primary);
+  text(paid ? 'Total paid' : 'Invoice total', 113, y + 5, 10, '#ffffff', true);
+  text(money(amount), 188, y + 5, 12, '#ffffff', true, 'right'); y += 19;
+
+  if (invoice.note?.trim()) { room(20); rule(y); y += 7; field('Notes', invoice.note.trim()); }
+  room(18); y += 4; text('Thank you for choosing ' + brand + '.', 18, y, 10, ink, true); y += 6;
+  wrapped(paid ? 'Your payment has been recorded. Please retain this invoice for your records.' : 'This document does not confirm receipt of payment.', 18, 174, 9, muted);
+
+  const pages = pdf.getNumberOfPages();
+  for (let page = 1; page <= pages; page++) {
+    pdf.setPage(page);
+    polygon([[0, 277], [124, 277], [134, 297], [0, 297]], navy);
+    polygon([[129, 277], [210, 277], [210, 290], [135, 290]], primary);
+    text('THANK YOU FOR YOUR BUSINESS', 18, 284, 8, '#ffffff', true);
+    const contact = [options.supportEmail, options.supportPhone].filter(Boolean).join('   |   ');
+    pdf.setFontSize(7);
+    const contactLines = pdf.splitTextToSize(contact, 106) as string[];
+    contactLines.slice(0, 2).forEach((part, index) => text(part, 18, 289 + index * 3, 7, '#dbe6f8'));
+    text('Computer-generated invoice', 204, 282, 7, '#ffffff', false, 'right');
+    text('No signature required', 204, 286, 7, '#ffffff', false, 'right');
+    text('Page ' + page + ' / ' + pages, 192, 295, 7, muted, false, 'right');
+  }
+  return pdf;
 }
 
-function buildInvoiceHtml(
-  invoice: PlanInvoiceData,
-  options: PlanInvoiceOptions & { logoUrl?: string; primaryColor: string; siteName: string }
-): string {
-  const p = options.primaryColor;
-  const invoiceNo = esc(invoice.invoiceNo || `INV-${Date.now()}`);
-  const dateLabel = esc(formatInvoiceDate(invoice.created_at));
-  const storeName = esc(invoice.storeName || 'Store');
-  const planName = esc(invoice.plan || invoice.packageName || 'Subscription plan');
-  const planLabel = esc(invoice.packageLabel || invoice.type || 'Subscription');
-  const status = esc(invoice.status || 'Paid');
-  const isPaid = String(invoice.status || 'Paid').toLowerCase() === 'paid';
-
-  const amount = Number(invoice.amount || 0);
-  const discount = Number(invoice.discountAmt || 0);
-  const subtotal = amount + discount;
-
-  const logoBlock = options.logoUrl
-    ? `<img class="pi-logo" src="${escAttr(options.logoUrl)}" alt="${escAttr(options.siteName)}" crossorigin="anonymous" />`
-    : `<div class="pi-logo-fallback">${esc(options.siteName)}</div>`;
-
-  const couponRow =
-    discount > 0
-      ? `<tr>
-          <td>Discount${invoice.couponCode ? ` (${esc(invoice.couponCode)})` : ''}</td>
-          <td class="pi-right pi-green">− ${money(discount)}</td>
-        </tr>`
-      : '';
-
-  return `
-  <div class="pi-root">
-    <style>
-      .pi-root, .pi-root * { box-sizing: border-box; font-family: Inter, Segoe UI, Roboto, Helvetica, Arial, sans-serif; }
-      .pi-paper {
-        width: 794px;
-        background: #fff;
-        color: ${BRAND.ink};
-        position: relative;
-        overflow: hidden;
-      }
-      .pi-accent {
-        height: 8px;
-        background: linear-gradient(90deg, ${p}, ${BRAND.primaryDeep});
-      }
-      .pi-pad { padding: 36px 40px 28px; }
-      .pi-top {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        gap: 24px;
-        margin-bottom: 28px;
-      }
-      .pi-brand { min-width: 0; }
-      .pi-logo {
-        display: block;
-        height: auto;
-        width: auto;
-        max-height: 56px;
-        max-width: 220px;
-        object-fit: contain;
-        object-position: left center;
-        margin-bottom: 12px;
-      }
-      .pi-logo-fallback {
-        display: inline-flex;
-        align-items: center;
-        height: 48px;
-        padding: 0 16px;
-        border-radius: 10px;
-        background: ${p};
-        color: #fff;
-        font-size: 20px;
-        font-weight: 800;
-        letter-spacing: 0.04em;
-        margin-bottom: 12px;
-      }
-      .pi-issuer {
-        font-size: 12px;
-        color: ${BRAND.muted};
-        line-height: 1.5;
-      }
-      .pi-issuer strong {
-        display: block;
-        color: ${BRAND.ink};
-        font-size: 13px;
-        margin-bottom: 2px;
-      }
-      .pi-inv-box { text-align: right; }
-      .pi-inv-title {
-        margin: 0 0 4px;
-        font-size: 28px;
-        font-weight: 800;
-        letter-spacing: 0.08em;
-        color: ${p};
-      }
-      .pi-inv-sub {
-        margin: 0 0 14px;
-        font-size: 12px;
-        color: ${BRAND.muted};
-      }
-      .pi-meta {
-        display: inline-block;
-        text-align: left;
-        background: ${BRAND.soft};
-        border: 1px solid ${BRAND.line};
-        border-radius: 12px;
-        padding: 12px 14px;
-        min-width: 220px;
-      }
-      .pi-meta-row {
-        display: flex;
-        justify-content: space-between;
-        gap: 18px;
-        font-size: 12px;
-        margin-bottom: 6px;
-      }
-      .pi-meta-row:last-child { margin-bottom: 0; }
-      .pi-meta-row span { color: ${BRAND.muted}; }
-      .pi-meta-row strong { color: ${BRAND.ink}; font-weight: 700; }
-      .pi-parties {
-        width: 100%;
-        border-collapse: separate;
-        border-spacing: 12px 0;
-        margin: 0 0 22px -12px;
-      }
-      .pi-party {
-        width: 50%;
-        vertical-align: top;
-        background: #fff;
-        border: 1px solid ${BRAND.line};
-        border-radius: 12px;
-        padding: 14px 16px;
-      }
-      .pi-party-label {
-        display: block;
-        font-size: 11px;
-        font-weight: 700;
-        letter-spacing: 0.06em;
-        text-transform: uppercase;
-        color: ${BRAND.muted};
-        margin-bottom: 8px;
-      }
-      .pi-party strong {
-        display: block;
-        font-size: 15px;
-        margin-bottom: 4px;
-        color: ${BRAND.ink};
-      }
-      .pi-party div {
-        font-size: 12px;
-        color: ${BRAND.muted};
-        line-height: 1.45;
-      }
-      .pi-table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-bottom: 18px;
-      }
-      .pi-table th {
-        text-align: left;
-        font-size: 11px;
-        font-weight: 700;
-        letter-spacing: 0.05em;
-        text-transform: uppercase;
-        color: #fff;
-        background: ${p};
-        padding: 11px 12px;
-      }
-      .pi-table th:first-child { border-radius: 10px 0 0 0; }
-      .pi-table th:last-child { border-radius: 0 10px 0 0; text-align: right; }
-      .pi-table td {
-        padding: 14px 12px;
-        border-bottom: 1px solid ${BRAND.line};
-        font-size: 13px;
-        color: ${BRAND.ink};
-        vertical-align: top;
-      }
-      .pi-table td.pi-right { text-align: right; font-weight: 650; font-variant-numeric: tabular-nums; }
-      .pi-item-name { font-weight: 700; margin-bottom: 2px; }
-      .pi-item-sub { font-size: 12px; color: ${BRAND.muted}; }
-      .pi-bottom {
-        width: 100%;
-        border-collapse: separate;
-        border-spacing: 16px 0;
-        margin: 0 0 18px -16px;
-      }
-      .pi-notes {
-        width: 54%;
-        vertical-align: top;
-        padding: 4px 0;
-      }
-      .pi-notes-title {
-        font-size: 13px;
-        font-weight: 700;
-        margin-bottom: 6px;
-        color: ${BRAND.ink};
-      }
-      .pi-notes p {
-        margin: 0;
-        font-size: 12px;
-        color: ${BRAND.muted};
-        line-height: 1.5;
-      }
-      .pi-pill {
-        display: inline-flex;
-        margin-top: 10px;
-        padding: 4px 10px;
-        border-radius: 999px;
-        font-size: 11px;
-        font-weight: 700;
-        background: ${isPaid ? BRAND.okBg : '#fef2f2'};
-        color: ${isPaid ? BRAND.ok : '#b91c1c'};
-      }
-      .pi-totals {
-        width: 46%;
-        vertical-align: top;
-      }
-      .pi-totals-inner {
-        width: 100%;
-        border-collapse: collapse;
-        border: 1px solid ${BRAND.line};
-        border-radius: 12px;
-        overflow: hidden;
-      }
-      .pi-totals-inner td {
-        padding: 10px 12px;
-        font-size: 12px;
-        border-bottom: 1px solid ${BRAND.line};
-      }
-      .pi-totals-inner tr:last-child td { border-bottom: 0; }
-      .pi-totals-inner .pi-label { color: ${BRAND.muted}; }
-      .pi-totals-inner .pi-right { text-align: right; font-weight: 650; color: ${BRAND.ink}; }
-      .pi-green { color: ${BRAND.ok} !important; }
-      .pi-totals-inner tr.grand td {
-        background: ${p};
-        color: #fff;
-        font-weight: 800;
-        font-size: 13px;
-      }
-      .pi-totals-inner tr.grand .pi-label,
-      .pi-totals-inner tr.grand .pi-right { color: #fff; }
-      .pi-foot {
-        border-top: 1px solid ${BRAND.line};
-        padding-top: 16px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 12px;
-      }
-      .pi-foot-left {
-        font-size: 11px;
-        color: #9ca3af;
-        line-height: 1.45;
-      }
-      .pi-foot-brand {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        font-size: 12px;
-        font-weight: 700;
-        color: ${BRAND.ink};
-      }
-      .pi-foot-logo {
-        height: 22px;
-        width: auto;
-        max-width: 96px;
-        object-fit: contain;
-      }
-    </style>
-    <div class="pi-paper">
-      <div class="pi-accent"></div>
-      <div class="pi-pad">
-        <div class="pi-top">
-          <div class="pi-brand">
-            ${logoBlock}
-            <div class="pi-issuer">
-              <strong>${esc(options.siteName)}</strong>
-              Subscription billing
-              ${options.supportEmail ? `<div>${esc(options.supportEmail)}</div>` : ''}
-              ${options.supportPhone ? `<div>${esc(options.supportPhone)}</div>` : ''}
-            </div>
-          </div>
-          <div class="pi-inv-box">
-            <h1 class="pi-inv-title">INVOICE</h1>
-            <p class="pi-inv-sub">Official payment receipt</p>
-            <div class="pi-meta">
-              <div class="pi-meta-row"><span>Invoice</span><strong>${invoiceNo}</strong></div>
-              <div class="pi-meta-row"><span>Date</span><strong>${dateLabel}</strong></div>
-              <div class="pi-meta-row"><span>Status</span><strong>${status}</strong></div>
-            </div>
-          </div>
-        </div>
-
-        <table class="pi-parties">
-          <tr>
-            <td class="pi-party">
-              <span class="pi-party-label">Billed to</span>
-              <strong>${storeName}</strong>
-              ${invoice.storeEmail ? `<div>${esc(invoice.storeEmail)}</div>` : ''}
-              ${invoice.storePhone ? `<div>${esc(invoice.storePhone)}</div>` : ''}
-              ${invoice.storeSlug ? `<div>/${esc(invoice.storeSlug)}</div>` : ''}
-            </td>
-            <td class="pi-party">
-              <span class="pi-party-label">From</span>
-              <strong>${esc(options.siteName)}</strong>
-              <div>SaaS subscription platform</div>
-              ${options.supportEmail ? `<div>${esc(options.supportEmail)}</div>` : ''}
-            </td>
-          </tr>
-        </table>
-
-        <table class="pi-table">
-          <thead>
-            <tr>
-              <th>Description</th>
-              <th style="text-align:right">Amount</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>
-                <div class="pi-item-name">${planName}</div>
-                <div class="pi-item-sub">${planLabel}${invoice.paymentId ? ` · ${esc(invoice.paymentId)}` : ''}</div>
-              </td>
-              <td class="pi-right">${money(subtotal)}</td>
-            </tr>
-          </tbody>
-        </table>
-
-        <table class="pi-bottom">
-          <tr>
-            <td class="pi-notes">
-              <div class="pi-notes-title">Thank you for your business</div>
-              <p>This invoice confirms your ${esc(options.siteName)} subscription payment. Retain it for your records. Unused plan days stack when you renew early.</p>
-              <span class="pi-pill">${status}</span>
-              ${invoice.note ? `<p style="margin-top:10px">${esc(String(invoice.note).slice(0, 140))}</p>` : ''}
-            </td>
-            <td class="pi-totals">
-              <table class="pi-totals-inner">
-                <tr>
-                  <td class="pi-label">Subtotal</td>
-                  <td class="pi-right">${money(subtotal)}</td>
-                </tr>
-                ${couponRow}
-                <tr class="grand">
-                  <td class="pi-label">Total paid</td>
-                  <td class="pi-right">${money(amount)}</td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-        </table>
-
-        <div class="pi-foot">
-          <div class="pi-foot-left">
-            Computer-generated invoice · ${esc(options.siteName)}<br/>
-            No signature required
-          </div>
-          <div class="pi-foot-brand">
-            ${
-              options.logoUrl
-                ? `<img class="pi-foot-logo" src="${escAttr(options.logoUrl)}" alt="" crossorigin="anonymous" />`
-                : ''
-            }
-            <span>${esc(options.siteName)}</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>`;
+export async function downloadPlanInvoicePdf(invoice: PlanInvoiceData, options: PlanInvoiceOptions = {}): Promise<void> {
+  const pdf = await createPlanInvoicePdf(invoice, options);
+  const filename = (invoice.invoiceNo || 'Storsee-invoice').replace(/[^a-zA-Z0-9._-]/g, '-').slice(0, 100);
+  pdf.save(`${filename}.pdf`);
 }
 
-function money(n: number): string {
-  return `₹${Number(n || 0).toLocaleString('en-IN', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  })}`;
+function finiteAmount(value: unknown): number { const n = Number(value); return Number.isFinite(n) ? n : 0; }
+function money(value: number): string {
+  return `INR ${value.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+}
+function invoiceDate(value?: string): string {
+  if (!value) return 'Not available';
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? 'Not available' : date.toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' });
 }
 
-function formatInvoiceDate(value?: string): string {
-  if (!value) return new Date().toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric' });
-  const d = new Date(value);
-  if (isNaN(d.getTime())) return String(value).slice(0, 16);
-  return d.toLocaleString('en-IN', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
+/** Rasterize the configured logo once, preserving its aspect ratio and transparency. */
+async function loadLogo(url?: string): Promise<{data: string; width: number; height: number} | null> {
+  if (!url || typeof document === 'undefined') return null;
+  return new Promise(resolve => {
+    const image = new Image();
+    image.crossOrigin = 'anonymous';
+    const timer = setTimeout(() => resolve(null), 7000);
+    image.onload = () => {
+      clearTimeout(timer);
+      try {
+        if (!image.naturalWidth || !image.naturalHeight) return resolve(null);
+        const canvas = document.createElement('canvas');
+        const ratio = Math.min(1, 1000 / image.naturalWidth, 400 / image.naturalHeight);
+        canvas.width = Math.max(1, Math.round(image.naturalWidth * ratio));
+        canvas.height = Math.max(1, Math.round(image.naturalHeight * ratio));
+        canvas.getContext('2d')!.drawImage(image, 0, 0, canvas.width, canvas.height);
+        resolve({data: canvas.toDataURL('image/png'), width: image.naturalWidth, height: image.naturalHeight});
+      } catch { resolve(null); }
+    };
+    image.onerror = () => { clearTimeout(timer); resolve(null); };
+    try { image.src = new URL(url, document.baseURI).href; } catch { clearTimeout(timer); resolve(null); }
   });
-}
-
-function resolveAssetUrl(url?: string): string {
-  const raw = String(url || '').trim();
-  if (!raw) return '';
-  if (/^https?:\/\//i.test(raw) || raw.startsWith('data:')) return raw;
-  if (typeof window === 'undefined') return raw;
-  if (raw.startsWith('/')) return `${window.location.origin}${raw}`;
-  return `${window.location.origin}/${raw.replace(/^\.\//, '')}`;
-}
-
-/** Prefer embedding logo as data URL so PDF export is not blocked by CORS. */
-async function toDataUrlSafe(url?: string): Promise<string> {
-  const src = String(url || '').trim();
-  if (!src || src.startsWith('data:')) return src;
-  try {
-    const res = await fetch(src, { mode: 'cors', credentials: 'omit' });
-    if (!res.ok) return '';
-    const blob = await res.blob();
-    return await new Promise<string>((resolve) => {
-      const reader = new FileReader();
-      reader.onloadend = () => resolve(String(reader.result || ''));
-      reader.onerror = () => resolve('');
-      reader.readAsDataURL(blob);
-    });
-  } catch {
-    return '';
-  }
-}
-
-function waitForImages(root: HTMLElement): Promise<void> {
-  const imgs = Array.from(root.querySelectorAll('img'));
-  if (!imgs.length) return Promise.resolve();
-  return Promise.all(
-    imgs.map(
-      (img) =>
-        new Promise<void>((resolve) => {
-          if (img.complete) return resolve();
-          img.onload = () => resolve();
-          img.onerror = () => resolve();
-        })
-    )
-  ).then(() => undefined);
-}
-
-function esc(value: any): string {
-  return String(value ?? '')
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
-}
-
-function escAttr(value: any): string {
-  return esc(value).replace(/'/g, '&#39;');
 }

@@ -1,0 +1,59 @@
+﻿// Semantic action icons shared by merchant and backoffice panels.
+// Color the icon itself, so labels and existing light button surfaces stay intact.
+$action-controls: ':is(.table-single-btn, .tx-icon-button, .cat-action-btn, .ai-icon-btn, .em-icon-btn, .loc-icon-btn, .spf-icon-btn, .cos__icon-btn, .domain-icon-btn, .domain-row-action, .lsec-icon-btn, .icon-button, .coupon-ticket__btn, .plan-action-btn, .tpl-btn, .pr-btn, .code-copy, .coupon-ticket__copy, .domain-live__copy, .cr-secret__eye--copy, .te-announce-remove, .te-remove-btn, .spf-thumb-del, .blog-thumb-remove, .cover-remove, .pos-remove, .ship-rule__remove)';
+
+#{$action-controls} {
+  i:is(.fa-pen, .fa-pencil, .fa-pen-to-square, .fa-edit, .fa-pencil-alt) { color: #2563eb !important; }
+  i:is(.fa-eye, .fa-eye-slash, .fa-list, .fa-list-ul, .fa-circle-info, .fa-info-circle) { color: #475569 !important; }
+  i:is(.fa-download, .fa-file-arrow-down, .fa-file-download, .fa-print, .fa-file-invoice, .fa-receipt, .fa-wallet, .fa-chart-simple) { color: #0f766e !important; }
+  i:is(.fa-copy, .fa-clone, .fa-duplicate, .fa-palette, .fa-dice, .fa-users) { color: #7c3aed !important; }
+  i:is(.fa-check, .fa-check-double, .fa-circle-check, .fa-check-circle, .fa-plus, .fa-user-plus, .fa-floppy-disk, .fa-save, .fa-clipboard-check, .fa-play) { color: #15803d !important; }
+  i:is(.fa-rotate, .fa-rotate-right, .fa-rotate-left, .fa-arrows-rotate, .fa-sync, .fa-sync-alt, .fa-link, .fa-arrow-up-right-from-square, .fa-external-link-alt, .fa-paper-plane, .fa-magnifying-glass, .fa-shield-halved, .fa-at) { color: #2563eb !important; }
+  i:is(.fa-gear, .fa-cog, .fa-sliders, .fa-ellipsis, .fa-ellipsis-vertical, .fa-paperclip, .fa-table-columns, .fa-hashtag, .fa-bars, .fa-arrow-left, .fa-arrow-up, .fa-arrow-down, .fa-chevron-up, .fa-chevron-down) { color: #475569 !important; }
+  i:is(.fa-ban, .fa-link-slash, .fa-xmark, .fa-times, .fa-circle-xmark, .fa-right-from-bracket) { color: #b91c1c !important; }
+
+  i:is(.fa-star, .fa-pause) { color: #b45309 !important; }
+  i.fa-map-location-dot { color: #7c3aed !important; }
+
+  // Legacy table hover rules used saturated fills that hid colored icons.
+  &:hover, &:focus-visible { background-color: #f1f3f6 !important; background-image: none !important; }
+}
+
+// Destructive actions also occur outside tables: editor sections, cards and menus.
+:is(button, a, [role='button']) i:is(.fa-trash, .fa-trash-can, .fa-trash-alt, .fa-trash-o, .fa-trash-can-arrow-up),
+:is(button, a, [role='button']):is(.delete, .delete-action, .tx-delete, .cat-action-btn--delete, .pr-btn--delete, .tpl-btn--del) i,
+:is(button, a, [role='button'])[aria-label*='delete' i] i {
+  color: #dc2626 !important;
+}
+
+// Keep explicitly solid red delete buttons readable with their red icons too.
+:is(.site-btn.red-color, .btn-danger):has(i:is(.fa-trash, .fa-trash-can, .fa-trash-alt)) {
+  background: #fff1f2 !important;
+  border-color: #fecdd3 !important;
+  color: #b91c1c !important;
+}
+
+
+// Table actions keep their semantic color in idle, hover and focus states.
+.table-single-btn.table-single-btn {
+  --table-action-color: #2563eb;
+  &.green { --table-action-color: #0f766e; }
+  &.yellow { --table-action-color: #b77910; }
+  &:has(i:is(.fa-eye,.fa-eye-slash,.fa-circle-info,.fa-info-circle,.fa-list,.fa-list-ul)) { --table-action-color: #7c3aed; }
+  &:has(i:is(.fa-copy,.fa-clone,.fa-users,.fa-user,.fa-palette)) { --table-action-color: #7c3aed; }
+  &:has(i:is(.fa-wallet,.fa-download,.fa-file-arrow-down,.fa-file-download,.fa-receipt,.fa-print,.fa-file-invoice,.fa-file-invoice-dollar)) { --table-action-color: #0f766e; }
+  &:has(i:is(.fa-pencil,.fa-pen,.fa-edit,.fa-pen-to-square,.fa-pencil-alt,.fa-link,.fa-globe,.fa-external-link,.fa-external-link-alt,.fa-arrow-up-right-from-square,.fa-rotate,.fa-rotate-right)) { --table-action-color: #2563eb; }
+  &:has(i:is(.fa-check,.fa-circle-check,.fa-check-circle,.fa-plus,.fa-play,.fa-circle-play,.fa-toggle-on,.fa-user-check)) { --table-action-color: #15803d; }
+  &:has(i:is(.fa-star,.fa-pause,.fa-clock,.fa-history,.fa-clock-rotate-left,.fa-flag)) { --table-action-color: #b77910; }
+  &.red,&.delete,&.delete-action,
+  &:has(i:is(.fa-trash,.fa-trash-can,.fa-trash-alt,.fa-trash-o,.fa-trash-can-arrow-up,.fa-ban,.fa-xmark,.fa-times,.fa-circle-xmark,.fa-toggle-off)) { --table-action-color: #dc2626; }
+  &, &:hover, &:focus-visible, &:active {
+    color: var(--table-action-color) !important;
+    background: #f5f7fa !important;
+    border-color: #e7ebf1;
+  }
+  &:hover, &:focus-visible { background: #edf1f7 !important; }
+  i, span > i, svg { color: var(--table-action-color) !important; }
+  i::before, i::after { color: inherit !important; }
+  &:disabled { cursor: not-allowed; }
+}

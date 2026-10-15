@@ -12,7 +12,7 @@ export class TransactionService {
         return this.http.get<any>(urlConstant.TransactionsAPI.getTransactions);
     }
     getAllTransactionsByPage(page, limit, searchTxt) {
-        return this.http.get<any>(urlConstant.TransactionsAPI.getAllTransactionsByPage+`?limit=${limit}&page=${page}&searchtxt=${searchTxt}`);
+        return this.http.get<any>(urlConstant.TransactionsAPI.getAllTransactionsByPage, { params: { limit, page, searchtxt: searchTxt } });
     }
     getTransactionByStoreId(id) {
         return this.http.post<any>(urlConstant.TransactionsAPI.getTransactionByStoreId,{id});

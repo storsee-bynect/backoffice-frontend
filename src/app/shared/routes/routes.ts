@@ -28,7 +28,6 @@ import { CredentialsComponent } from "../../components/credentials/credentials.c
 import { LocationsComponent } from "../../components/locations/locations.component";
 import { BlogsComponent } from "../../components/blogs/blogs.component";
 export const routing: Routes = [
-    {path:'blog-setting',loadComponent:()=>import('../../components/blog-setting/blog-setting.component').then(m=>m.BlogSettingComponent)},
     { path: 'ai-settings', loadComponent: () => import('../../components/ai-settings/ai-settings.component').then(m => m.AiSettingsComponent) },
     { path: 'fonts', loadComponent: () => import('../../components/fonts/fonts.component').then(m => m.FontsComponent) },
     {

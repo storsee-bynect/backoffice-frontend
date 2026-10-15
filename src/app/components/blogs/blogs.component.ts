@@ -1,5 +1,4 @@
-import { Component, OnDestroy } from '@angular/core';
-import {StoreAppItem, StoreAppsService} from '../blog-setting/blog-setting.service';
+import { Component } from '@angular/core';
 import { finalize } from 'rxjs/operators';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { SharedService } from '../../shared/services/shared.service';
@@ -13,8 +12,7 @@ import { BlogsService } from './blogs.service';
   templateUrl: './blogs.component.html',
   styleUrl: './blogs.component.scss',
 })
-export class BlogsComponent implements OnDestroy {
-  publishingApps:StoreAppItem[]=[]; postingKey=''; private poll?:ReturnType<typeof setInterval>;
+export class BlogsComponent {
   dataList: any[] = [];
   searchTxt = '';
   page = 1;
@@ -31,30 +29,11 @@ export class BlogsComponent implements OnDestroy {
   constructor(
     public sharedservice: SharedService,
     private blogsService: BlogsService,
-    private modalService: NgbModal,
-    private appsService:StoreAppsService
+    private modalService: NgbModal
   ) {}
 
   ngOnInit(): void {
     this.getDataList();
-    this.loadPublishingApps();
-    this.poll=setInterval(()=>{if(this.dataList.some(b=>(b.externalPosts || []).some((p:any)=>['pending','publishing'].includes(p.status))))this.refreshPublishingStatuses();},6000);
-  }
-
-  ngOnDestroy(){if(this.poll)clearInterval(this.poll);}
-  private loadPublishingApps(){this.appsService.list().subscribe({next:r=>this.publishingApps=r.data.filter(a=>a.code === 'blogger'),error:()=>{this.publishingApps=[];}});}
-  get hasActivePublisher(){return this.publishingApps.some(app=>app.enabled && app.connection?.connected);}
-  private refreshPublishingStatuses(){if(this.isListLoading)return;this.blogsService.getAllByPage(this.page,this.limit,this.searchTxt).subscribe({next:r=>{for(const blog of this.dataList){const updated=r.data?.find((b:any)=>b.id===blog.id);if(updated)blog.externalPosts=updated.externalPosts;}this.loadPublishingApps();},error:()=>{}});}
-  postState(blog:any, code:string):any{return (blog.externalPosts || []).find((p:any)=>p.provider===code);}
-  canPost(blog:any,app:StoreAppItem):boolean {const state=this.postState(blog,app.code);return this.sharedservice.isPageUpdate && Number(blog.status)===1 && app.enabled && !!app.connection?.connected && (app.settings.postingMode==='manual' || state?.status==='failed') && (!state || state.status==='failed');}
-  post(blog:any,app:StoreAppItem){
-    if(this.postingKey || !this.canPost(blog,app))return;
-    this.postingKey=blog.id+':'+app.code;
-    this.appsService.publish(app.code,blog.id).pipe(finalize(()=>this.postingKey='')).subscribe({next:r=>{
-      blog.externalPosts=(blog.externalPosts || []).filter((p:any)=>p.provider!==app.code);if(r.data)blog.externalPosts.push(r.data);
-      this.sharedservice.showAlert(r.data?.status==='succeeded' ? 1 : 2,r.data?.status==='succeeded' ? `Posted to ${app.name} successfully` : r.data?.error || `Posting to ${app.name} is in progress`);
-      this.loadPublishingApps();
-    },error:e=>this.sharedservice.showAlert(2,e?.error?.error || 'Could not post this blog.')});
   }
 
 
