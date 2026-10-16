@@ -32,6 +32,7 @@ export class StoreService {
     updateStoreLimits(storeId, data: { productLimit: number; maxOrders: number }) {
         return this.http.put<any>(urlConstant.StoresAPI.updateStoreLimits + storeId, data);
     }
+    allAbuseReports(page:number,limit:number,search:string,status:string) { return this.http.get<any>(urlConstant.StoresAPI.updateStore.replace('updateStore/', 'abuse-reports'),{params:{page,limit,search,status}}); }
     abuseReports(id: number) { return this.http.get<any>(urlConstant.StoresAPI.updateStore.replace('updateStore/', 'abuse-reports/') + id); }
 
     setSuspension(id: number, suspended: boolean, reason: string) {
