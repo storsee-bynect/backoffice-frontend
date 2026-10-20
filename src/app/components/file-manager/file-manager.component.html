@@ -54,16 +54,18 @@
                 }@else {
                     <div class="no-data-found-main">
                         <div class="no-data-found-img">
-                            <img src="../../../assets/img/no-data.png" alt="">
+                            <img src="assets/img/empty-state.svg" alt="">
                         </div>
-                        <div class="no-data-found-ttl">No Files Found!</div>
-                        <div class="no-data-found-ctx">
+                        <span class="no-data-found-eyebrow">Everything in one place</span>
+<h2 class="no-data-found-ttl">No Files Found!</h2>
+                        <p class="no-data-found-ctx">
                             You don't currently have any Files. Upload a new File by clicking the button below.
-                        </div>
+                        </p>
                         @if(sharedservice.isPageInsert){
                         <button class="site-btn primary-color" (click)="UploadFile()"><span class="site-btn-icon"><i class="fa-solid fa-upload"></i></span> Upload</button>
                         }
-                    </div>
+                    <div class="no-data-found-features"><span>Stay organised</span><span>Manage with ease</span><span>Everything in sync</span></div>
+</div>
                 }
             </div>
         }

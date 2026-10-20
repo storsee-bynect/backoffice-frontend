@@ -31,7 +31,8 @@ export class SharedService {
         if(sidebarEncoded){
         let decodedJSON = atob(sidebarEncoded);    
         if(decodedJSON){
-            let parsedJSON = JSON.parse(String(decodedJSON));
+            let parsedJSON;
+            try { parsedJSON=JSON.parse(decodeURIComponent(escape(decodedJSON))); } catch { parsedJSON=JSON.parse(decodedJSON); }
             this.sidebarPages = parsedJSON;            
         }else{
             this.logout();

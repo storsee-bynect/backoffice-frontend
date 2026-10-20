@@ -1,3 +1,4 @@
+import { CustomersDirectoryComponent } from '../../components/customers-directory/customers-directory.component';
 import { Routes } from "@angular/router";
 import { IndustriesComponent } from '../../components/industries/industries.component';
 import { DashboardComponent } from "../../components/dashboard/dashboard.component";
@@ -110,6 +111,9 @@ export const routing: Routes = [
         path: 'leads',
         component: LeadsComponent
     },    {
+        path: 'customers-directory',
+        component: CustomersDirectoryComponent
+    },{
         path: 'shipping',
         component: ShippingManagerComponent
     },{
@@ -121,6 +125,9 @@ export const routing: Routes = [
     },{
         path: 'credentials',
         component: CredentialsComponent
+    },{
+        path:'billing-settings',
+        loadComponent:()=>import('../../components/billing-settings/billing-settings.component').then(m=>m.BillingSettingsComponent)
     },{
         path: 'store-apps',
         loadComponent: () => import('../../components/store-apps/store-apps.component').then(m => m.StoreAppsComponent)

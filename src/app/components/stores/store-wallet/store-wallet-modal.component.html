@@ -35,7 +35,7 @@
           <div class="sw-row">
             <label>
               Amount (₹)
-              <input type="number" min="1" [(ngModel)]="depositAmount" />
+              <input type="number" step="0.01" [min]="billing.minDeposit" [max]="billing.maxDeposit" [(ngModel)]="depositAmount" /><small>INR {{billing.minDeposit}} - {{billing.maxDeposit}}</small>
             </label>
             <label>
               Bucket

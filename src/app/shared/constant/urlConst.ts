@@ -5,6 +5,7 @@ export let urlConstant: ReturnType<typeof buildUrlConstant>;
 function buildUrlConstant() {
   const base = environment.APIUrl;
   return {
+    CustomerDirectoryAPI: { base: base + 'storecustomer/admin/directory' },
     LoginAPI: {
       loginAdministrator: base + 'users/loginUser',
       loginStoreadmin: base + 'storeadmin/loginStoreadmin',

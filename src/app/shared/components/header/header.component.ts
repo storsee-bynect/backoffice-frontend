@@ -42,6 +42,7 @@ export class HeaderComponent implements OnInit {
     { label: 'Policies',         url: '/policies',           group: 'Settings' },
     { label: 'Payment Setting',  url: '/payment-setting',    group: 'Settings' },
     { label: 'Notification Settings', url: '/notification-settings', group: 'Settings' },
+    { label: 'Wallet & SMS Charges', url: '/billing-settings', group: 'Settings' },
     { label: 'Web Push Campaigns', url: '/push-notifications', group: 'Marketing' },
     { label: 'App Push Campaigns', url: '/app-notifications', group: 'Marketing' },
     { label: 'Store Users',      url: '/store-users',        group: 'Tools' },

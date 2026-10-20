@@ -26,6 +26,8 @@ export class ShippingService {
     return this.http.post<any>(this.base + 'providers/reorder', { orderedProviderIds });
   }
 
+  getCredentials(id: number) { return this.http.get<any>(this.base + 'providers/' + id + '/credentials'); }
+
   saveCredentials(id: number, secrets: any) {
     return this.http.post<any>(this.base + 'providers/' + id + '/credentials', { secrets });
   }

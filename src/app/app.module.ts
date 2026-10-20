@@ -1,3 +1,4 @@
+import { CustomersDirectoryComponent } from './components/customers-directory/customers-directory.component';
 import { AddUpdateTicketComponent } from './components/tickets/add-update-ticket/add-update-ticket.component';
 import { PaginationRangeDirective } from './shared/directives/pagination-range.directive';
 import { APP_INITIALIZER, NgModule } from '@angular/core';
@@ -93,6 +94,7 @@ import { AddUpdateBlogComponent } from './components/blogs/add-update-blog/add-u
 
 @NgModule({
   declarations: [
+    CustomersDirectoryComponent,
     AppComponent,
     IndustriesComponent,
     HeaderComponent,

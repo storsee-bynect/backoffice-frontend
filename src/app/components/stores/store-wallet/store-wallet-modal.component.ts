@@ -13,6 +13,7 @@ export class StoreWalletModalComponent implements OnInit {
 
   readonly currencySymbol = '₹';
 
+  billing={minDeposit:1,maxDeposit:500000};
   prepaidBalance = 0;
   withdrawableBalance = 0;
   totalBalance = 0;
@@ -66,6 +67,7 @@ export class StoreWalletModalComponent implements OnInit {
     this.walletService.getWallet(this.storeId).subscribe({
       next: (res) => {
         this.applyBalances(res?.data || {});
+        this.billing=res?.data?.billing||this.billing;
         this.loading = false;
         this.loadLedger(1);
         this.loadWithdrawRequests(1);
@@ -114,7 +116,7 @@ export class StoreWalletModalComponent implements OnInit {
 
   doDeposit(): void {
     const amount = Number(this.depositAmount);
-    if (!amount || amount < 1) {
+    if (!amount || amount < this.billing.minDeposit || amount > this.billing.maxDeposit) {
       this.sharedservice.showAlert(2, 'Enter deposit amount ≥ ₹1');
       return;
     }

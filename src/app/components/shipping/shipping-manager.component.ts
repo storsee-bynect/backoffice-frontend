@@ -15,7 +15,7 @@ type TabKey =
   | 'remittances';
 
 const SHIPROCKET_LOGO =
-  'https://sr-website-01.shiprocket.in/sr-website/shiprocket_logo-1-TWLqUy.svg';
+  'assets/img/shipping/shiprocket-logo.svg';
 
 const PLATFORM_PROVIDER = 'shiprocket';
 
@@ -69,6 +69,9 @@ export class ShippingManagerComponent implements OnInit {
 
   credForms: Record<number, { email: string; password: string }> = {};
   showPassword: Record<number, boolean> = {};
+  loadingCredentials: Record<number, boolean> = {};
+  loadedCredentials: Record<number, boolean> = {};
+  credentialErrors: Record<number, string> = {};
   testingId: number | null = null;
   savingCredId: number | null = null;
 
@@ -208,7 +211,7 @@ export class ShippingManagerComponent implements OnInit {
     const next = !this.storseeEnabled;
     const msg = next
       ? 'Enable Storsee Shipping for all stores?'
-      : 'Disable Storsee Shipping? All stores will be switched to their own shipping providers and must connect Shiprocket/NimbusPost.';
+      : 'Disable Storsee Shipping? All stores will be switched to their own shipping providers and must connect Shiprocket.';
     if (!confirm(msg)) return;
 
     this.isTogglingStorsee = true;
@@ -232,6 +235,7 @@ export class ShippingManagerComponent implements OnInit {
   private initCredForms(list: any[]) {
     for (const p of list) {
       if (!this.credForms[p.id]) this.credForms[p.id] = { email: '', password: '' };
+      if(p.hasCredentials && !this.loadedCredentials[p.id] && !this.loadingCredentials[p.id] && !this.credentialErrors[p.id]) this.loadSavedCredentials(p.id);
     }
   }
 
@@ -306,11 +310,18 @@ export class ShippingManagerComponent implements OnInit {
     });
   }
 
+  loadSavedCredentials(id: number) {
+    if(this.loadingCredentials[id])return;
+    this.loadingCredentials[id]=true;this.credentialErrors[id]='';this.showPassword[id]=false;
+    this.shipping.getCredentials(id).pipe(finalize(()=>this.loadingCredentials[id]=false)).subscribe({next:res=>{this.credForms[id]={email:res?.data?.email||'',password:res?.data?.password||''};this.loadedCredentials[id]=true;},error:()=>this.credentialErrors[id]='Saved credentials could not be loaded. Retry or enter new credentials to replace them.'});
+  }
+
   saveCredentials(p: any) {
+    if(this.loadingCredentials[p.id] || this.savingCredId===p.id)return;
     const form = this.credForm(p.id);
     const email = String(form.email || '').trim();
-    const password = String(form.password || '').trim();
-    if (!email || !password) {
+    const password = String(form.password || '');
+    if (!email || !password.trim()) {
       this.sharedservice.showAlert(2, 'Enter Shiprocket API email and password');
       return;
     }
@@ -321,7 +332,7 @@ export class ShippingManagerComponent implements OnInit {
       .subscribe({
         next: () => {
           this.sharedservice.showAlert(1, 'Credentials saved — Shiprocket enabled');
-          form.password = '';
+          form.email = email; form.password = password; this.showPassword[p.id] = false; this.loadedCredentials[p.id] = true; this.credentialErrors[p.id] = '';
           this.loadProviders();
           this.loadOverview();
         },

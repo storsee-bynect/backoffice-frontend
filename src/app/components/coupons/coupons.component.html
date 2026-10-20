@@ -81,20 +81,21 @@
     <div class="no-data-found-main">
         <div class="no-data-found-img">
             @if(isTechnicalIssue){
-                <img src="../../../assets/img/technical-issue.png" alt="">
+                <img src="assets/img/empty-state-error.svg" alt="">
             }@else {
-                <img src="../../../assets/img/no-data.png" alt="">
+                <img src="assets/img/empty-state.svg" alt="">
             }
         </div>
         @if(isTechnicalIssue){
-            <div class="no-data-found-ttl">We Found Some Technical Issues in Our System</div>
+            <span class="no-data-found-eyebrow">Connection interrupted</span>
+<h2 class="no-data-found-ttl">We Found Some Technical Issues in Our System</h2>
         }@else {
             <div class="no-data-found-ttl">No Record Found!</div>
         }
         @if(isTechnicalIssue){
-            <div class="no-data-found-ctx">
+            <p class="no-data-found-ctx">
                 Currently we're working on the Issue please try again later.
-            </div>
+            </p>
             <button class="site-btn primary-color" routerLink="/dashboard">Go to Dashboard</button>
         }@else {
             <div class="no-data-found-ctx">
@@ -108,5 +109,6 @@
                     class="site-btn-icon"><i class="fa-solid fa-plus"></i></span> Create</button>
             }
         }
-    </div>
+    <div class="no-data-found-features"><span>Secure access</span><span>Data stays safe</span><span>Try again anytime</span></div>
+</div>
 }
