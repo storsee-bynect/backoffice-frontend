@@ -56,11 +56,11 @@
             </div>
 
             <label class="tpl-upload" [class.tpl-upload--has-file]="!!dataReqModel.thumbnail">
-              <input type="file" accept="image/png,image/jpeg,image/jpg,image/webp" (change)="uploadImage($event)" hidden />
+              <input type="file" accept="image/png,image/jpeg,image/jpg,image/webp" [disabled]="isUploading || isSaving" (change)="uploadImage($event)" hidden />
               <span class="tpl-upload__icon"><i class="fa-solid fa-cloud-arrow-up"></i></span>
               <span class="tpl-upload__text">
-                <strong>{{ dataReqModel.thumbnail ? 'Replace thumbnail' : 'Upload thumbnail' }}</strong>
-                <small>PNG, JPG or WEBP · 16:9 recommended</small>
+                <strong>{{ isUploading ? 'Uploading & compressing…' : (dataReqModel.thumbnail ? 'Replace thumbnail' : 'Upload thumbnail') }}</strong>
+                <small>PNG, JPG or WEBP · Automatically compressed · 16:9 recommended</small>
               </span>
             </label>
           </section>
@@ -186,7 +186,7 @@
 
     <footer class="tpl-modal__footer">
       <button type="button" class="site-btn grey-color" (click)="activeModal.close()" [disabled]="isSaving">Cancel</button>
-      <button type="button" class="site-btn primary-color" (click)="validateData()" [appBtnLoading]="isSaving" [disabled]="isSaving">
+      <button type="button" class="site-btn primary-color" (click)="validateData()" [appBtnLoading]="isSaving" [disabled]="isSaving || isUploading">
         <span class="site-btn-icon"><i class="fa-solid fa-check"></i></span>
         {{ isEdit ? 'Save changes' : 'Create template' }}
       </button>

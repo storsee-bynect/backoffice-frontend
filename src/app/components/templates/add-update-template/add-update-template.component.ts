@@ -5,6 +5,7 @@ import { SharedService } from '../../../shared/services/shared.service';
 import { TemplateService } from '../templates.service';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ThemeCategoryService } from '../../theme-category/theme-category.service';
+import { FileUploadService } from '../../../shared/components/file-upload/file-upload.service';
 
 @Component({
   selector: 'app-add-update-template',
@@ -18,12 +19,14 @@ export class AddUpdateTemplateComponent implements OnInit {
   dataReqModel: TemplateReqModel = new TemplateReqModel();
   isSystemDefault = false;
   isSaving = false;
+  isUploading = false;
 
   constructor(
     public sharedservice: SharedService,
     private templateservice: TemplateService,
     private themecategoryservice: ThemeCategoryService,
-    public activeModal: NgbActiveModal
+    public activeModal: NgbActiveModal,
+    private fileUploadService: FileUploadService
   ) {}
 
   ngOnInit(): void {
@@ -60,6 +63,7 @@ export class AddUpdateTemplateComponent implements OnInit {
   }
 
   validateData() {
+    if(this.isUploading || this.isSaving)return;
     let errTxt = '';
     if (!this.dataReqModel.name) errTxt += 'Enter Name <br/>';
     if (!this.dataReqModel.uniqueCode) errTxt += 'Enter Unique Code <br/>';
@@ -113,16 +117,24 @@ export class AddUpdateTemplateComponent implements OnInit {
   }
 
   uploadImage(event) {
-    const reader = new FileReader();
-    const imagePath = event.target.files[0];
+    const input=event.target as HTMLInputElement;
+    const imagePath = input.files?.[0];
     if (!imagePath) return;
+    input.value='';
+    if(this.isUploading || this.isSaving)return;
     if (!['image/png', 'image/jpeg', 'image/jpg', 'image/webp'].includes(imagePath.type)) {
       this.sharedservice.showAlert(2, 'Upload PNG/JPG/WEBP');
       return;
     }
-    reader.readAsDataURL(imagePath);
-    reader.onload = () => {
-      this.dataReqModel.thumbnail = String(reader.result);
-    };
+    if(imagePath.size>25*1024*1024){this.sharedservice.showAlert(2,'Image must be smaller than 25 MB');return;}
+    this.isUploading=true;
+    this.fileUploadService.uploadFile(imagePath,'templates/thumbnails').pipe(finalize(()=>this.isUploading=false)).subscribe({
+      next:(res:any)=>{
+        const url=res?.file?.url;
+        if(typeof url!=='string' || !/^https?:\/\//i.test(url)){this.sharedservice.showAlert(2,'Upload did not return an image URL. Please try again.');return;}
+        this.dataReqModel.thumbnail=url;
+      },
+      error:(err)=>this.sharedservice.showAlert(2,err?.error?.message || 'Image upload failed. Please try again.')
+    });
   }
 }
