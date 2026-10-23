@@ -26,6 +26,7 @@ export class HeaderComponent implements OnInit {
   private readonly searchIndex: HeaderSearchItem[] = [
     { label: 'Dashboard',        url: '/dashboard',          group: 'Main' },
     { label: 'Stores',           url: '/stores',             group: 'Stores' },
+    { label: 'Reports',          url: '/reports',            group: 'Stores' },
     { label: 'Users',            url: '/users',              group: 'Admin' },
     { label: 'Roles',            url: '/roles',              group: 'Admin' },
     { label: 'Packages',         url: '/packages',           group: 'Monetisation' },

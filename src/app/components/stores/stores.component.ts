@@ -1,3 +1,4 @@
+import { StoreReportsComponent } from '../store-reports/store-reports.component';
 import { StoreDomainsModalComponent } from './store-domains-modal/store-domains-modal.component';
 import { Component, TemplateRef } from '@angular/core';
 import { finalize } from 'rxjs/operators';
@@ -21,13 +22,12 @@ import { formatPhoneDisplay } from '../../shared/constant/country-codes';
   styleUrl: './stores.component.scss'
 })
 export class StoresComponent {
-  reportsRows:any[]=[]; reportsPage=1; reportsLimit=10; reportsTotal=0; reportsSearch=''; reportsStatus=''; reportsLoading=false; reportsFailed=false;
-  get reportsPages(){const total=Math.ceil(this.reportsTotal/this.reportsLimit);const start=Math.max(1,Math.min(this.reportsPage-2,total-4));return Array.from({length:Math.min(5,total)},(_,i)=>start+i);}
-  get reportsLastPage(){return Math.max(1,Math.ceil(this.reportsTotal/this.reportsLimit));}
-  get reportsRange(){return this.reportsTotal?((this.reportsPage-1)*this.reportsLimit+1)+'-'+Math.min(this.reportsPage*this.reportsLimit,this.reportsTotal)+' / '+this.reportsTotal:'0-0 / 0';}
-  openReports(template:TemplateRef<any>){this.reportsPage=1;this.reportsSearch='';this.reportsStatus='';this.loadReports();this.modalService.open(template,{size:'xl',centered:true,scrollable:true});}
-  loadReports(reset=false){if(this.reportsLoading)return;if(reset)this.reportsPage=1;this.reportsLoading=true;this.reportsFailed=false;this.storeservice.allAbuseReports(this.reportsPage,this.reportsLimit,this.reportsSearch,this.reportsStatus).pipe(finalize(()=>this.reportsLoading=false)).subscribe({next:r=>{this.reportsRows=r.data||[];this.reportsTotal=r.total||0;},error:()=>this.reportsFailed=true});}
-  reportsGo(page:number){if(this.reportsLoading||page<1||page>this.reportsLastPage)return;this.reportsPage=page;this.loadReports();}
+  openReports(store: any): void {
+    const ref = this.modalService.open(StoreReportsComponent, {size: 'xl', centered: true, scrollable: true});
+    ref.componentInstance.storeId = Number(store.id);
+    ref.componentInstance.storeName = store.name;
+    ref.componentInstance.modalMode = true;
+  }
   dataList: any = [];
   suspensionReports: any[] = [];
   suspensionReportsLoading = false;

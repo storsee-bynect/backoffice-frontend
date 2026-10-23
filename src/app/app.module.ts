@@ -56,6 +56,7 @@ import { PackagesComponent } from './components/packages/packages.component';
 import { AddUpdatePackageComponent } from './components/packages/add-update-package/add-update-package.component';
 import { PackageBenefitsComponent } from './components/packages/package-benefits/package-benefits.component';
 import { StoresComponent } from './components/stores/stores.component';
+import { StoreReportsComponent } from './components/store-reports/store-reports.component';
 import { AddUpdateStoreComponent } from './components/stores/add-update-store/add-update-store.component';
 import { ContactLeadsComponent } from './components/contact-leads/contact-leads.component';
 import { ViewStoreDetailComponent } from './components/stores/view-store-detail/view-store-detail.component';
@@ -130,6 +131,7 @@ import { AddUpdateBlogComponent } from './components/blogs/add-update-blog/add-u
     AddUpdatePackageComponent,
     PackageBenefitsComponent,
     StoresComponent,
+    StoreReportsComponent,
     AddUpdateStoreComponent,
     ContactLeadsComponent,
     ViewStoreDetailComponent,

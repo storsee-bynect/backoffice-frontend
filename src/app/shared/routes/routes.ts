@@ -1,4 +1,5 @@
 import { CustomersDirectoryComponent } from '../../components/customers-directory/customers-directory.component';
+import { StoreReportsComponent } from '../../components/store-reports/store-reports.component';
 import { Routes } from "@angular/router";
 import { IndustriesComponent } from '../../components/industries/industries.component';
 import { DashboardComponent } from "../../components/dashboard/dashboard.component";
@@ -77,6 +78,9 @@ export const routing: Routes = [
     },{
         path: 'stores',
         component: StoresComponent
+    },{
+        path: 'reports',
+        component: StoreReportsComponent
     },{
         path: 'industries',
         component: IndustriesComponent
